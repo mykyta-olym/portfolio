@@ -97,4 +97,16 @@ import showcase from '@/assets/renders/showcase.webp';
     transform: scale(0.8);
     border-radius: 4px;
   }
+
+  @media (max-width: 767px) {
+    .showcase__frame :global(.showcase__image) {
+      /* Keep the complete laptop screen inside the portrait frame. Only the empty
+         sides of the landscape artwork extend beyond it. */
+      inset: 15% auto 0 -45%;
+      width: 160%;
+      max-width: none;
+      height: 85%;
+      object-fit: contain;
+    }
+  }
 </style>
