@@ -1,0 +1,11 @@
+dist/
+.astro/
+node_modules/
+.media-cache/
+test-results/
+playwright-report/
+package-lock.json
+public/
+*.webp
+*.png
+*.jpg
