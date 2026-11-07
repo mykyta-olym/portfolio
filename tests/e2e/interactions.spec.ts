@@ -1,0 +1,88 @@
+import { expect, test } from '@playwright/test';
+import { waitForStage } from './helpers';
+
+test('FAQ items open and close', async ({ page }) => {
+  await page.goto('work/');
+  await waitForStage(page);
+  const item = page.locator('details.faq__item').first();
+  const summary = item.locator('summary');
+  await summary.scrollIntoViewIfNeeded();
+  await summary.click();
+  await expect(item).toHaveAttribute('open', '');
+  await expect(item.locator('[data-faq-body]')).toBeVisible();
+  await summary.click();
+  await expect(item).not.toHaveAttribute('open', '');
+});
+
+test('case study tabs switch with the mouse and the arrow keys', async ({ page }) => {
+  await page.goto('work/relayq/');
+  await waitForStage(page);
+  const tabs = page.getByRole('tab');
+  await expect(tabs).toHaveCount(3);
+  await expect(page.getByRole('tabpanel')).toHaveCount(1);
+  await tabs.nth(1).click();
+  await expect(tabs.nth(1)).toHaveAttribute('aria-selected', 'true');
+  await expect(page.getByRole('tabpanel')).toContainText('Lua script');
+  await tabs.nth(1).focus();
+  await page.keyboard.press('ArrowRight');
+  await expect(tabs.nth(2)).toBeFocused();
+  await expect(page.getByRole('tabpanel')).toContainText('mutants');
+  await page.keyboard.press('Home');
+  await expect(tabs.nth(0)).toHaveAttribute('aria-selected', 'true');
+});
+
+test('the email address can be copied on the contact page', async ({ page, context, browserName }) => {
+  test.skip(browserName !== 'chromium', 'clipboard permissions are Chromium only');
+  await context.grantPermissions(['clipboard-read', 'clipboard-write']);
+  await page.goto('contact/');
+  await waitForStage(page);
+  const button = page.getByRole('button', { name: 'Copy the email address' });
+  await button.click();
+  await expect(button).toHaveClass(/is-copied/);
+  await expect(page.locator('[data-copy-status]')).toHaveText('Email address copied');
+  expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('mykyta.olym.work@gmail.com');
+});
+
+test('back to top returns to the top of the page', async ({ page }) => {
+  await page.goto('work/');
+  await waitForStage(page);
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  await page.getByRole('button', { name: /Back to top/ }).click();
+  await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 5000 }).toBeLessThan(5);
+});
+
+test('image strips scroll sideways by dragging without opening the project', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'mouse dragging is a desktop interaction');
+  await page.goto('work/');
+  await waitForStage(page);
+  const strip = page.getByRole('region', { name: 'relayq images' });
+  await strip.scrollIntoViewIfNeeded();
+  const box = await strip.boundingBox();
+  if (!box) throw new Error('strip has no box');
+  const y = box.y + box.height / 2;
+  await page.mouse.move(box.x + box.width - 40, y);
+  await page.mouse.down();
+  await page.mouse.move(box.x + box.width - 340, y, { steps: 12 });
+  await page.mouse.up();
+  await expect.poll(() => strip.evaluate((element) => element.scrollLeft)).toBeGreaterThan(100);
+  await expect(page).toHaveURL(/\/work\/$/);
+});
+
+test('the about field moves when dragged', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'mouse dragging is a desktop interaction');
+  await page.goto('about/');
+  await waitForStage(page);
+  const tile = page.locator('[data-field-tile]').first();
+  const before = await tile.evaluate((element) => element.style.transform);
+  await page.mouse.move(700, 450);
+  await page.mouse.down();
+  await page.mouse.move(400, 300, { steps: 10 });
+  await page.mouse.up();
+  await expect.poll(() => tile.evaluate((element) => element.style.transform)).not.toBe(before);
+});
+
+test('the typed phrase in the navigation types the home words', async ({ page }) => {
+  await page.goto('./');
+  await waitForStage(page);
+  await expect(page.locator('[data-typewriter-text]')).toHaveText('WORK', { timeout: 8000 });
+});
