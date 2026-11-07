@@ -87,6 +87,7 @@ export function splitLines(element: HTMLElement): { lines: HTMLElement[]; restor
     if (line.childNodes.length > 0) line.append(document.createTextNode(' '));
     line.append(word.cloneNode(true));
   });
-  element.replaceChildren(...containers);
+  // A space between the line boxes keeps words apart in the text and the accessible name.
+  element.replaceChildren(...containers.flatMap((clip, index) => (index === 0 ? [clip] : [document.createTextNode(' '), clip])));
   return { lines, restore };
 }

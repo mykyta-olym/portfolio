@@ -44,16 +44,15 @@ export function initPixelWordmark(wrapper: HTMLElement): Cleanup {
   const SUB = 3;
   const layout = (): void => {
     // On narrow screens the name breaks onto two lines so each glyph stays legible.
-    grid = stackLines(wrapper.clientWidth < 640 ? text.split(' ') : [text]);
+    grid = stackLines(window.matchMedia('(max-width: 639px)').matches ? text.split(' ') : [text]);
     columns = grid[0]?.length ?? 1;
     rows = grid.length;
-    width = wrapper.clientWidth;
+    width = canvas.clientWidth;
     cell = width / (columns * SUB);
     height = cell * rows * SUB;
     const ratio = Math.min(window.devicePixelRatio || 1, 1.5);
     canvas.width = Math.round(width * ratio);
     canvas.height = Math.round(height * ratio);
-    canvas.style.height = `${height}px`;
     context.setTransform(ratio, 0, 0, ratio, 0, 0);
     dots = [];
     grid.forEach((row, gy) =>

@@ -28,6 +28,7 @@ export function initDragField(field: HTMLElement): Cleanup {
   let spanY = 0;
   const columns = Math.max(...tiles.map((t) => t.baseX)) + 1;
   const rows = Math.max(...tiles.map((t) => t.baseY)) + 1;
+  // Must match --cell in FieldHero.astro, which places the tiles before this script runs.
   const measure = (): void => {
     const width = field.clientWidth;
     cellW = Math.max(220, width / (width < 768 ? 2.1 : 4.2));
@@ -69,11 +70,10 @@ export function initDragField(field: HTMLElement): Cleanup {
     const speed = Math.hypot(targetX - offsetX, targetY - offsetY) + Math.hypot(velocityX, velocityY) * 0.02;
     const tiltX = Math.max(-14, Math.min(14, -(targetY - offsetY) * 0.12));
     const tiltY = Math.max(-14, Math.min(14, (targetX - offsetX) * 0.12));
-    const width = field.clientWidth;
-    const height = field.clientHeight;
+    // Positions are relative to the centre of the field, where the tiles are anchored.
     for (const tile of tiles) {
-      const x = wrap(tile.baseX * cellW + offsetX + cellW * 0.5, spanX) - cellW * 0.5 - (spanX - width) / 2;
-      const y = wrap(tile.baseY * cellH + offsetY + cellH * 0.5, spanY) - cellH * 0.5 - (spanY - height) / 2;
+      const x = wrap(tile.baseX * cellW + offsetX + cellW * 0.5, spanX) - cellW * 0.5 - spanX / 2;
+      const y = wrap(tile.baseY * cellH + offsetY + cellH * 0.5, spanY) - cellH * 0.5 - spanY / 2;
       tile.element.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg)`;
     }
     if (title) title.style.setProperty('--field-blur', `${Math.min(14, speed * 0.25).toFixed(2)}px`);

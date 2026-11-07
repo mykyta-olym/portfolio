@@ -14,14 +14,16 @@ import { disciplines } from '@/data/disciplines';
       {disciplines.map((item, index) => (
         <li class:list={['disciplines__item', { 'is-active': index === 0 }]} data-discipline-item>
           <h3 class="disciplines__title">{item.title}</h3>
-          <p class="disciplines__description">{item.description}</p>
         </li>
       ))}
     </ol>
     <div class="disciplines__media">
       {disciplines.map((item, index) => (
         <figure class:list={['disciplines__figure', { 'is-active': index === 0 }]} data-discipline-image>
-          <Image src={item.image.src} alt={item.image.alt} widths={[480, 960]} sizes="(min-width: 1024px) 32vw, 80vw" loading="lazy" />
+          <div class="disciplines__picture">
+            <Image src={item.image.src} alt={item.image.alt} widths={[480, 960]} sizes="(min-width: 1024px) 32vw, 80vw" loading="lazy" />
+          </div>
+          <figcaption class="disciplines__description">{item.description}</figcaption>
         </figure>
       ))}
     </div>
@@ -31,7 +33,7 @@ import { disciplines } from '@/data/disciplines';
 <style>
   .disciplines {
     position: relative;
-    height: calc(100vh + var(--count) * 42vh);
+    height: calc(100vh + var(--count) * 30vh);
     background: var(--color-black);
   }
 
@@ -76,51 +78,47 @@ import { disciplines } from '@/data/disciplines';
     color: var(--color-white);
   }
 
-  .disciplines__description {
-    max-height: 0;
-    overflow: hidden;
-    max-width: 30rem;
-    font-size: var(--fs-body);
-    line-height: 1.35;
-    color: var(--color-text-muted);
-    transition:
-      max-height 0.45s var(--ease-in-out),
-      margin 0.45s var(--ease-in-out);
-  }
-
-  .disciplines__item:global(.is-active) .disciplines__description {
-    max-height: 4em;
-    margin: 0.6rem 0 0.9rem;
-  }
-
+  /* All figures share one grid cell, so swapping them never changes the layout. */
   .disciplines__media {
-    position: relative;
+    display: grid;
     align-self: center;
-    aspect-ratio: 464 / 300;
   }
 
   .disciplines__figure {
-    position: absolute;
-    inset: 0;
+    grid-area: 1 / 1;
     margin: 0;
-    overflow: hidden;
-    border-radius: 3px;
     opacity: 0;
-    transform: scale(1.03);
-    transition:
-      opacity 0.45s ease,
-      transform 0.6s var(--ease-out);
+    transition: opacity 0.45s ease;
   }
 
   .disciplines__figure:global(.is-active) {
     opacity: 1;
-    transform: none;
   }
 
-  .disciplines__figure :global(img) {
+  .disciplines__picture {
+    aspect-ratio: 464 / 300;
+    overflow: hidden;
+    border-radius: 3px;
+  }
+
+  .disciplines__picture :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transform: scale(1.03);
+    transition: transform 0.6s var(--ease-out);
+  }
+
+  .disciplines__figure:global(.is-active) .disciplines__picture :global(img) {
+    transform: none;
+  }
+
+  .disciplines__description {
+    max-width: 26rem;
+    margin-top: 0.9rem;
+    font-size: var(--fs-small);
+    line-height: 1.45;
+    color: var(--color-text-muted);
   }
 
   @media (max-width: 1023px) {
@@ -145,7 +143,7 @@ import { disciplines } from '@/data/disciplines';
   @media (prefers-reduced-motion: reduce) {
     .disciplines__item,
     .disciplines__figure,
-    .disciplines__description {
+    .disciplines__picture :global(img) {
       transition: none;
     }
   }

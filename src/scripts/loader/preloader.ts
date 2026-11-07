@@ -10,7 +10,7 @@ import { PixelMark } from './pixel-mark';
 const SEEN_KEY = 'loader-seen';
 const MORPH_MS = 360;
 const COUNTER_STEP_MS = 140;
-const MAX_WAIT_MS = 6500;
+const MAX_WAIT_MS = 4000;
 
 function readSeen(): boolean {
   try {
@@ -28,8 +28,17 @@ function writeSeen(): void {
   }
 }
 
+/** True on connections where waiting for the hero video would hold the page back. */
+function slowConnection(): boolean {
+  const connection = (navigator as Navigator & { connection?: { effectiveType?: string; saveData?: boolean } }).connection;
+  if (!connection) return false;
+  return Boolean(connection.saveData) || ['slow-2g', '2g', '3g'].includes(connection.effectiveType ?? '');
+}
+
 function trackVideo(progress: LoadProgress, video: HTMLVideoElement | null): void {
-  if (!video) {
+  // The poster under the video is a frame of the same loop, so on a slow connection the page
+  // opens on the poster and the video fades in once it can play.
+  if (!video || slowConnection()) {
     progress.settle('video');
     return;
   }

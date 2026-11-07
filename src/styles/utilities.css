@@ -44,10 +44,8 @@
 
 .line-clip {
   display: block;
-  overflow: hidden;
-  /* Room for descenders and accents inside the clipping box. */
-  padding-block: 0.08em 0.12em;
-  margin-block: -0.08em -0.12em;
+  /* Clipping past the line box keeps descenders and accents without changing its height. */
+  clip-path: inset(-0.15em -0.1em -0.2em -0.1em);
 }
 
 .line-slide {

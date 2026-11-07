@@ -3,8 +3,8 @@ import { Image } from 'astro:assets';
 import showcase from '@/assets/renders/showcase.webp';
 ---
 
-<section class="showcase" aria-labelledby="showcase-title">
-  <div class="showcase__wrapper" data-module="showcase">
+<section class="showcase" data-module="showcase" aria-labelledby="showcase-title">
+  <div class="showcase__wrapper">
     <div class="showcase__frame" data-showcase-frame>
       <Image
         src={showcase}
@@ -27,13 +27,17 @@ import showcase from '@/assets/renders/showcase.webp';
 </section>
 
 <style>
+  /* Twice the viewport tall: the frame sticks for one viewport of scrolling while it shrinks.
+     Sticky positioning keeps the layout still, so the pin causes no layout shift. */
   .showcase {
     position: relative;
+    height: 200vh;
     background: var(--color-surface);
   }
 
   .showcase__wrapper {
-    position: relative;
+    position: sticky;
+    top: 0;
     height: 100vh;
     overflow: hidden;
   }
@@ -81,11 +85,15 @@ import showcase from '@/assets/renders/showcase.webp';
     color: #dadada;
   }
 
-  :global(.js) .showcase__wrapper:not(:global(.is-static)) [data-showcase-content] {
+  :global(.js) .showcase:not(:global(.is-static)) [data-showcase-content] {
     opacity: 0;
   }
 
-  .showcase__wrapper:global(.is-static) .showcase__frame {
+  .showcase:global(.is-static) {
+    height: auto;
+  }
+
+  .showcase:global(.is-static) .showcase__frame {
     transform: scale(0.8);
     border-radius: 4px;
   }

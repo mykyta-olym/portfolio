@@ -54,21 +54,20 @@ export function initAwayTitle(): Cleanup {
   };
 }
 
-/** Copies data-copy to the clipboard and confirms with a short state change. */
+/** Copies data-copy to the clipboard, confirms visually and through a polite live region. */
 export function initCopy(button: HTMLElement): Cleanup {
   const value = button.dataset['copy'] ?? '';
-  const status = button.querySelector<HTMLElement>('[data-copy-status]');
-  const initial = status?.textContent ?? '';
+  const status = button.parentElement?.querySelector<HTMLElement>('[data-copy-status]') ?? null;
   let timer = 0;
   const onClick = async (): Promise<void> => {
     try {
       await navigator.clipboard.writeText(value);
       button.classList.add('is-copied');
-      if (status) status.textContent = 'Copied';
+      if (status) status.textContent = 'Email address copied';
       window.clearTimeout(timer);
       timer = window.setTimeout(() => {
         button.classList.remove('is-copied');
-        if (status) status.textContent = initial;
+        if (status) status.textContent = '';
       }, 1800);
     } catch {
       // Clipboard access can be denied; the address stays visible and selectable.

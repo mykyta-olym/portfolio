@@ -75,9 +75,18 @@ const year = new Date().getFullYear();
     line-height: 0;
   }
 
+  /* The pixel font gives the name a fixed shape: 63 by 7 cells on one line, 35 by 16 on
+     two. Reserving it here means the footer does not move when the canvas is drawn. */
   .footer__mark canvas {
     display: block;
     width: 100%;
+    aspect-ratio: 63 / 7;
+  }
+
+  @media (max-width: 639px) {
+    .footer__mark canvas {
+      aspect-ratio: 35 / 16;
+    }
   }
 
   .footer__mark-fallback {

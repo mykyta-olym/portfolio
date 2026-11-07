@@ -65,6 +65,7 @@ function start(): void {
     // Pinned sections change the page height; recalculate once everything is mounted.
     const { ScrollTrigger } = await import('@/scripts/core/gsap');
     ScrollTrigger.refresh();
+    document.documentElement.dataset['modules'] = 'ready';
   });
 }
 

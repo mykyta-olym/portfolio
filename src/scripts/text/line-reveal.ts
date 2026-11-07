@@ -1,6 +1,7 @@
 // Headings and short texts rise into view line by line, once, when they first enter the
-// viewport and the page is on stage. After the motion the original markup is restored, so
-// the text wraps naturally again on resize.
+// viewport and the page is on stage. The split lines stay in place after the motion (so the
+// finished text is not painted a second time); the original markup comes back on the first
+// width change, so the text wraps naturally again.
 import { gsap } from '@/scripts/core/gsap';
 import { fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
 import { whenStageReady } from '@/scripts/core/stage';
@@ -21,11 +22,12 @@ export async function initLineReveals(scope: ParentNode = document): Promise<Cle
   }
   await fontsReady();
   const pending = new Map<HTMLElement, Pending>();
+  const finished = new Map<HTMLElement, () => void>();
 
   const prepare = (element: HTMLElement): void => {
     pending.get(element)?.restore();
     const { lines, restore } = splitLines(element);
-    gsap.set(lines, { yPercent: 112 });
+    gsap.set(lines, { yPercent: 125 });
     element.classList.add('is-split');
     pending.set(element, { element, lines, restore });
   };
@@ -43,9 +45,8 @@ export async function initLineReveals(scope: ParentNode = document): Promise<Cle
       delay,
       stagger: 0.07,
       onComplete: () => {
-        entry.restore();
-        element.classList.remove('is-split');
         element.classList.add('is-done');
+        finished.set(element, entry.restore);
       },
     });
   };
@@ -72,6 +73,11 @@ export async function initLineReveals(scope: ParentNode = document): Promise<Cle
     window.clearTimeout(timer);
     timer = window.setTimeout(() => {
       for (const element of [...pending.keys()]) prepare(element);
+      for (const [element, restore] of finished) {
+        restore();
+        element.classList.remove('is-split');
+      }
+      finished.clear();
     }, 150);
   };
   window.addEventListener('resize', onResize);
@@ -80,6 +86,7 @@ export async function initLineReveals(scope: ParentNode = document): Promise<Cle
     observer.disconnect();
     window.removeEventListener('resize', onResize);
     for (const entry of pending.values()) entry.restore();
+    for (const restore of finished.values()) restore();
   };
 }
 

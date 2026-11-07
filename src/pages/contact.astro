@@ -36,13 +36,11 @@ import { links, profile } from '@/data/profile';
       <p class="contact__card-label">Email</p>
       <div class="contact__mail">
         <a href={links.email.href}>{profile.email}</a>
-        <button class="contact__copy" type="button" data-module="copy" data-copy={profile.email}>
+        <button class="contact__copy" type="button" data-module="copy" data-copy={profile.email} aria-label="Copy the email address">
           <Icon name="copy" size={13} class="contact__copy-icon" />
           <Icon name="check" size={13} class="contact__copied-icon" />
-          <span class="visually-hidden" data-copy-status>
-            Copy the email address
-          </span>
         </button>
+        <span class="visually-hidden" aria-live="polite" data-copy-status></span>
       </div>
     </div>
 

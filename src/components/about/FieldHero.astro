@@ -35,7 +35,7 @@ const tiles = fieldTiles.map((image, index) => {
         data-field-tile
         data-x={tile.x}
         data-y={tile.y}
-        style={`--dx: ${tile.dx}; --dy: ${tile.dy}`}
+        style={`--x: ${tile.x}; --y: ${tile.y}; --dx: ${tile.dx}; --dy: ${tile.dy}`}
       >
         <Image src={tile.image.src} alt="" widths={[320, 560]} sizes="(min-width: 768px) 18vw, 40vw" loading="eager" draggable="false" />
       </li>
@@ -55,7 +55,12 @@ const tiles = fieldTiles.map((image, index) => {
 </section>
 
 <style>
+  /* Tiles are placed around the centre on a grid of cells. The script uses the same
+     formula, so taking over from these first-paint positions moves nothing. */
   .field {
+    --cell: max(220px, 100cqw / 4.2);
+    --cell-h: calc(var(--cell) * 0.82);
+    container-type: inline-size;
     position: relative;
     height: 100vh;
     height: 100svh;
@@ -80,8 +85,9 @@ const tiles = fieldTiles.map((image, index) => {
 
   .field__tile {
     position: absolute;
-    top: 0;
-    left: 0;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(calc((var(--x) - 2) * var(--cell)), calc((var(--y) - 2) * var(--cell-h)), 0);
     width: clamp(7rem, 12vw, 13rem);
     aspect-ratio: 4 / 5;
     margin-left: calc(var(--dx) * 10vw);
@@ -109,14 +115,6 @@ const tiles = fieldTiles.map((image, index) => {
 
   .field:hover .field__tile :global(img) {
     filter: grayscale(0.4) brightness(0.92);
-  }
-
-  /* Before the script lays the field out, tiles sit in a plain grid. */
-  :global(.no-js) .field__tile,
-  .field:not(:global(.is-ready)) .field__tile {
-    position: relative;
-    display: inline-block;
-    margin: 1rem;
   }
 
   .field__title {
@@ -155,6 +153,12 @@ const tiles = fieldTiles.map((image, index) => {
     letter-spacing: 0.14em;
     text-transform: uppercase;
     color: var(--color-text-dim);
+  }
+
+  @media (max-width: 767px) {
+    .field {
+      --cell: max(220px, 100cqw / 2.1);
+    }
   }
 
   @media (pointer: fine) {
