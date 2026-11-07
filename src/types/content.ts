@@ -19,7 +19,7 @@ export interface Profile {
   readonly links: readonly ExternalLink[];
 }
 
-export type MediaKind = 'screenshot' | 'chart' | 'diagram' | 'code' | 'terminal' | 'render';
+export type MediaKind = 'screenshot' | 'chart' | 'diagram' | 'code' | 'terminal' | 'render' | 'photo';
 
 export interface MediaItem {
   readonly src: ImageMetadata;

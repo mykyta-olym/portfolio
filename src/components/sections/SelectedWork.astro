@@ -3,7 +3,7 @@ import ProjectRow from '@/components/projects/ProjectRow.astro';
 import SectionLabel from '@/components/ui/SectionLabel.astro';
 import InlinePic from '@/components/ui/InlinePic.astro';
 import Button from '@/components/ui/Button.astro';
-import { featuredProjects, projectMedia } from '@/data/projects';
+import { featuredProjects } from '@/data/projects';
 import { href } from '@/lib/paths';
 ---
 
@@ -14,8 +14,8 @@ import { href } from '@/lib/paths';
       Selected work
     </h2>
     <p class="work__statement" data-scroll-rise>
-      Everything here is public. The code, the tests and the numbers <InlinePic image={projectMedia.phishlensEvaluation} /> are in each
-      repository, including the results that did not go my way.
+      Everything here is public. The code, the tests and the numbers <InlinePic variant="convert" /> are in each repository, including the
+      results that did not go my way.
     </p>
   </div>
   <div class="work__rows">

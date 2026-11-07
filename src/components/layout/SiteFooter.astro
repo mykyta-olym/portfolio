@@ -12,7 +12,7 @@ const year = new Date().getFullYear();
   <h2 class="visually-hidden" id="footer-title">
     Site footer
   </h2>
-  <div class="footer__mark" data-module="pixel-wordmark" data-text="MYKYTA OLYM" data-cursor="Play">
+  <div class="footer__mark" data-module="pixel-wordmark" data-text="MYKYTA OLYM">
     <canvas aria-hidden="true"></canvas>
     <p class="footer__mark-fallback" aria-hidden="true">
       MYKYTA OLYM
@@ -75,17 +75,17 @@ const year = new Date().getFullYear();
     line-height: 0;
   }
 
-  /* The pixel font gives the name a fixed shape: 63 by 7 cells on one line, 35 by 16 on
-     two. Reserving it here means the footer does not move when the canvas is drawn. */
+  /* The canvas includes empty cells around the glyphs for their full hover displacement.
+     These dimensions match pixel-wordmark.ts, so first paint and animation occupy one box. */
   .footer__mark canvas {
     display: block;
     width: 100%;
-    aspect-ratio: 63 / 7;
+    aspect-ratio: 71 / 9;
   }
 
   @media (max-width: 639px) {
     .footer__mark canvas {
-      aspect-ratio: 35 / 16;
+      aspect-ratio: 43 / 18;
     }
   }
 
@@ -99,6 +99,10 @@ const year = new Date().getFullYear();
     font-weight: 500;
     line-height: 1;
     letter-spacing: 0.04em;
+    opacity: 1;
+  }
+
+  .footer__mark:global(.is-ready) .footer__mark-fallback {
     opacity: 0;
   }
 
@@ -186,6 +190,12 @@ const year = new Date().getFullYear();
 
   .footer__top:hover {
     color: var(--color-white);
+  }
+
+  @media (max-height: 640px) {
+    .footer {
+      position: relative;
+    }
   }
 
   @media (max-width: 767px) {

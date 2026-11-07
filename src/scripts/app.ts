@@ -3,7 +3,8 @@
 import type { Cleanup } from '@/scripts/core/motion';
 import { startPreloader } from '@/scripts/loader/preloader';
 import { initPageTransitions } from '@/scripts/modules/page-transition';
-import { initAwayTitle } from '@/scripts/modules/page-details';
+import { initAwayTitle, initBackgroundVideo, initBackToTop, initCopy } from '@/scripts/modules/page-details';
+import { ScrollTrigger } from '@/scripts/core/gsap';
 import { initFadeReveals, initLineReveals } from '@/scripts/text/line-reveal';
 import { initScramble } from '@/scripts/text/scramble';
 import { initScrollRise } from '@/scripts/text/scroll-rise';
@@ -13,16 +14,16 @@ type Init = (element: HTMLElement) => Cleanup;
 const modules: Record<string, () => Promise<Init>> = {
   menu: () => import('@/scripts/modules/menu').then((m) => m.initMenu),
   typewriter: () => import('@/scripts/modules/typewriter').then((m) => m.initTypewriter),
-  'background-video': () =>
-    import('@/scripts/modules/page-details').then((m) => (element: HTMLElement) => m.initBackgroundVideo(element as HTMLVideoElement)),
-  'back-to-top': () => import('@/scripts/modules/page-details').then((m) => m.initBackToTop),
-  copy: () => import('@/scripts/modules/page-details').then((m) => m.initCopy),
+  'background-video': () => Promise.resolve((element: HTMLElement) => initBackgroundVideo(element as HTMLVideoElement)),
+  'back-to-top': () => Promise.resolve(initBackToTop),
+  copy: () => Promise.resolve(initCopy),
   'cursor-label': () => import('@/scripts/modules/cursor-label').then((m) => m.initCursorLabel),
   'pixel-wordmark': () => import('@/scripts/modules/pixel-wordmark').then((m) => m.initPixelWordmark),
   'orbit-gallery': () => import('@/scripts/modules/orbit-gallery').then((m) => m.initOrbitGallery),
   disciplines: () => import('@/scripts/modules/disciplines').then((m) => m.initDisciplines),
   showcase: () => import('@/scripts/modules/showcase').then((m) => m.initShowcase),
   'drag-scroll': () => import('@/scripts/modules/drag-scroll').then((m) => m.initDragScroll),
+  marquee: () => import('@/scripts/modules/marquee').then((m) => m.initMarquee),
   'drag-field': () => import('@/scripts/modules/drag-field').then((m) => m.initDragField),
   faq: () => import('@/scripts/modules/faq').then((m) => m.initFaq),
   tabs: () => import('@/scripts/modules/tabs').then((m) => m.initTabs),
@@ -61,9 +62,8 @@ function start(): void {
   cleanups.push(initAwayTitle(), initFadeReveals(), initScramble());
   void initLineReveals().then((cleanup) => cleanups.push(cleanup));
   void initScrollRise().then((cleanup) => cleanups.push(cleanup));
-  void mountModules().then(async () => {
+  void mountModules().then(() => {
     // Pinned sections change the page height; recalculate once everything is mounted.
-    const { ScrollTrigger } = await import('@/scripts/core/gsap');
     ScrollTrigger.refresh();
     document.documentElement.dataset['modules'] = 'ready';
   });

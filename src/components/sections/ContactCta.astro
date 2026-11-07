@@ -105,7 +105,7 @@ import { href } from '@/lib/paths';
     transition: transform 0.4s var(--ease-in-out);
   }
 
-  .faq__item[open] :global(.faq__icon),
+  .faq__item[open]:not(:global(.is-enhanced)) :global(.faq__icon),
   .faq__item:global(.is-open) :global(.faq__icon) {
     transform: rotate(180deg);
   }

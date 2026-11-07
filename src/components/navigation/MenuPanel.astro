@@ -20,43 +20,45 @@ const current = Astro.url.pathname;
         <Icon name="close" size={16} />
       </button>
     </div>
-    <nav class="menu__nav" aria-label="Primary">
-      <ul>
-        {primaryNavigation.map((item) => (
-          <li data-menu-item>
-            <a class="menu__link" href={href(item.path)} aria-current={isCurrent(current, item.path) ? 'page' : undefined}>
-              {item.label}
-              <Icon name="arrow-up-right" size={18} class="menu__arrow" />
-            </a>
-          </li>
-        ))}
-      </ul>
-    </nav>
-    <div class="menu__foot">
-      <ul class="menu__social">
-        {profile.links.map((link) => (
-          <li data-menu-item>
-            <a href={link.href} target={link.href.startsWith('mailto:') ? undefined : '_blank'} rel="noopener">
-              {link.label}
-            </a>
-          </li>
-        ))}
-      </ul>
-      <figure class="menu__media" data-menu-media>
-        <video
-          data-menu-video
-          muted
-          loop
-          playsinline
-          preload="none"
-          poster={href('media/menu/garden-poster.webp')}
-          aria-hidden="true"
-          tabindex="-1"
-        >
-          <source src={href('media/menu/garden.mp4')} type="video/mp4" />
-        </video>
-        <figcaption class="visually-hidden">Gameplay from Garden of Lost Paths</figcaption>
-      </figure>
+    <div class="menu__body" data-menu-surface>
+      <nav class="menu__nav" aria-label="Primary">
+        <ul>
+          {primaryNavigation.map((item) => (
+            <li data-menu-item>
+              <a class="menu__link" href={href(item.path)} aria-current={isCurrent(current, item.path) ? 'page' : undefined}>
+                {item.label}
+                <Icon name="arrow-up-right" size={18} class="menu__arrow" />
+              </a>
+            </li>
+          ))}
+        </ul>
+      </nav>
+      <div class="menu__foot">
+        <ul class="menu__social">
+          {profile.links.map((link) => (
+            <li data-menu-item>
+              <a href={link.href} target={link.href.startsWith('mailto:') ? undefined : '_blank'} rel="noopener">
+                {link.label}
+              </a>
+            </li>
+          ))}
+        </ul>
+        <figure class="menu__media" data-menu-media>
+          <video
+            data-menu-video
+            muted
+            loop
+            playsinline
+            preload="none"
+            poster={href('media/menu/programmer-poster.webp')}
+            aria-hidden="true"
+            tabindex="-1"
+          >
+            <source src={href('media/menu/programmer.mp4')} type="video/mp4" />
+          </video>
+          <figcaption class="visually-hidden">A programmer working at a computer</figcaption>
+        </figure>
+      </div>
     </div>
   </div>
 </div>
@@ -85,7 +87,7 @@ const current = Astro.url.pathname;
     flex-direction: column;
     width: var(--nav-width);
     transform: translateX(-50%);
-    background: var(--color-black);
+    background: transparent;
     border-radius: var(--radius-pill) var(--radius-pill) 0 0;
     overflow: hidden;
   }
@@ -95,7 +97,18 @@ const current = Astro.url.pathname;
     justify-content: space-between;
     align-items: center;
     height: 3.25rem;
+    flex: none;
     padding: 0.3125rem;
+    background: var(--color-black);
+  }
+
+  .menu__body {
+    display: flex;
+    flex: 1;
+    min-height: 0;
+    flex-direction: column;
+    overflow: hidden;
+    background: var(--color-black);
   }
 
   .menu__logo,

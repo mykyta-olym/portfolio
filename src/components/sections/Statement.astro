@@ -4,7 +4,6 @@ import avatar from '@/assets/profile/avatar.jpg';
 import InlinePic from '@/components/ui/InlinePic.astro';
 import TechMarquee from './TechMarquee.astro';
 import { profile } from '@/data/profile';
-import { projectMedia } from '@/data/projects';
 ---
 
 <section class="statement" aria-label="About">
@@ -18,12 +17,11 @@ import { projectMedia } from '@/data/projects';
     </div>
     <div class="statement__text">
       <p data-scroll-rise>
-        I build software I would want to inherit <InlinePic image={projectMedia.relayqStates} />: small parts with clear guarantees and
-        tests that pull the plug on purpose.
+        I build software I would want to inherit <InlinePic variant="experience" />: small parts with clear guarantees and tests that pull
+        the plug on purpose.
       </p>
       <p data-scroll-rise>
-        Every number on this site comes from a real run <InlinePic image={projectMedia.speechInDomain} /> and every project links to its
-        code.
+        Every number on this site comes from a real run <InlinePic variant="shape" /> and every project links to its code.
       </p>
     </div>
   </div>

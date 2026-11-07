@@ -66,17 +66,15 @@
   transform: none;
 }
 
-/* Words that rise with the scroll position (scripts/text/scroll-rise.ts sets the variables). */
+/* Scroll contrast keeps the complete sentence visible, including between wheel events. */
 .is-rising .rise-word {
   display: inline-block;
-  clip-path: inset(-0.12em -0.08em -0.22em -0.08em);
 }
 
 .is-rising .rise-inner,
 .is-rising [data-inline-pic] {
   display: inline-block;
-  transform: translate3d(0, var(--rise-y, 1.1em), 0);
-  opacity: var(--rise-a, 0);
+  opacity: var(--rise-a, 1);
 }
 
 @media (prefers-reduced-motion: reduce) {

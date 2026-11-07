@@ -1,16 +1,18 @@
 ---
-import { Image } from 'astro:assets';
-import type { MediaItem } from '@/types/content';
+import { href } from '@/lib/paths';
 
 interface Props {
-  image: MediaItem;
+  variant: 'experience' | 'shape' | 'convert';
 }
 
-const { image } = Astro.props;
+const { variant } = Astro.props;
 ---
 
 <span class="inline-pic" data-inline-pic>
-  <Image src={image.src} alt="" width={96} height={96} class="inline-pic__image" loading="lazy" />
+  <picture>
+    <source media="(prefers-reduced-motion: reduce)" srcset={href(`media/inline/${variant}-still.webp`)} />
+    <img src={href(`media/inline/${variant}.webp`)} alt="" width="150" height="150" class="inline-pic__image" loading="lazy" />
+  </picture>
 </span>
 
 <style>
@@ -22,11 +24,11 @@ const { image } = Astro.props;
     vertical-align: -0.1em;
     overflow: hidden;
     border-radius: 0.16em;
-    transform: translate3d(0, var(--rise-y, 0), 0);
     opacity: var(--rise-a, 1);
   }
 
-  .inline-pic :global(.inline-pic__image) {
+  .inline-pic picture,
+  .inline-pic__image {
     width: 100%;
     height: 100%;
     object-fit: cover;

@@ -4,13 +4,15 @@ import { principles } from '@/data/principles';
 
 <ol class="principles" aria-label="How I work">
   {principles.map((principle, index) => (
-    <li class="principles__item" data-reveal="fade" data-reveal-delay={String(index * 0.05)}>
+    <li class="principles__item">
       <span class="principles__number" aria-hidden="true">
         {index + 1}
       </span>
       <div class="principles__copy">
-        <h3 class="principles__title">{principle.title}</h3>
-        <p class="principles__text">{principle.text}</p>
+        <h3 class="visually-hidden">{principle.title}</h3>
+        <p class="principles__text" data-reveal="fade">
+          {principle.text}
+        </p>
       </div>
     </li>
   ))}
@@ -23,32 +25,34 @@ import { principles } from '@/data/principles';
 
   .principles__item {
     display: grid;
-    grid-template-columns: 3.5rem minmax(0, 1fr);
-    align-items: start;
+    grid-template-columns: 53% minmax(0, 1fr);
+    align-items: center;
     gap: 1.5rem;
-    padding: 1.6rem 0;
+    min-height: clamp(7rem, 6.2vw, 10rem);
+    padding: 1.8rem 0;
     border-bottom: 1px solid var(--color-line);
   }
 
   .principles__number {
     justify-self: end;
-    font-size: clamp(1.5rem, 2.1vw, 2.25rem);
+    font-size: clamp(2rem, 2.1vw, 3rem);
     font-weight: 300;
     line-height: 1;
     color: var(--color-white);
   }
 
-  .principles__title {
-    font-size: var(--fs-small);
-    font-weight: 600;
+  .principles__text {
+    max-width: 52rem;
+    font-size: var(--fs-body);
+    line-height: 1.4;
     color: var(--color-white);
   }
 
-  .principles__text {
-    margin-top: 0.4rem;
-    max-width: 30rem;
-    font-size: var(--fs-small);
-    line-height: 1.45;
-    color: var(--color-text-muted);
+  @media (max-width: 767px) {
+    .principles__item {
+      grid-template-columns: 2rem minmax(0, 1fr);
+      gap: 1rem;
+      padding-block: 1.75rem;
+    }
   }
 </style>

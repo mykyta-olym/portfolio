@@ -5,7 +5,7 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger';
 gsap.registerPlugin(ScrollTrigger, CustomEase);
 
 // A steep in-out curve for wipes and panels: slow start, fast middle, long settle.
-CustomEase.create('wipe', 'M0,0 C0.4,0 0.45,0.14 0.5,0.5 0.56,0.9 0.66,1 1,1');
+CustomEase.create('wipe', 'M0,0 C0.354,0 0.464,0.133 0.498,0.502 0.532,0.872 0.651,1 1,1');
 // Text lines rising into view.
 CustomEase.create('rise', 'M0,0 C0.7,0 0.2,1 1,1');
 

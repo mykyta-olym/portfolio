@@ -46,6 +46,7 @@ test('closes with the close button and the backdrop, and survives fast toggling'
     await page.waitForTimeout(60);
   }
   await expect(dialog).toBeHidden();
+  await expect(page.locator('html')).not.toHaveClass(/is-locked/);
   await toggle.click();
   await expect(dialog).toBeVisible();
   await expect(page.getByRole('dialog').getByRole('link', { name: 'About' })).toHaveAttribute('aria-current', 'page');

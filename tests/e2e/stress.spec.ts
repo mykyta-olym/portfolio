@@ -71,3 +71,34 @@ test('a background tab finishes loading when it comes to the front', async ({ pa
   await waitForStage(page);
   await other.close();
 });
+
+test('the footer hover never draws particles outside its canvas', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'the pointer effect is disabled on touch screens');
+  await page.addInitScript(() => {
+    const fill = CanvasRenderingContext2D.prototype.fillRect;
+    CanvasRenderingContext2D.prototype.fillRect = function (x, y, width, height) {
+      if (this.canvas.closest('[data-module="pixel-wordmark"]')) {
+        const scale = this.getTransform().a;
+        const clipped = x < 0 || y < 0 || (x + width) * scale > this.canvas.width || (y + height) * scale > this.canvas.height;
+        this.canvas.dataset['draws'] = String(Number(this.canvas.dataset['draws'] ?? 0) + 1);
+        if (clipped) this.canvas.dataset['clipped'] = 'true';
+      }
+      fill.call(this, x, y, width, height);
+    };
+  });
+  await page.goto('work/');
+  await waitForStage(page);
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  const canvas = page.locator('.footer__mark canvas');
+  const box = await canvas.boundingBox();
+  if (!box) throw new Error('footer canvas has no box');
+  const before = Number(await canvas.getAttribute('data-draws'));
+  for (const x of [0.01, 0.5, 0.99]) {
+    for (const y of [0.01, 0.5, 0.99]) {
+      await page.mouse.move(box.x + box.width * x, box.y + box.height * y);
+      await page.waitForTimeout(150);
+    }
+  }
+  expect(Number(await canvas.getAttribute('data-draws'))).toBeGreaterThan(before);
+  await expect(canvas).not.toHaveAttribute('data-clipped', 'true');
+});

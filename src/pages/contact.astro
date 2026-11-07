@@ -1,24 +1,22 @@
 ---
-import { Image } from 'astro:assets';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import AvatarButton from '@/components/ui/AvatarButton.astro';
 import Icon from '@/components/ui/Icon.astro';
-import contactRender from '@/assets/renders/contact.webp';
 import { links, profile } from '@/data/profile';
+import { href } from '@/lib/paths';
 ---
 
-<BaseLayout title="Contact" pill="contact" description="Contact Mykyta Olym by email, Telegram or LinkedIn. Based in Košice, Slovakia.">
+<BaseLayout
+  title="Contact"
+  pill="contact"
+  footer={false}
+  description="Contact Mykyta Olym by email, Telegram or LinkedIn. Based in Košice, Slovakia."
+>
   <section class="contact" aria-labelledby="contact-title">
-    <Image
-      src={contactRender}
-      alt=""
-      widths={[960, 1600, 2560]}
-      sizes="100vw"
-      class="contact__backdrop"
-      loading="eager"
-      fetchpriority="high"
-    />
-    <div class="contact__shade" aria-hidden="true"></div>
+    <picture class="contact__backdrop" aria-hidden="true">
+      <source media="(prefers-reduced-motion: reduce)" srcset={href('media/contact/cubic-still.webp')} />
+      <img src={href('media/contact/cubic-loop.webp')} alt="" width="800" height="500" fetchpriority="high" />
+    </picture>
 
     <div class="contact__centre">
       <h1 class="contact__title" id="contact-title" data-reveal="lines">
@@ -33,7 +31,7 @@ import { links, profile } from '@/data/profile';
     </div>
 
     <div class="contact__card contact__card--mail" data-reveal="fade" data-reveal-delay="0.6">
-      <p class="contact__card-label">Email</p>
+      <p class="contact__card-label">E-mail</p>
       <div class="contact__mail">
         <a href={links.email.href}>{profile.email}</a>
         <button class="contact__copy" type="button" data-module="copy" data-copy={profile.email} aria-label="Copy the email address">
@@ -45,13 +43,12 @@ import { links, profile } from '@/data/profile';
     </div>
 
     <div class="contact__card contact__card--social" data-reveal="fade" data-reveal-delay="0.75">
-      <p class="contact__card-label">Elsewhere</p>
+      <p class="contact__card-label">Socials</p>
       <ul>
         {[links.github, links.linkedin, links.telegram].map((link) => (
           <li>
             <a href={link.href} target="_blank" rel="noopener">
-              <span>{link.label}</span>
-              <span class="contact__handle">{link.display}</span>
+              [{link.label}]
             </a>
           </li>
         ))}
@@ -65,14 +62,14 @@ import { links, profile } from '@/data/profile';
     position: relative;
     display: grid;
     place-items: center;
-    min-height: 100vh;
     min-height: 100svh;
     overflow: hidden;
     padding: 7rem var(--gutter) 6rem;
-    background: var(--color-black);
+    background: #000;
   }
 
-  .contact :global(.contact__backdrop) {
+  .contact__backdrop,
+  .contact__backdrop img {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -80,133 +77,124 @@ import { links, profile } from '@/data/profile';
     object-fit: cover;
   }
 
-  .contact__shade {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(60% 50% at 50% 45%, rgb(0 0 0 / 72%), transparent 75%),
-      linear-gradient(180deg, rgb(0 0 0 / 55%), transparent 30%, transparent 70%, rgb(0 0 0 / 65%));
-  }
-
   .contact__centre {
     position: relative;
     display: grid;
     justify-items: center;
-    gap: 1.4rem;
-    max-width: 36rem;
+    gap: clamp(2rem, 4vw, 4rem);
+    max-width: 37rem;
     text-align: center;
+    transform: translateY(-3vh);
   }
 
   .contact__title {
-    font-size: var(--fs-display);
-    font-weight: 300;
-    letter-spacing: -0.02em;
+    font-size: clamp(3rem, 5vw, 7.5rem);
+    font-weight: 400;
+    letter-spacing: -0.025em;
     line-height: 1;
+    color: #c2c2c2;
   }
 
   .contact__text {
-    font-size: var(--fs-small);
-    line-height: 1.5;
-    color: var(--color-text-muted);
+    font-size: var(--fs-body);
+    line-height: 1.2;
+    color: #eee;
   }
 
+  /* The reference's small, horizontal-rule paper cards. */
   .contact__card {
     position: absolute;
-    padding: 0.9rem 1.1rem 1rem;
-    background: rgb(236 236 236 / 94%);
-    color: var(--color-black);
-    border-radius: 4px;
-    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 90%);
+    width: clamp(14rem, 17.36vw, 19rem);
+    padding: 0.65rem;
+    border: 6px solid #b5b5b5;
+    border-top-width: 15px;
+    border-radius: 6px;
+    background: repeating-linear-gradient(#fff 0 1px, #d6d6d6 1px 2px, #fafafa 2px 4px);
+    color: #111;
+    font-size: var(--fs-small);
   }
 
   .contact__card--mail {
-    top: 26vh;
-    left: 8vw;
-    transform: rotate(-2.5deg);
+    top: 30vh;
+    left: 8.3vw;
   }
-
   .contact__card--social {
-    right: 8vw;
-    bottom: 18vh;
-    min-width: 15rem;
-    transform: rotate(2deg);
+    right: 8.3vw;
+    bottom: 34vh;
+    text-align: center;
   }
 
   .contact__card-label {
-    margin-bottom: 0.6rem;
+    margin-bottom: 0.4rem;
+    padding-bottom: 0.45rem;
+    border-bottom: 1px solid #555;
     font-family: var(--font-label);
     font-size: var(--fs-tag);
     font-weight: 600;
-    letter-spacing: 0.14em;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
-    color: #555;
   }
 
   .contact__mail {
     display: flex;
     align-items: center;
-    gap: 0.6rem;
-    padding: 0.55rem 0.7rem;
-    background: var(--color-white);
-    border: 1px solid #d6d6d6;
-    border-radius: 3px;
-    font-size: var(--fs-small);
+    justify-content: space-between;
+    gap: 0.25rem;
+    overflow-wrap: anywhere;
   }
 
-  .contact__mail a:hover,
-  .contact__card--social a:hover span:first-child {
+  .contact__mail a,
+  .contact__card--social a {
     text-decoration: underline;
-    text-underline-offset: 3px;
+    text-underline-offset: 2px;
+  }
+  .contact__card--social a {
+    display: inline-flex;
+    align-items: center;
+    min-height: 1.5rem;
   }
 
   .contact__copy {
     display: grid;
     place-items: center;
-    width: 1.75rem;
-    height: 1.75rem;
-    border-radius: 3px;
-    color: #444;
+    width: 1.5rem;
+    height: 1.5rem;
+    flex: none;
   }
-
-  .contact__copy:hover {
-    background: #eee;
+  .contact__copy:focus-visible {
+    outline-color: #000;
   }
-
   .contact__copy :global(.contact__copied-icon),
   .contact__copy:global(.is-copied) :global(.contact__copy-icon) {
     display: none;
   }
-
   .contact__copy:global(.is-copied) :global(.contact__copied-icon) {
     display: block;
   }
 
-  .contact__card--social ul {
-    display: grid;
-    gap: 0.125rem;
-  }
-
-  .contact__card--social a {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    gap: 1.5rem;
-    min-height: 1.5rem;
-    font-size: var(--fs-small);
-  }
-
-  .contact__handle {
-    color: #666;
+  @media (max-width: 1023px) and (min-width: 768px) {
+    .contact__card--mail {
+      top: auto;
+      bottom: 8vh;
+      left: 4vw;
+    }
+    .contact__card--social {
+      right: 4vw;
+      bottom: 8vh;
+    }
   }
 
   @media (max-width: 767px) {
     .contact {
       display: flex;
       flex-direction: column;
-      gap: 2rem;
-      padding-top: 8rem;
+      gap: 2.5rem;
+      padding-top: 9rem;
     }
-
+    .contact__centre {
+      transform: none;
+      margin-bottom: 1rem;
+    }
     .contact__card {
       position: relative;
       inset: auto;

@@ -5,7 +5,6 @@ import Principles from '@/components/about/Principles.astro';
 import SectionLabel from '@/components/ui/SectionLabel.astro';
 import InlinePic from '@/components/ui/InlinePic.astro';
 import ContactCta from '@/components/sections/ContactCta.astro';
-import { projectMedia } from '@/data/projects';
 ---
 
 <BaseLayout
@@ -27,8 +26,8 @@ import { projectMedia } from '@/data/projects';
           bachelor's degree finished.
         </p>
         <p data-scroll-rise>
-          I work across the stack <InlinePic image={projectMedia.gardenPlay} />, from interfaces to queues, databases and models, and I
-          publish what I build together with its tests and its numbers.
+          I work across the stack <InlinePic variant="experience" />, from interfaces to queues, databases and models, and I publish what I
+          build together with its tests and its numbers.
         </p>
       </div>
     </div>
@@ -48,7 +47,7 @@ import { projectMedia } from '@/data/projects';
 
   .prologue__grid {
     display: grid;
-    grid-template-columns: 19.6vw minmax(0, 52vw);
+    grid-template-columns: 23vw minmax(0, 1fr);
   }
 
   .prologue__grid :global(.prologue__label) {
@@ -67,11 +66,9 @@ import { projectMedia } from '@/data/projects';
   }
 
   .prologue__principles {
-    display: grid;
-    grid-template-columns: 19.6vw minmax(0, 1fr);
+    display: block;
     margin-top: clamp(5rem, 9vw, 9rem);
-    margin-left: 46vw;
-    margin-right: calc(-1 * var(--gutter) + 2vw);
+    margin-inline: calc(-1 * var(--gutter) + 2vw);
   }
 
   .prologue__principles > :global(.label) {

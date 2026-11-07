@@ -1,5 +1,5 @@
 // A small label that follows the pointer over elements with data-cursor, such as "Drag" on
-// the about field or "Play" on the footer wordmark. Mouse only; hidden on touch screens.
+// the about field. Mouse only; hidden on touch screens.
 import { damp } from '@/lib/math';
 import { coarsePointer, reducedMotion, type Cleanup } from '@/scripts/core/motion';
 

@@ -4,6 +4,7 @@ import { fieldTiles } from '@/data/disciplines';
 
 // Tiles sit on a 4 by 4 pattern of cells, each nudged off-centre so the field looks loose.
 const columns = 4;
+const rows = Math.ceil(fieldTiles.length / columns);
 const nudges = [
   [0.1, 0.05],
   [-0.08, 0.18],
@@ -19,10 +20,10 @@ const tiles = fieldTiles.map((image, index) => {
   return {
     image,
     x: index % columns,
-    y: Math.floor(index / columns),
+    y: (Math.floor(index / columns) + 1) % rows,
     dx: nudge[0],
     dy: nudge[1],
-    wide: image.src.width / image.src.height > 1.3,
+    ratio: image.kind === 'render' ? 0.8 : image.src.width / image.src.height,
   };
 });
 ---
@@ -31,11 +32,11 @@ const tiles = fieldTiles.map((image, index) => {
   <ul class="field__tiles" aria-hidden="true">
     {tiles.map((tile) => (
       <li
-        class:list={['field__tile', { 'field__tile--wide': tile.wide }]}
+        class="field__tile"
         data-field-tile
         data-x={tile.x}
         data-y={tile.y}
-        style={`--x: ${tile.x}; --y: ${tile.y}; --dx: ${tile.dx}; --dy: ${tile.dy}`}
+        style={`--x: ${tile.x}; --y: ${tile.y}; --dx: ${tile.dx}; --dy: ${tile.dy}; --ratio: ${tile.ratio}`}
       >
         <Image src={tile.image.src} alt="" widths={[320, 560]} sizes="(min-width: 768px) 18vw, 40vw" loading="eager" draggable="false" />
       </li>
@@ -58,9 +59,9 @@ const tiles = fieldTiles.map((image, index) => {
   /* Tiles are placed around the centre on a grid of cells. The script uses the same
      formula, so taking over from these first-paint positions moves nothing. */
   .field {
-    --cell: max(220px, 100cqw / 4.2);
-    --cell-h: calc(var(--cell) * 0.82);
-    container-type: inline-size;
+    --cell: max(220px, 100cqw / 3.6);
+    --cell-h: 56cqh;
+    container-type: size;
     position: relative;
     height: 100vh;
     height: 100svh;
@@ -87,21 +88,16 @@ const tiles = fieldTiles.map((image, index) => {
     position: absolute;
     top: 50%;
     left: 50%;
-    transform: translate3d(calc((var(--x) - 2) * var(--cell)), calc((var(--y) - 2) * var(--cell-h)), 0);
-    width: clamp(7rem, 12vw, 13rem);
-    aspect-ratio: 4 / 5;
+    translate: -50% -50%;
+    transform: translate3d(calc((var(--x) - 1.5) * var(--cell)), calc((var(--y) - 1.5) * var(--cell-h)), 0);
+    width: clamp(7rem, 16vw, 26rem);
+    aspect-ratio: var(--ratio);
     margin-left: calc(var(--dx) * 10vw);
     margin-top: calc(var(--dy) * 10vw);
     overflow: hidden;
-    border-radius: 3px;
     background: #0b0b0c;
     will-change: transform;
     transition: filter 0.4s ease;
-  }
-
-  .field__tile--wide {
-    width: clamp(9rem, 15vw, 16rem);
-    aspect-ratio: 16 / 10;
   }
 
   .field__tile :global(img) {
@@ -109,12 +105,12 @@ const tiles = fieldTiles.map((image, index) => {
     height: 100%;
     object-fit: cover;
     pointer-events: none;
-    filter: grayscale(0.85) brightness(0.8);
+    filter: grayscale(0.65) brightness(0.8);
     transition: filter 0.5s ease;
   }
 
   .field:hover .field__tile :global(img) {
-    filter: grayscale(0.4) brightness(0.92);
+    filter: grayscale(0.3) brightness(0.92);
   }
 
   .field__title {

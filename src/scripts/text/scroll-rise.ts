@@ -1,17 +1,15 @@
-// Statement paragraphs whose lines rise and brighten with the scroll position. The motion is
-// tied to scrolling, so it reverses when scrolling back, and every line uses the same curve.
+// Scroll-linked contrast: words brighten in reading order without moving the text's baseline.
 import { clamp, easeOutCubic } from '@/lib/math';
 import { fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
-import { lineIndices, splitWords } from './split';
+import { splitWords } from './split';
 
 interface Group {
   element: HTMLElement;
   words: HTMLElement[];
-  rows: number[];
-  lineCount: number;
+  restore(): void;
 }
 
-const WINDOW = 0.68;
+const WINDOW = 0.45;
 
 export async function initScrollRise(scope: ParentNode = document): Promise<Cleanup> {
   const elements = [...scope.querySelectorAll<HTMLElement>('[data-scroll-rise]')];
@@ -19,29 +17,20 @@ export async function initScrollRise(scope: ParentNode = document): Promise<Clea
   await fontsReady();
 
   const groups: Group[] = elements.map((element) => {
-    const { words } = splitWords(element, 'rise-word', 'rise-inner');
+    const { words, restore } = splitWords(element, 'rise-word', 'rise-inner');
     element.classList.add('is-rising');
-    return { element, words, rows: [], lineCount: 1 };
+    return { element, words, restore };
   });
-
-  const measure = (): void => {
-    for (const group of groups) {
-      group.rows = lineIndices(group.words);
-      group.lineCount = Math.max(1, ...group.rows.map((row) => row + 1));
-    }
-  };
 
   const update = (): void => {
     const vh = window.innerHeight;
     for (const group of groups) {
       const top = group.element.getBoundingClientRect().top;
-      const progress = clamp((vh * 0.88 - top) / (vh * 0.58));
-      const step = group.lineCount > 1 ? (1 - WINDOW) / (group.lineCount - 1) : 0;
+      const progress = clamp((vh * 0.85 - top) / (vh * 0.55));
+      const step = (1 - WINDOW) / Math.max(1, group.words.length - 1);
       group.words.forEach((word, index) => {
-        const row = group.rows[index] ?? 0;
-        const eased = easeOutCubic((progress - row * step) / WINDOW);
-        word.style.setProperty('--rise-y', `${((1 - eased) * 1.1).toFixed(3)}em`);
-        word.style.setProperty('--rise-a', Math.min(1, eased * 1.5).toFixed(3));
+        const eased = easeOutCubic((progress - index * step) / WINDOW);
+        word.style.setProperty('--rise-a', (0.45 + eased * 0.55).toFixed(3));
       });
     }
   };
@@ -54,17 +43,16 @@ export async function initScrollRise(scope: ParentNode = document): Promise<Clea
       update();
     });
   };
-  const refresh = (): void => {
-    measure();
-    schedule();
-  };
-
-  refresh();
+  update();
   window.addEventListener('scroll', schedule, { passive: true });
-  window.addEventListener('resize', refresh);
+  window.addEventListener('resize', schedule);
   return () => {
     cancelAnimationFrame(frame);
     window.removeEventListener('scroll', schedule);
-    window.removeEventListener('resize', refresh);
+    window.removeEventListener('resize', schedule);
+    for (const group of groups) {
+      group.restore();
+      group.element.classList.remove('is-rising');
+    }
   };
 }

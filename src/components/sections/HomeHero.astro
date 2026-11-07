@@ -9,11 +9,11 @@ const portrait = '(max-aspect-ratio: 3/4)';
 <section class="hero" aria-labelledby="hero-title">
   <div class="hero__media" aria-hidden="true">
     <picture>
-      <source media={portrait} srcset={href('media/hero/hero-portrait-poster.webp')} width="720" height="1280" />
+      <source media={portrait} srcset={href('media/hero/grid-portrait-poster.webp')} width="720" height="1280" />
       <img
         class="hero__poster"
         data-hero-poster
-        src={href('media/hero/hero-1080-poster.webp')}
+        src={href('media/hero/grid-1080-poster.webp')}
         alt=""
         width="1920"
         height="1080"
@@ -22,10 +22,8 @@ const portrait = '(max-aspect-ratio: 3/4)';
       />
     </picture>
     <video class="hero__video" data-hero-video data-module="background-video" autoplay muted loop playsinline preload="auto" tabindex="-1">
-      <source src={href('media/hero/hero-portrait.webm')} type="video/webm" media={portrait} />
-      <source src={href('media/hero/hero-portrait.mp4')} type="video/mp4" media={portrait} />
-      <source src={href('media/hero/hero-1080.webm')} type="video/webm" />
-      <source src={href('media/hero/hero-1080.mp4')} type="video/mp4" />
+      <source src={href('media/hero/grid-portrait.mp4')} type="video/mp4" media={portrait} />
+      <source src={href('media/hero/grid-1080.mp4')} type="video/mp4" />
     </video>
     <div class="hero__shade"></div>
   </div>
@@ -85,7 +83,7 @@ const portrait = '(max-aspect-ratio: 3/4)';
   }
 
   .hero__shade {
-    background: linear-gradient(180deg, rgb(0 0 0 / 55%) 0%, transparent 28%), linear-gradient(0deg, rgb(0 0 0 / 50%) 0%, transparent 35%);
+    background: linear-gradient(180deg, rgb(0 0 0 / 45%) 0%, transparent 28%), linear-gradient(0deg, #000 0%, transparent 24%);
   }
 
   .hero__intro {

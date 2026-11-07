@@ -14,6 +14,27 @@ test('FAQ items open and close', async ({ page }) => {
   await expect(item).not.toHaveAttribute('open', '');
 });
 
+test('reversing a moving FAQ keeps its visible height and follows the last click', async ({ page }) => {
+  await page.goto('work/');
+  await waitForStage(page);
+  const item = page.locator('details.faq__item').first();
+  const summary = item.locator('summary');
+  await summary.scrollIntoViewIfNeeded();
+  await summary.click();
+  for (let i = 0; i < 2; i += 1) {
+    await page.waitForTimeout(120);
+    const jump = await item.evaluate((element) => {
+      const before = element.getBoundingClientRect().height;
+      element.querySelector('summary')?.click();
+      return Math.abs(element.getBoundingClientRect().height - before);
+    });
+    expect(jump).toBeLessThan(1);
+  }
+  await page.waitForTimeout(500);
+  await expect(item).toHaveAttribute('open', '');
+  await expect(item.locator('[data-faq-body]')).toBeVisible();
+});
+
 test('case study tabs switch with the mouse and the arrow keys', async ({ page }) => {
   await page.goto('work/relayq/');
   await waitForStage(page);
@@ -59,12 +80,14 @@ test('image strips scroll sideways by dragging without opening the project', asy
   await strip.scrollIntoViewIfNeeded();
   const box = await strip.boundingBox();
   if (!box) throw new Error('strip has no box');
+  const image = strip.locator('li').first();
+  const before = await image.evaluate((element) => element.getBoundingClientRect().x);
   const y = box.y + box.height / 2;
   await page.mouse.move(box.x + box.width - 40, y);
   await page.mouse.down();
   await page.mouse.move(box.x + box.width - 340, y, { steps: 12 });
   await page.mouse.up();
-  await expect.poll(() => strip.evaluate((element) => element.scrollLeft)).toBeGreaterThan(100);
+  await expect.poll(() => image.evaluate((element) => element.getBoundingClientRect().x)).toBeLessThan(before - 100);
   await expect(page).toHaveURL(/\/work\/$/);
 });
 

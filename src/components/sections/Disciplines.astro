@@ -141,6 +141,38 @@ import { disciplines } from '@/data/disciplines';
     }
   }
 
+  /* A landscape viewport still needs room below the fixed navigation. */
+  @media (max-height: 640px) and (min-width: 640px) {
+    .disciplines__sticky {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 40%);
+      grid-template-rows: auto minmax(0, 1fr);
+      align-content: normal;
+      gap: 1rem 4vw;
+      padding: 5.75rem var(--gutter) 1.5rem;
+    }
+
+    .disciplines__sticky :global(.disciplines__label) {
+      margin-left: 0;
+    }
+
+    .disciplines__title {
+      font-size: clamp(1.375rem, 8vh, 2.75rem);
+    }
+
+    .disciplines__media {
+      width: 100%;
+    }
+
+    .disciplines__picture {
+      height: min(35vh, 12rem);
+      aspect-ratio: auto;
+    }
+
+    .disciplines__picture :global(img) {
+      object-fit: contain;
+    }
+  }
+
   @media (prefers-reduced-motion: reduce) {
     .disciplines__item,
     .disciplines__figure,

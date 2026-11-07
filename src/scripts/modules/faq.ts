@@ -10,25 +10,35 @@ export function initFaq(list: HTMLElement): Cleanup {
     const body = details.querySelector<HTMLElement>('[data-faq-body]');
     if (!summary || !body) return null;
     let animation: Animation | null = null;
+    let expanded = details.open;
+    details.classList.add('is-enhanced');
+    details.classList.toggle('is-open', expanded);
     const onClick = (event: MouseEvent): void => {
       event.preventDefault();
+      // Read the visible height before cancelling, including during a reversal.
+      const from = details.getBoundingClientRect().height;
       animation?.cancel();
-      const opening = !details.open;
-      const from = details.offsetHeight;
-      if (opening) details.open = true;
-      const to = opening ? summary.offsetHeight + body.offsetHeight : summary.offsetHeight;
-      details.classList.toggle('is-open', opening);
+      expanded = !expanded;
+      details.open = true;
+      const border = details.offsetHeight - details.clientHeight;
+      const to = expanded ? details.offsetHeight : summary.offsetHeight + border;
+      details.classList.toggle('is-open', expanded);
       animation = details.animate([{ height: `${from}px` }, { height: `${to}px` }], {
         duration: 420,
         easing: 'cubic-bezier(0.65, 0, 0.35, 1)',
+        fill: 'both',
       });
       animation.onfinish = () => {
-        if (!opening) details.open = false;
+        details.open = expanded;
+        animation?.cancel();
         animation = null;
       };
     };
     summary.addEventListener('click', onClick);
-    return () => summary.removeEventListener('click', onClick);
+    return () => {
+      animation?.cancel();
+      summary.removeEventListener('click', onClick);
+    };
   });
   return () => handlers.forEach((remove) => remove?.());
 }

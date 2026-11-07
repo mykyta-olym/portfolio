@@ -20,9 +20,18 @@ interface Props {
   image?: string;
   /** Section background behind the page, used under the footer reveal. */
   surface?: 'black' | 'grey';
+  footer?: boolean;
 }
 
-const { title, description = site.description, pill, loader = false, image = 'social/og-default.jpg', surface = 'black' } = Astro.props;
+const {
+  title,
+  description = site.description,
+  pill,
+  loader = false,
+  image = 'social/og-default.jpg',
+  surface = 'black',
+  footer = true,
+} = Astro.props;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 const ogImage = new URL(href(image), Astro.site);
 const fullTitle = title === site.title ? `${site.title} | Software developer` : `${title} | ${site.title}`;
@@ -83,9 +92,9 @@ const fullTitle = title === site.title ? `${site.title} | Software developer` : 
       <main id="main" tabindex="-1">
         <slot />
       </main>
-      <div class="footer-sentinel" data-footer-sentinel aria-hidden="true"></div>
+      {footer && <div class="footer-sentinel" data-footer-sentinel aria-hidden="true"></div>}
     </div>
-    <SiteFooter />
+    {footer && <SiteFooter />}
     <PageCover />
     <CursorLabel />
     <script>

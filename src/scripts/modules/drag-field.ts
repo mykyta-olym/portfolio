@@ -31,8 +31,8 @@ export function initDragField(field: HTMLElement): Cleanup {
   // Must match --cell in FieldHero.astro, which places the tiles before this script runs.
   const measure = (): void => {
     const width = field.clientWidth;
-    cellW = Math.max(220, width / (width < 768 ? 2.1 : 4.2));
-    cellH = cellW * 0.82;
+    cellW = Math.max(220, width / (width < 768 ? 2.1 : 3.6));
+    cellH = field.clientHeight * 0.56;
     spanX = cellW * columns;
     spanY = cellH * rows;
   };
@@ -72,8 +72,8 @@ export function initDragField(field: HTMLElement): Cleanup {
     const tiltY = Math.max(-14, Math.min(14, (targetX - offsetX) * 0.12));
     // Positions are relative to the centre of the field, where the tiles are anchored.
     for (const tile of tiles) {
-      const x = wrap(tile.baseX * cellW + offsetX + cellW * 0.5, spanX) - cellW * 0.5 - spanX / 2;
-      const y = wrap(tile.baseY * cellH + offsetY + cellH * 0.5, spanY) - cellH * 0.5 - spanY / 2;
+      const x = wrap((tile.baseX + 0.5) * cellW + offsetX, spanX) - spanX / 2;
+      const y = wrap((tile.baseY + 0.5) * cellH + offsetY, spanY) - spanY / 2;
       tile.element.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0) rotateX(${tiltX.toFixed(2)}deg) rotateY(${tiltY.toFixed(2)}deg)`;
     }
     if (title) title.style.setProperty('--field-blur', `${Math.min(14, speed * 0.25).toFixed(2)}px`);
@@ -124,6 +124,10 @@ export function initDragField(field: HTMLElement): Cleanup {
   const observer = new IntersectionObserver(([entry]) => {
     visible = entry?.isIntersecting ?? true;
     if (visible) kick();
+    else {
+      cancelAnimationFrame(frame);
+      frame = 0;
+    }
   });
   observer.observe(field);
 
@@ -133,7 +137,6 @@ export function initDragField(field: HTMLElement): Cleanup {
     resizeTimer = window.setTimeout(() => {
       measure();
       kick();
-      requestAnimationFrame(render);
     }, 120);
   };
 
@@ -142,11 +145,12 @@ export function initDragField(field: HTMLElement): Cleanup {
   field.addEventListener('pointerup', onUp);
   field.addEventListener('pointercancel', onUp);
   window.addEventListener('resize', onResize);
-  requestAnimationFrame(render);
+  kick();
   field.classList.add('is-ready');
 
   return () => {
     cancelAnimationFrame(frame);
+    window.clearTimeout(resizeTimer);
     observer.disconnect();
     field.removeEventListener('pointerdown', onDown);
     field.removeEventListener('pointermove', onMove);

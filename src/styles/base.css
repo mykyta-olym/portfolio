@@ -9,6 +9,7 @@ html {
   text-size-adjust: 100%;
   background: var(--color-black);
   scrollbar-color: #3a3a3a var(--color-black);
+  scrollbar-gutter: stable;
 }
 
 body {
