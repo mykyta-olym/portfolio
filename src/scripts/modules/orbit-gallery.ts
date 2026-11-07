@@ -7,7 +7,7 @@ import { reducedMotion, type Cleanup } from '@/scripts/core/motion';
 function radiusFor(width: number): number {
   if (width > 1024) return 280;
   if (width >= 768) return 230;
-  return 150;
+  return 118;
 }
 
 export function initOrbitGallery(section: HTMLElement): Cleanup {
