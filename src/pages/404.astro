@@ -1,0 +1,65 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import Button from '@/components/ui/Button.astro';
+import LogoMark from '@/components/navigation/LogoMark.astro';
+import { href } from '@/lib/paths';
+---
+
+<BaseLayout title="Page not found" pill="missing" description="This page does not exist.">
+  <section class="missing" aria-labelledby="missing-title">
+    <LogoMark size={44} class="missing__mark" />
+    <p class="missing__code">404</p>
+    <h1 class="missing__title" id="missing-title" data-reveal="lines">
+      This page does not exist
+    </h1>
+    <p class="missing__text">The link may be old, or the address may have a typo.</p>
+    <div class="missing__actions">
+      <Button href={href()}>Back Home</Button>
+      <Button href={href('work/')} variant="dark">
+        See the Work
+      </Button>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .missing {
+    display: grid;
+    place-content: center;
+    justify-items: center;
+    gap: 1.25rem;
+    min-height: 100vh;
+    padding: 8rem var(--gutter);
+    text-align: center;
+  }
+
+  .missing :global(.missing__mark) {
+    color: var(--color-white);
+  }
+
+  .missing__code {
+    font-family: var(--font-mono);
+    font-size: var(--fs-label);
+    letter-spacing: 0.2em;
+    color: var(--color-text-dim);
+  }
+
+  .missing__title {
+    font-size: var(--fs-display);
+    font-weight: 400;
+    letter-spacing: -0.02em;
+    line-height: 1.05;
+  }
+
+  .missing__text {
+    color: var(--color-text-muted);
+  }
+
+  .missing__actions {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 0.75rem;
+    margin-top: 0.75rem;
+  }
+</style>

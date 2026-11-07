@@ -1,0 +1,116 @@
+---
+// Covers the home page while its hero media loads. The markup is visible from the first
+// paint; scripts/loader/preloader.ts drives it. A CSS failsafe hides it if script never runs.
+---
+
+<div class="loader" data-preloader aria-hidden="true">
+  <div class="loader__stack">
+    <canvas class="loader__mark" data-loader-mark width="54" height="54"></canvas>
+    <p class="loader__counter">
+      <span class="loader__digits" data-loader-digits>
+        <span class="loader__digit" data-digit>
+          00
+        </span>
+      </span>
+      <span class="loader__percent">%</span>
+    </p>
+  </div>
+</div>
+
+<style>
+  .loader {
+    position: fixed;
+    inset: 0;
+    z-index: var(--layer-loader);
+    display: grid;
+    place-items: center;
+    background: var(--color-black);
+    transition: transform 0.82s var(--ease-wipe);
+    will-change: transform;
+    animation: loader-failsafe 0.01s linear 9s forwards;
+  }
+
+  :global(.no-js) .loader {
+    display: none;
+  }
+
+  .loader:global(.is-leaving) {
+    transform: translate3d(0, -101%, 0);
+    pointer-events: none;
+  }
+
+  .loader__stack {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    transform: translateY(-6px);
+  }
+
+  .loader__mark {
+    width: 54px;
+    height: 54px;
+  }
+
+  .loader__counter {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 1.25rem;
+    margin-top: 1.125rem;
+    color: #ececec;
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.03em;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .loader__digits {
+    position: relative;
+    display: block;
+    width: 3.1ch;
+    height: 1.4em;
+    overflow: hidden;
+  }
+
+  .loader__digits :global(.loader__digit) {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+  }
+
+  .loader__digits :global(.loader__digit:only-child) {
+    position: absolute;
+  }
+
+  @keyframes loader-failsafe {
+    to {
+      visibility: hidden;
+      pointer-events: none;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .loader__mark {
+      width: 48px;
+      height: 48px;
+    }
+
+    .loader__counter {
+      font-size: 0.625rem;
+      margin-top: 1rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .loader {
+      transition: opacity 0.3s linear;
+    }
+
+    .loader:global(.is-leaving) {
+      transform: none;
+      opacity: 0;
+    }
+  }
+</style>

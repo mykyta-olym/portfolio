@@ -1,0 +1,99 @@
+---
+import { Image } from 'astro:assets';
+import avatar from '@/assets/profile/avatar.jpg';
+import InlinePic from '@/components/ui/InlinePic.astro';
+import TechMarquee from './TechMarquee.astro';
+import { profile } from '@/data/profile';
+import { projectMedia } from '@/data/projects';
+---
+
+<section class="statement" aria-label="About">
+  <div class="statement__inner">
+    <div class="statement__person" data-reveal="fade">
+      <Image src={avatar} alt="Mykyta Olym" width={96} height={96} class="statement__avatar" />
+      <div>
+        <p class="statement__name">{profile.name}</p>
+        <p class="statement__role">{profile.role}, Košice</p>
+      </div>
+    </div>
+    <div class="statement__text">
+      <p data-scroll-rise>
+        I build software I would want to inherit <InlinePic image={projectMedia.relayqStates} />: small parts with clear guarantees and
+        tests that pull the plug on purpose.
+      </p>
+      <p data-scroll-rise>
+        Every number on this site comes from a real run <InlinePic image={projectMedia.speechInDomain} /> and every project links to its
+        code.
+      </p>
+    </div>
+  </div>
+  <TechMarquee />
+</section>
+
+<style>
+  .statement {
+    position: relative;
+    padding-top: clamp(4.5rem, 8vw, 8.5rem);
+    background: var(--color-black);
+  }
+
+  .statement__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 20.8vw) minmax(0, 62.5vw);
+    gap: 0 clamp(1rem, 2vw, 2.5rem);
+    padding-left: 9.7vw;
+  }
+
+  .statement__person {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    align-self: start;
+    padding-top: 0.35rem;
+  }
+
+  .statement__person :global(.statement__avatar) {
+    width: 3rem;
+    height: 3rem;
+    border-radius: 50%;
+    object-fit: cover;
+    filter: grayscale(1);
+  }
+
+  .statement__name {
+    font-family: var(--font-tight);
+    font-size: var(--fs-name);
+    font-weight: 500;
+    letter-spacing: -0.006em;
+    color: #d9d9d9;
+  }
+
+  .statement__role {
+    margin-top: 0.15rem;
+    font-family: var(--font-tight);
+    font-size: 0.625rem;
+    color: #bdbdbd;
+  }
+
+  .statement__text {
+    display: grid;
+    gap: 0.9em;
+    font-size: var(--fs-statement);
+    font-weight: 500;
+    line-height: 1.03;
+    letter-spacing: var(--tracking-statement);
+    color: var(--color-text-soft);
+  }
+
+  @media (max-width: 1023px) {
+    .statement__inner {
+      grid-template-columns: 1fr;
+      gap: 2.5rem;
+      padding-inline: var(--gutter);
+    }
+
+    .statement__person {
+      order: 2;
+    }
+  }
+</style>

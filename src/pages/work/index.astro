@@ -1,0 +1,82 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import ProjectRow from '@/components/projects/ProjectRow.astro';
+import SectionLabel from '@/components/ui/SectionLabel.astro';
+import ContactCta from '@/components/sections/ContactCta.astro';
+import { projects } from '@/data/projects';
+import { links } from '@/data/profile';
+---
+
+<BaseLayout
+  title="Work"
+  pill="work"
+  surface="grey"
+  description="Projects by Mykyta Olym: a Redis job queue in Go, a phishing URL classifier, a GitLab analytics platform, a shop backend, a browser game and a speech study."
+>
+  <section class="work-page" aria-labelledby="work-page-title">
+    <header class="work-page__head">
+      <SectionLabel text={`My work (${projects.length})`} class="work-page__label" />
+      <h1 class="work-page__title" id="work-page-title" data-reveal="lines">
+        All Projects
+      </h1>
+    </header>
+    <div class="work-page__rows">
+      {projects.map((project) => (
+        <ProjectRow project={project} headingLevel="h2" />
+      ))}
+    </div>
+    <p class="work-page__more" data-reveal="fade">
+      More, including smaller experiments, on{' '}
+      <a href={links.github.href} target="_blank" rel="noopener">
+        GitHub
+      </a>
+      .
+    </p>
+  </section>
+  <ContactCta />
+</BaseLayout>
+
+<style>
+  .work-page {
+    background: var(--color-surface);
+    padding-top: clamp(7.5rem, 12vh, 9rem);
+  }
+
+  .work-page__head {
+    display: grid;
+    grid-template-columns: 19.6vw 1fr;
+    align-items: center;
+    padding: 0 var(--gutter) clamp(1.75rem, 3vw, 2.75rem);
+  }
+
+  .work-page__title {
+    font-size: var(--fs-display);
+    font-weight: 500;
+    letter-spacing: var(--tracking-display);
+    line-height: 1.05;
+  }
+
+  .work-page__rows {
+    border-bottom: 1px solid rgb(255 255 255 / 8%);
+  }
+
+  .work-page__more {
+    padding: clamp(2.5rem, 4vw, 3.5rem) var(--gutter) clamp(4rem, 6vw, 6rem);
+    text-align: center;
+    font-size: var(--fs-body);
+    color: var(--color-text-muted);
+  }
+
+  .work-page__more a {
+    color: var(--color-white);
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+
+  @media (max-width: 1023px) {
+    .work-page__head {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+  }
+</style>

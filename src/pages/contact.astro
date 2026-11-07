@@ -1,0 +1,217 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import AvatarButton from '@/components/ui/AvatarButton.astro';
+import Icon from '@/components/ui/Icon.astro';
+import contactRender from '@/assets/renders/contact.webp';
+import { links, profile } from '@/data/profile';
+---
+
+<BaseLayout title="Contact" pill="contact" description="Contact Mykyta Olym by email, Telegram or LinkedIn. Based in Košice, Slovakia.">
+  <section class="contact" aria-labelledby="contact-title">
+    <Image
+      src={contactRender}
+      alt=""
+      widths={[960, 1600, 2560]}
+      sizes="100vw"
+      class="contact__backdrop"
+      loading="eager"
+      fetchpriority="high"
+    />
+    <div class="contact__shade" aria-hidden="true"></div>
+
+    <div class="contact__centre">
+      <h1 class="contact__title" id="contact-title" data-reveal="lines">
+        Let's talk
+      </h1>
+      <p class="contact__text" data-reveal="lines" data-reveal-delay="0.15">
+        Tell me about a project, a role or a question about my code. Email reaches me fastest.
+      </p>
+      <div data-reveal="fade" data-reveal-delay="0.5">
+        <AvatarButton href={links.email.href}>Send an Email</AvatarButton>
+      </div>
+    </div>
+
+    <div class="contact__card contact__card--mail" data-reveal="fade" data-reveal-delay="0.6">
+      <p class="contact__card-label">Email</p>
+      <div class="contact__mail">
+        <a href={links.email.href}>{profile.email}</a>
+        <button class="contact__copy" type="button" data-module="copy" data-copy={profile.email}>
+          <Icon name="copy" size={13} class="contact__copy-icon" />
+          <Icon name="check" size={13} class="contact__copied-icon" />
+          <span class="visually-hidden" data-copy-status>
+            Copy the email address
+          </span>
+        </button>
+      </div>
+    </div>
+
+    <div class="contact__card contact__card--social" data-reveal="fade" data-reveal-delay="0.75">
+      <p class="contact__card-label">Elsewhere</p>
+      <ul>
+        {[links.github, links.linkedin, links.telegram].map((link) => (
+          <li>
+            <a href={link.href} target="_blank" rel="noopener">
+              <span>{link.label}</span>
+              <span class="contact__handle">{link.display}</span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact {
+    position: relative;
+    display: grid;
+    place-items: center;
+    min-height: 100vh;
+    min-height: 100svh;
+    overflow: hidden;
+    padding: 7rem var(--gutter) 6rem;
+    background: var(--color-black);
+  }
+
+  .contact :global(.contact__backdrop) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .contact__shade {
+    position: absolute;
+    inset: 0;
+    background:
+      radial-gradient(60% 50% at 50% 45%, rgb(0 0 0 / 72%), transparent 75%),
+      linear-gradient(180deg, rgb(0 0 0 / 55%), transparent 30%, transparent 70%, rgb(0 0 0 / 65%));
+  }
+
+  .contact__centre {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    gap: 1.4rem;
+    max-width: 36rem;
+    text-align: center;
+  }
+
+  .contact__title {
+    font-size: var(--fs-display);
+    font-weight: 300;
+    letter-spacing: -0.02em;
+    line-height: 1;
+  }
+
+  .contact__text {
+    font-size: var(--fs-small);
+    line-height: 1.5;
+    color: var(--color-text-muted);
+  }
+
+  .contact__card {
+    position: absolute;
+    padding: 0.9rem 1.1rem 1rem;
+    background: rgb(236 236 236 / 94%);
+    color: var(--color-black);
+    border-radius: 4px;
+    box-shadow: 0 30px 60px -30px rgb(0 0 0 / 90%);
+  }
+
+  .contact__card--mail {
+    top: 26vh;
+    left: 8vw;
+    transform: rotate(-2.5deg);
+  }
+
+  .contact__card--social {
+    right: 8vw;
+    bottom: 18vh;
+    min-width: 15rem;
+    transform: rotate(2deg);
+  }
+
+  .contact__card-label {
+    margin-bottom: 0.6rem;
+    font-family: var(--font-label);
+    font-size: var(--fs-tag);
+    font-weight: 600;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: #555;
+  }
+
+  .contact__mail {
+    display: flex;
+    align-items: center;
+    gap: 0.6rem;
+    padding: 0.55rem 0.7rem;
+    background: var(--color-white);
+    border: 1px solid #d6d6d6;
+    border-radius: 3px;
+    font-size: var(--fs-small);
+  }
+
+  .contact__mail a:hover,
+  .contact__card--social a:hover span:first-child {
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .contact__copy {
+    display: grid;
+    place-items: center;
+    width: 1.75rem;
+    height: 1.75rem;
+    border-radius: 3px;
+    color: #444;
+  }
+
+  .contact__copy:hover {
+    background: #eee;
+  }
+
+  .contact__copy :global(.contact__copied-icon),
+  .contact__copy:global(.is-copied) :global(.contact__copy-icon) {
+    display: none;
+  }
+
+  .contact__copy:global(.is-copied) :global(.contact__copied-icon) {
+    display: block;
+  }
+
+  .contact__card--social ul {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .contact__card--social a {
+    display: flex;
+    justify-content: space-between;
+    gap: 1.5rem;
+    font-size: var(--fs-small);
+  }
+
+  .contact__handle {
+    color: #666;
+  }
+
+  @media (max-width: 767px) {
+    .contact {
+      display: flex;
+      flex-direction: column;
+      gap: 2rem;
+      padding-top: 8rem;
+    }
+
+    .contact__card {
+      position: relative;
+      inset: auto;
+      width: 100%;
+      max-width: 22rem;
+    }
+  }
+</style>

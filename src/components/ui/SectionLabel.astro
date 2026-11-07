@@ -1,0 +1,40 @@
+---
+interface Props {
+  text: string;
+  class?: string;
+  as?: 'p' | 'h2' | 'span';
+}
+
+const { text, class: className, as: Tag = 'p' } = Astro.props;
+---
+
+<Tag class:list={['label', className]} data-scramble-group>
+  <svg class="label__glyph" width="15" height="6" viewBox="0 0 15 6" aria-hidden="true" shape-rendering="crispEdges">
+    <rect x="0" y="0" width="3" height="3" fill="currentColor"></rect>
+    <rect x="3" y="3" width="3" height="3" fill="currentColor"></rect>
+    <rect x="6" y="0" width="3" height="3" fill="currentColor"></rect>
+    <rect x="9" y="3" width="3" height="3" fill="currentColor"></rect>
+    <rect x="12" y="0" width="3" height="3" fill="currentColor"></rect>
+  </svg>
+  <span data-scramble>{text}</span>
+</Tag>
+
+<style>
+  .label {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    font-family: var(--font-label);
+    font-size: var(--fs-label);
+    font-weight: 500;
+    letter-spacing: var(--tracking-label);
+    line-height: 1.4;
+    text-transform: uppercase;
+    color: var(--color-white);
+  }
+
+  .label__glyph {
+    flex: none;
+    opacity: 0.85;
+  }
+</style>

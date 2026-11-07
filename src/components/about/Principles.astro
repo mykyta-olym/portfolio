@@ -1,0 +1,54 @@
+---
+import { principles } from '@/data/principles';
+---
+
+<ol class="principles" aria-label="How I work">
+  {principles.map((principle, index) => (
+    <li class="principles__item" data-reveal="fade" data-reveal-delay={String(index * 0.05)}>
+      <span class="principles__number" aria-hidden="true">
+        {index + 1}
+      </span>
+      <div class="principles__copy">
+        <h3 class="principles__title">{principle.title}</h3>
+        <p class="principles__text">{principle.text}</p>
+      </div>
+    </li>
+  ))}
+</ol>
+
+<style>
+  .principles {
+    border-top: 1px solid var(--color-line);
+  }
+
+  .principles__item {
+    display: grid;
+    grid-template-columns: 3.5rem minmax(0, 1fr);
+    align-items: start;
+    gap: 1.5rem;
+    padding: 1.6rem 0;
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .principles__number {
+    justify-self: end;
+    font-size: clamp(1.5rem, 2.1vw, 2.25rem);
+    font-weight: 300;
+    line-height: 1;
+    color: var(--color-white);
+  }
+
+  .principles__title {
+    font-size: var(--fs-small);
+    font-weight: 600;
+    color: var(--color-white);
+  }
+
+  .principles__text {
+    margin-top: 0.4rem;
+    max-width: 30rem;
+    font-size: var(--fs-small);
+    line-height: 1.45;
+    color: var(--color-text-muted);
+  }
+</style>

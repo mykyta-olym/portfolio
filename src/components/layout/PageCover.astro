@@ -1,0 +1,50 @@
+---
+import LogoMark from '@/components/navigation/LogoMark.astro';
+---
+
+<div class="cover" data-page-cover aria-hidden="true">
+  <LogoMark size={40} class="cover__mark" />
+</div>
+
+<style>
+  .cover {
+    position: fixed;
+    inset: 0;
+    z-index: var(--layer-transition);
+    display: grid;
+    place-items: center;
+    background: var(--color-black);
+    color: var(--color-white);
+    transform: translate3d(0, 101%, 0);
+    pointer-events: none;
+    visibility: hidden;
+  }
+
+  :global(.is-departing) .cover {
+    visibility: visible;
+    transform: none;
+    transition: transform 0.7s var(--ease-wipe);
+  }
+
+  :global(.is-arriving) .cover {
+    visibility: visible;
+    transform: none;
+    transition: none;
+  }
+
+  :global(.is-uncovering) .cover {
+    visibility: visible;
+    transform: translate3d(0, -101%, 0);
+    transition: transform 0.85s var(--ease-wipe);
+  }
+
+  .cover :global(.cover__mark) {
+    opacity: 0;
+    transition: opacity 0.3s ease 0.25s;
+  }
+
+  :global(.is-departing) .cover :global(.cover__mark),
+  :global(.is-arriving) .cover :global(.cover__mark) {
+    opacity: 1;
+  }
+</style>

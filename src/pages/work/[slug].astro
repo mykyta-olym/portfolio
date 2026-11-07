@@ -1,0 +1,86 @@
+---
+import type { GetStaticPaths } from 'astro';
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import CaseHero from '@/components/case/CaseHero.astro';
+import CaseBody from '@/components/case/CaseBody.astro';
+import ProjectRow from '@/components/projects/ProjectRow.astro';
+import SectionLabel from '@/components/ui/SectionLabel.astro';
+import Button from '@/components/ui/Button.astro';
+import ContactCta from '@/components/sections/ContactCta.astro';
+import { projects } from '@/data/projects';
+import type { Project } from '@/types/content';
+import { href } from '@/lib/paths';
+
+export const getStaticPaths = (() =>
+  projects.map((project) => ({ params: { slug: project.slug }, props: { project } }))) satisfies GetStaticPaths;
+
+interface Props {
+  project: Project;
+}
+
+const { project } = Astro.props;
+const index = projects.findIndex((item) => item.slug === project.slug);
+const others = [1, 2, 3].map((step) => projects[(index + step) % projects.length]).filter((item): item is Project => item !== undefined);
+---
+
+<BaseLayout title={project.name} pill="project" description={`${project.name}: ${project.summary}`} surface="grey">
+  <CaseHero project={project} />
+  <CaseBody project={project} />
+  <section class="more" aria-labelledby="more-title">
+    <header class="more__head">
+      <SectionLabel text="Other work" />
+      <h2 class="more__title" id="more-title" data-reveal="lines">
+        View more projects
+      </h2>
+    </header>
+    <div class="more__rows">
+      {others.map((item) => (
+        <ProjectRow project={item} />
+      ))}
+    </div>
+    <div class="more__cta">
+      <Button href={href('work/')} variant="dark">
+        All Projects
+      </Button>
+    </div>
+  </section>
+  <ContactCta />
+</BaseLayout>
+
+<style>
+  .more {
+    background: var(--color-surface);
+    padding-top: clamp(4.5rem, 8vw, 8rem);
+  }
+
+  .more__head {
+    display: grid;
+    grid-template-columns: 19.6vw 1fr;
+    align-items: center;
+    padding: 0 var(--gutter) clamp(2rem, 3vw, 3rem);
+  }
+
+  .more__title {
+    font-size: var(--fs-display);
+    font-weight: 500;
+    letter-spacing: var(--tracking-display);
+    line-height: 1.05;
+  }
+
+  .more__rows {
+    border-bottom: 1px solid rgb(255 255 255 / 8%);
+  }
+
+  .more__cta {
+    display: flex;
+    justify-content: center;
+    padding: clamp(2.5rem, 3.2vw, 3.5rem) 0 clamp(4rem, 6vw, 6rem);
+  }
+
+  @media (max-width: 1023px) {
+    .more__head {
+      grid-template-columns: 1fr;
+      gap: 1.25rem;
+    }
+  }
+</style>

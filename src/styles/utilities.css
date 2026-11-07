@@ -1,0 +1,94 @@
+.visually-hidden {
+  position: absolute !important;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.skip-link {
+  position: fixed;
+  top: 0.75rem;
+  left: 0.75rem;
+  z-index: calc(var(--layer-loader) + 1);
+  padding: 0.75rem 1rem;
+  background: var(--color-white);
+  color: var(--color-black);
+  font-size: var(--fs-small);
+  font-weight: 500;
+  border-radius: var(--radius-small);
+  transform: translateY(-200%);
+}
+
+.skip-link:focus-visible {
+  transform: none;
+}
+
+.container {
+  padding-inline: var(--gutter);
+}
+
+/* Text revealed line by line. Without script, or with reduced motion, it is simply shown. */
+.js [data-reveal='lines'] {
+  visibility: hidden;
+}
+
+.js [data-reveal='lines'].is-split,
+.js [data-reveal='lines'].is-done {
+  visibility: visible;
+}
+
+.line-clip {
+  display: block;
+  overflow: hidden;
+  /* Room for descenders and accents inside the clipping box. */
+  padding-block: 0.08em 0.12em;
+  margin-block: -0.08em -0.12em;
+}
+
+.line-slide {
+  display: block;
+  will-change: transform;
+}
+
+.js [data-reveal='fade'] {
+  opacity: 0;
+  transform: translate3d(0, 1.25rem, 0);
+  transition:
+    opacity 0.9s var(--ease-out),
+    transform 0.9s var(--ease-out);
+}
+
+.js [data-reveal='fade'].is-done {
+  opacity: 1;
+  transform: none;
+}
+
+/* Words that rise with the scroll position (scripts/text/scroll-rise.ts sets the variables). */
+.is-rising .rise-word {
+  display: inline-block;
+  clip-path: inset(-0.12em -0.08em -0.22em -0.08em);
+}
+
+.is-rising .rise-inner,
+.is-rising [data-inline-pic] {
+  display: inline-block;
+  transform: translate3d(0, var(--rise-y, 1.1em), 0);
+  opacity: var(--rise-a, 0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .js [data-reveal='lines'] {
+    visibility: visible;
+  }
+
+  .js [data-reveal='fade'] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}

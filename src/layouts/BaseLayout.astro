@@ -1,0 +1,116 @@
+---
+import '@/styles/global.css';
+import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
+import NavPill from '@/components/navigation/NavPill.astro';
+import MenuPanel from '@/components/navigation/MenuPanel.astro';
+import Preloader from '@/components/loader/Preloader.astro';
+import SiteFooter from '@/components/layout/SiteFooter.astro';
+import PageCover from '@/components/layout/PageCover.astro';
+import CursorLabel from '@/components/interactions/CursorLabel.astro';
+import { site } from '@/data/profile';
+import type { PillContext } from '@/data/navigation';
+import { href } from '@/lib/paths';
+
+interface Props {
+  title: string;
+  description?: string;
+  pill: PillContext;
+  loader?: boolean;
+  /** Social preview image, relative to the site root. */
+  image?: string;
+  /** Section background behind the page, used under the footer reveal. */
+  surface?: 'black' | 'grey';
+}
+
+const { title, description = site.description, pill, loader = false, image = 'social/og-default.jpg', surface = 'black' } = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site);
+const ogImage = new URL(href(image), Astro.site);
+const fullTitle = title === site.title ? `${site.title} | Software developer` : `${title} | ${site.title}`;
+---
+
+<!doctype html>
+<html lang={site.locale} class="no-js">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <title>{fullTitle}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#000000" />
+    <meta name="color-scheme" content="dark" />
+    <meta name="author" content="Mykyta Olym" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.title} />
+    <meta property="og:title" content={fullTitle} />
+    <meta property="og:description" content={description} />
+    <meta property="og:url" content={canonical} />
+    <meta property="og:image" content={ogImage} />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
+    <meta property="og:image:alt" content="Mykyta Olym, software developer" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content={fullTitle} />
+    <meta name="twitter:description" content={description} />
+    <meta name="twitter:image" content={ogImage} />
+    <link rel="icon" href={href('favicon.svg')} type="image/svg+xml" />
+    <link rel="icon" href={href('favicon-32.png')} sizes="32x32" type="image/png" />
+    <link rel="apple-touch-icon" href={href('apple-touch-icon.png')} />
+    <link rel="manifest" href={href('site.webmanifest')} />
+    <link rel="preload" href={interLatin} as="font" type="font/woff2" crossorigin />
+    <script is:inline>
+      // Runs before first paint: enables script-only styles and keeps an arriving page
+      // covered when the previous page started a transition.
+      (function () {
+        const root = document.documentElement;
+        root.classList.remove('no-js');
+        root.classList.add('js');
+        try {
+          if (sessionStorage.getItem('page-transition')) root.classList.add('is-arriving');
+        } catch {
+          /* storage unavailable */
+        }
+      })();
+    </script>
+  </head>
+  <body data-surface={surface}>
+    <a class="skip-link" href="#main">
+      Skip to content
+    </a>
+    {loader && <Preloader />}
+    <NavPill context={pill} />
+    <MenuPanel />
+    <div class="page-shell">
+      <main id="main" tabindex="-1">
+        <slot />
+      </main>
+      <div class="footer-sentinel" data-footer-sentinel aria-hidden="true"></div>
+    </div>
+    <SiteFooter />
+    <PageCover />
+    <CursorLabel />
+    <script>
+      import '@/scripts/app';
+    </script>
+  </body>
+</html>
+
+<style>
+  .page-shell {
+    position: relative;
+    z-index: var(--layer-main);
+    background: var(--color-black);
+  }
+
+  body[data-surface='grey'] .page-shell {
+    background: var(--color-surface);
+  }
+
+  main:focus {
+    outline: none;
+  }
+
+  .footer-sentinel {
+    height: 1px;
+    margin-top: -1px;
+  }
+</style>

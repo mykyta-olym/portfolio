@@ -1,0 +1,21 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import HomeHero from '@/components/sections/HomeHero.astro';
+import Statement from '@/components/sections/Statement.astro';
+import OrbitGallery from '@/components/sections/OrbitGallery.astro';
+import Disciplines from '@/components/sections/Disciplines.astro';
+import Showcase from '@/components/sections/Showcase.astro';
+import SelectedWork from '@/components/sections/SelectedWork.astro';
+import ContactCta from '@/components/sections/ContactCta.astro';
+import { site } from '@/data/profile';
+---
+
+<BaseLayout title={site.title} pill="home" loader surface="grey">
+  <HomeHero />
+  <Statement />
+  <OrbitGallery />
+  <Disciplines />
+  <Showcase />
+  <SelectedWork />
+  <ContactCta />
+</BaseLayout>

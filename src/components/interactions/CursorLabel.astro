@@ -1,0 +1,43 @@
+<div class="cursor-label" data-module="cursor-label" aria-hidden="true">
+  <span class="cursor-label__text" data-cursor-text></span>
+</div>
+
+<style>
+  .cursor-label {
+    position: fixed;
+    top: 0;
+    left: 0;
+    z-index: var(--layer-cursor-label);
+    pointer-events: none;
+    opacity: 0;
+  }
+
+  .cursor-label__text {
+    display: block;
+    padding: 0.5rem 0.875rem;
+    transform: translate(14px, 14px) rotate(-3deg) scale(0.6);
+    transform-origin: 0 0;
+    background: var(--color-white);
+    color: var(--color-black);
+    border-radius: 999px;
+    font-size: 0.6875rem;
+    font-weight: 500;
+    letter-spacing: 0.02em;
+    white-space: nowrap;
+    transition: transform 0.3s var(--ease-out);
+  }
+
+  .cursor-label:global(.is-visible) {
+    opacity: 1;
+  }
+
+  .cursor-label:global(.is-visible) .cursor-label__text {
+    transform: translate(14px, 14px) rotate(-3deg) scale(1);
+  }
+
+  @media (pointer: coarse) {
+    .cursor-label {
+      display: none;
+    }
+  }
+</style>

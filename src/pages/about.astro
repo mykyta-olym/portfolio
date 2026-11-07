@@ -1,0 +1,94 @@
+---
+import BaseLayout from '@/layouts/BaseLayout.astro';
+import FieldHero from '@/components/about/FieldHero.astro';
+import Principles from '@/components/about/Principles.astro';
+import SectionLabel from '@/components/ui/SectionLabel.astro';
+import InlinePic from '@/components/ui/InlinePic.astro';
+import ContactCta from '@/components/sections/ContactCta.astro';
+import { projectMedia } from '@/data/projects';
+---
+
+<BaseLayout
+  title="About"
+  pill="about"
+  surface="grey"
+  description="Mykyta Olym is a software developer from Kyiv, living in Košice and studying informatics at the Technical University of Košice."
+>
+  <FieldHero />
+  <section class="prologue" aria-labelledby="prologue-label">
+    <div class="prologue__grid">
+      <SectionLabel text="Prologue" class="prologue__label" />
+      <h2 class="visually-hidden" id="prologue-label">
+        Prologue
+      </h2>
+      <div class="prologue__text">
+        <p data-scroll-rise>
+          I am from Kyiv and live in Košice, where I study informatics at the Technical University of Košice. I am in my fifth year, with my
+          bachelor's degree finished.
+        </p>
+        <p data-scroll-rise>
+          I work across the stack <InlinePic image={projectMedia.gardenPlay} />, from interfaces to queues, databases and models, and I
+          publish what I build together with its tests and its numbers.
+        </p>
+      </div>
+    </div>
+    <div class="prologue__principles">
+      <SectionLabel text="How I work" />
+      <Principles />
+    </div>
+  </section>
+  <ContactCta />
+</BaseLayout>
+
+<style>
+  .prologue {
+    background: var(--color-black);
+    padding: clamp(5rem, 10vw, 10rem) var(--gutter) clamp(5rem, 9vw, 9rem);
+  }
+
+  .prologue__grid {
+    display: grid;
+    grid-template-columns: 19.6vw minmax(0, 52vw);
+  }
+
+  .prologue__grid :global(.prologue__label) {
+    align-self: start;
+    margin-top: 0.4rem;
+  }
+
+  .prologue__text {
+    display: grid;
+    gap: 1em;
+    font-size: var(--fs-statement);
+    font-weight: 500;
+    line-height: 1.03;
+    letter-spacing: var(--tracking-statement);
+    color: var(--color-text-soft);
+  }
+
+  .prologue__principles {
+    display: grid;
+    grid-template-columns: 19.6vw minmax(0, 1fr);
+    margin-top: clamp(5rem, 9vw, 9rem);
+    margin-left: 46vw;
+    margin-right: calc(-1 * var(--gutter) + 2vw);
+  }
+
+  .prologue__principles > :global(.label) {
+    display: none;
+  }
+
+  @media (max-width: 1023px) {
+    .prologue__grid,
+    .prologue__principles {
+      grid-template-columns: 1fr;
+      gap: 2rem;
+      margin-left: 0;
+      margin-right: 0;
+    }
+
+    .prologue__principles > :global(.label) {
+      display: inline-flex;
+    }
+  }
+</style>

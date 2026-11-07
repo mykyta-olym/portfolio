@@ -1,0 +1,160 @@
+---
+import Button from '@/components/ui/Button.astro';
+import AvatarButton from '@/components/ui/AvatarButton.astro';
+import { href } from '@/lib/paths';
+
+const portrait = '(max-aspect-ratio: 3/4)';
+---
+
+<section class="hero" aria-labelledby="hero-title">
+  <div class="hero__media" aria-hidden="true">
+    <picture>
+      <source media={portrait} srcset={href('media/hero/hero-portrait-poster.webp')} width="720" height="1280" />
+      <img
+        class="hero__poster"
+        data-hero-poster
+        src={href('media/hero/hero-1080-poster.webp')}
+        alt=""
+        width="1920"
+        height="1080"
+        fetchpriority="high"
+        decoding="async"
+      />
+    </picture>
+    <video class="hero__video" data-hero-video data-module="background-video" autoplay muted loop playsinline preload="auto" tabindex="-1">
+      <source src={href('media/hero/hero-portrait.webm')} type="video/webm" media={portrait} />
+      <source src={href('media/hero/hero-portrait.mp4')} type="video/mp4" media={portrait} />
+      <source src={href('media/hero/hero-1080.webm')} type="video/webm" />
+      <source src={href('media/hero/hero-1080.mp4')} type="video/mp4" />
+    </video>
+    <div class="hero__shade"></div>
+  </div>
+
+  <div class="hero__intro">
+    <p class="hero__lead" data-reveal="lines" data-reveal-delay="0.15">
+      Backend systems, web apps and machine learning tools, each published with the tests that try to break it.
+    </p>
+    <div class="hero__cta" data-reveal="fade" data-reveal-delay="0.75">
+      <AvatarButton href={href('contact/')}>Get in Touch</AvatarButton>
+    </div>
+  </div>
+
+  <div class="hero__main">
+    <h1 class="hero__title" id="hero-title" data-reveal="lines">
+      <span class="hero__line">Software That</span>
+      <span class="hero__line">Holds Up</span>
+    </h1>
+    <div class="hero__action" data-reveal="fade" data-reveal-delay="0.85">
+      <Button href={href('work/')}>See the Work</Button>
+    </div>
+  </div>
+</section>
+
+<style>
+  .hero {
+    position: relative;
+    height: 100vh;
+    height: 100svh;
+    min-height: 34rem;
+    overflow: hidden;
+    background: var(--color-black);
+  }
+
+  .hero__media,
+  .hero__poster,
+  .hero__video,
+  .hero__shade {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+  }
+
+  .hero__poster,
+  .hero__video {
+    object-fit: cover;
+  }
+
+  .hero__video {
+    opacity: 0;
+    transition: opacity 0.8s ease;
+  }
+
+  .hero__video:global(.is-playing) {
+    opacity: 1;
+  }
+
+  .hero__shade {
+    background: linear-gradient(180deg, rgb(0 0 0 / 55%) 0%, transparent 28%), linear-gradient(0deg, rgb(0 0 0 / 50%) 0%, transparent 35%);
+  }
+
+  .hero__intro {
+    position: absolute;
+    top: 21.2vh;
+    left: 65.7vw;
+    width: min(27vw, 26rem);
+  }
+
+  .hero__lead {
+    font-size: var(--fs-lead);
+    font-weight: 300;
+    line-height: 1.12;
+    letter-spacing: -0.005em;
+    color: var(--color-text-strong);
+  }
+
+  .hero__cta {
+    margin-top: 3.4vh;
+  }
+
+  .hero__main {
+    position: absolute;
+    left: calc(var(--gutter) + 0.9vw);
+    bottom: 15.5vh;
+  }
+
+  .hero__title {
+    font-size: var(--fs-hero);
+    font-weight: 400;
+    line-height: 1;
+    letter-spacing: var(--tracking-hero);
+    color: var(--color-white);
+  }
+
+  .hero__line {
+    display: block;
+  }
+
+  .hero__action {
+    margin-top: 3.6vh;
+  }
+
+  @media (max-width: 1023px) {
+    .hero__intro {
+      left: auto;
+      right: var(--gutter);
+      width: min(44vw, 24rem);
+    }
+  }
+
+  @media (max-width: 767px) {
+    .hero__main {
+      top: 15vh;
+      bottom: auto;
+      left: var(--gutter);
+      right: var(--gutter);
+    }
+
+    .hero__intro {
+      top: auto;
+      bottom: 8vh;
+      left: var(--gutter);
+      right: var(--gutter);
+      width: auto;
+    }
+
+    .hero__lead {
+      max-width: 22rem;
+    }
+  }
+</style>

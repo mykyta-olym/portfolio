@@ -1,0 +1,161 @@
+---
+import { Image } from 'astro:assets';
+import Tag from '@/components/ui/Tag.astro';
+import type { Project } from '@/types/content';
+import { projectHref } from '@/lib/paths';
+
+interface Props {
+  project: Project;
+  headingLevel?: 'h2' | 'h3';
+}
+
+const { project, headingLevel: Heading = 'h3' } = Astro.props;
+const link = projectHref(project.slug);
+---
+
+<article class="row" aria-labelledby={`row-${project.slug}`}>
+  <Heading class="row__name" id={`row-${project.slug}`}>
+    <a href={link} class="row__link">
+      {project.name}
+    </a>
+  </Heading>
+  <div class="row__info" data-scramble-group>
+    <ul class="row__tags" aria-label="Stack">
+      {project.tags.map((tag) => (
+        <Tag text={tag} />
+      ))}
+    </ul>
+    <p class="row__summary">{project.summary}</p>
+  </div>
+  <div class="row__strip" data-module="drag-scroll" tabindex="0" role="region" aria-label={`${project.name} images`}>
+    <ul class="row__images">
+      {project.strip.map((item) => (
+        <li class="row__image" style={`--ratio: ${item.src.width / item.src.height}`}>
+          <Image src={item.src} alt={item.alt} widths={[360, 720]} sizes="(min-width: 768px) 22vw, 60vw" loading="lazy" draggable="false" />
+        </li>
+      ))}
+    </ul>
+  </div>
+</article>
+
+<style>
+  .row {
+    position: relative;
+    display: grid;
+    grid-template-columns: 19.6vw 31.1vw minmax(0, 1fr);
+    align-items: start;
+    min-height: 15.3vw;
+    padding: 1.4vw 0 1.4vw var(--gutter);
+    border-top: 1px solid rgb(255 255 255 / 8%);
+    transition: background-color 0.3s ease;
+  }
+
+  .row:hover,
+  .row:focus-within {
+    background: var(--color-black);
+  }
+
+  .row__name {
+    padding-top: 1.3vw;
+    padding-right: 1.5rem;
+    font-family: var(--font-tight);
+    font-size: var(--fs-project);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: -0.006em;
+  }
+
+  /* The whole row opens the case study; the strip sits above it so dragging still works. */
+  .row__link::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+  }
+
+  .row__info {
+    padding-top: 1.3vw;
+    padding-right: 2.5vw;
+  }
+
+  .row__tags {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+
+  .row__summary {
+    margin-top: 1rem;
+    max-width: 30rem;
+    font-size: var(--fs-body);
+    font-weight: 300;
+    line-height: 1.18;
+    color: var(--color-white);
+  }
+
+  .row__strip {
+    position: relative;
+    z-index: 1;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scrollbar-width: none;
+    cursor: grab;
+    -webkit-user-select: none;
+    user-select: none;
+  }
+
+  .row__strip::-webkit-scrollbar {
+    display: none;
+  }
+
+  .row__strip:global(.is-dragging) {
+    cursor: grabbing;
+  }
+
+  .row__images {
+    display: flex;
+    gap: 1.4vw;
+    width: max-content;
+    padding-right: var(--gutter);
+  }
+
+  .row__image {
+    height: 12.5vw;
+    aspect-ratio: var(--ratio);
+    overflow: hidden;
+    border-radius: 2px;
+    background: #0b0b0c;
+  }
+
+  .row__image :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    pointer-events: none;
+  }
+
+  @media (max-width: 1023px) {
+    .row {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+      padding: 1.75rem 0 1.75rem var(--gutter);
+    }
+
+    .row__name,
+    .row__info {
+      padding-top: 0;
+      padding-right: var(--gutter);
+    }
+
+    .row__summary {
+      margin-top: 0.85rem;
+    }
+
+    .row__image {
+      height: clamp(9rem, 38vw, 15rem);
+    }
+
+    .row__images {
+      gap: 0.75rem;
+    }
+  }
+</style>

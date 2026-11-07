@@ -1,0 +1,142 @@
+---
+import { Image } from 'astro:assets';
+import { galleryCards } from '@/data/disciplines';
+import { projectBySlug } from '@/data/projects';
+import { projectHref } from '@/lib/paths';
+---
+
+<section class="orbit" data-module="orbit-gallery" aria-labelledby="orbit-title">
+  <div class="orbit__stage">
+    <div class="orbit__heading" data-orbit-heading>
+      <h2 class="orbit__title" id="orbit-title">
+        Built in public
+      </h2>
+      <p class="orbit__meta">2026 // Selected work</p>
+    </div>
+    <ul class="orbit__ring" data-orbit-ring>
+      {galleryCards.map((card) => {
+        const project = projectBySlug(card.slug);
+        return (
+          <li class="orbit__card" data-orbit-card>
+            <a href={projectHref(project.slug)} aria-label={`${project.name} case study`}>
+              <Image
+                src={card.image.src}
+                alt=""
+                widths={[240, 420]}
+                sizes="(min-width: 768px) 14vw, 32vw"
+                class="orbit__image"
+                loading="lazy"
+              />
+            </a>
+          </li>
+        );
+      })}
+    </ul>
+  </div>
+</section>
+
+<style>
+  .orbit {
+    position: relative;
+    background: var(--color-black);
+    padding-block: clamp(2rem, 4vw, 4rem);
+  }
+
+  .orbit__stage {
+    position: relative;
+    display: grid;
+    place-items: center;
+    height: min(100vh, 62.5vw);
+    min-height: 34rem;
+    perspective: 1200px;
+    overflow: hidden;
+  }
+
+  .orbit__heading {
+    position: relative;
+    z-index: 1;
+    display: grid;
+    justify-items: center;
+    gap: 0.75rem;
+    text-align: center;
+    pointer-events: none;
+  }
+
+  .orbit__title {
+    font-family: var(--font-tight);
+    font-size: var(--fs-gallery);
+    font-weight: 400;
+    letter-spacing: -0.006em;
+    line-height: 1.12;
+    color: #dcdcdc;
+  }
+
+  .orbit__meta {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--color-text-dim);
+  }
+
+  .orbit__ring {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    transform-style: preserve-3d;
+  }
+
+  .orbit__card {
+    grid-area: 1 / 1;
+    width: clamp(8.5rem, 13.2vw, 15rem);
+    aspect-ratio: 16 / 10;
+    transform-style: preserve-3d;
+    will-change: transform;
+  }
+
+  .orbit__card a {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 4px;
+    overflow: hidden;
+    box-shadow: 0 20px 40px -20px rgb(0 0 0 / 90%);
+  }
+
+  .orbit__card :global(.orbit__image) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Before the script builds the ring, and with reduced motion: a calm static circle. */
+  .orbit__card:nth-child(1) {
+    transform: translate(0, -230%) rotate(0deg);
+  }
+  .orbit__card:nth-child(2) {
+    transform: translate(150%, -110%) rotate(60deg);
+  }
+  .orbit__card:nth-child(3) {
+    transform: translate(150%, 110%) rotate(120deg);
+  }
+  .orbit__card:nth-child(4) {
+    transform: translate(0, 230%) rotate(180deg);
+  }
+  .orbit__card:nth-child(5) {
+    transform: translate(-150%, 110%) rotate(240deg);
+  }
+  .orbit__card:nth-child(6) {
+    transform: translate(-150%, -110%) rotate(300deg);
+  }
+
+  :global(.js) .orbit:not(:global(.is-static)) .orbit__card {
+    transform: none;
+    opacity: 0;
+  }
+
+  :global(.js) .orbit:not(:global(.is-static)) .orbit__ring:global(.is-built) .orbit__card,
+  :global(.js) .orbit:not(:global(.is-static)) .orbit__card[style] {
+    opacity: 1;
+  }
+</style>

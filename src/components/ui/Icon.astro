@@ -1,0 +1,34 @@
+---
+interface Props {
+  name: 'arrow-up-right' | 'chevron-right' | 'chevron-down' | 'chevron-up' | 'close' | 'copy' | 'check';
+  size?: number;
+  class?: string;
+}
+
+const { name, size = 14, class: className } = Astro.props;
+const paths: Record<Props['name'], string> = {
+  'arrow-up-right': 'M5 15 15 5M7 5h8v8',
+  'chevron-right': 'm8 5 5 5-5 5',
+  'chevron-down': 'm5 8 5 5 5-5',
+  'chevron-up': 'm5 12 5-5 5 5',
+  close: 'M5 5l10 10M15 5 5 15',
+  copy: 'M7 7h8v8H7zM5 13V5h8',
+  check: 'm4.5 10.5 3.5 3.5 7.5-8',
+};
+---
+
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox="0 0 20 20"
+  fill="none"
+  stroke="currentColor"
+  stroke-width="1.8"
+  stroke-linecap="square"
+  stroke-linejoin="miter"
+  aria-hidden="true"
+  focusable="false"
+>
+  <path d={paths[name]}></path>
+</svg>

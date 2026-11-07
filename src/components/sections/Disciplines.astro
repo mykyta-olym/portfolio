@@ -1,0 +1,152 @@
+---
+import { Image } from 'astro:assets';
+import SectionLabel from '@/components/ui/SectionLabel.astro';
+import { disciplines } from '@/data/disciplines';
+---
+
+<section class="disciplines" data-module="disciplines" aria-labelledby="disciplines-label" style={`--count: ${disciplines.length}`}>
+  <div class="disciplines__sticky">
+    <SectionLabel text="What I do" class="disciplines__label" />
+    <h2 class="visually-hidden" id="disciplines-label">
+      What I do
+    </h2>
+    <ol class="disciplines__list">
+      {disciplines.map((item, index) => (
+        <li class:list={['disciplines__item', { 'is-active': index === 0 }]} data-discipline-item>
+          <h3 class="disciplines__title">{item.title}</h3>
+          <p class="disciplines__description">{item.description}</p>
+        </li>
+      ))}
+    </ol>
+    <div class="disciplines__media">
+      {disciplines.map((item, index) => (
+        <figure class:list={['disciplines__figure', { 'is-active': index === 0 }]} data-discipline-image>
+          <Image src={item.image.src} alt={item.image.alt} widths={[480, 960]} sizes="(min-width: 1024px) 32vw, 80vw" loading="lazy" />
+        </figure>
+      ))}
+    </div>
+  </div>
+</section>
+
+<style>
+  .disciplines {
+    position: relative;
+    height: calc(100vh + var(--count) * 42vh);
+    background: var(--color-black);
+  }
+
+  .disciplines__sticky {
+    position: sticky;
+    top: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 32vw);
+    grid-template-rows: auto 1fr;
+    align-items: center;
+    column-gap: 4vw;
+    height: 100vh;
+    padding: 18vh calc(var(--gutter) + 1.9vw) 12vh 11.1vw;
+  }
+
+  .disciplines__sticky :global(.disciplines__label) {
+    grid-column: 1 / -1;
+    align-self: start;
+    margin-left: -6.25vw;
+  }
+
+  .disciplines__list {
+    display: grid;
+    gap: 0.15em;
+    align-self: center;
+  }
+
+  .disciplines__item {
+    opacity: 0.25;
+    transition: opacity 0.3s ease;
+  }
+
+  .disciplines__item:global(.is-active) {
+    opacity: 1;
+  }
+
+  .disciplines__title {
+    font-size: var(--fs-display);
+    font-weight: 600;
+    line-height: 1;
+    letter-spacing: var(--tracking-display);
+    color: var(--color-white);
+  }
+
+  .disciplines__description {
+    max-height: 0;
+    overflow: hidden;
+    max-width: 30rem;
+    font-size: var(--fs-body);
+    line-height: 1.35;
+    color: var(--color-text-muted);
+    transition:
+      max-height 0.45s var(--ease-in-out),
+      margin 0.45s var(--ease-in-out);
+  }
+
+  .disciplines__item:global(.is-active) .disciplines__description {
+    max-height: 4em;
+    margin: 0.6rem 0 0.9rem;
+  }
+
+  .disciplines__media {
+    position: relative;
+    align-self: center;
+    aspect-ratio: 464 / 300;
+  }
+
+  .disciplines__figure {
+    position: absolute;
+    inset: 0;
+    margin: 0;
+    overflow: hidden;
+    border-radius: 3px;
+    opacity: 0;
+    transform: scale(1.03);
+    transition:
+      opacity 0.45s ease,
+      transform 0.6s var(--ease-out);
+  }
+
+  .disciplines__figure:global(.is-active) {
+    opacity: 1;
+    transform: none;
+  }
+
+  .disciplines__figure :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-width: 1023px) {
+    .disciplines__sticky {
+      grid-template-columns: 1fr;
+      grid-template-rows: auto auto auto;
+      align-content: center;
+      row-gap: 2rem;
+      padding: 14vh var(--gutter) 8vh;
+    }
+
+    .disciplines__sticky :global(.disciplines__label) {
+      margin-left: 0;
+    }
+
+    .disciplines__media {
+      width: min(100%, 26rem);
+      justify-self: end;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .disciplines__item,
+    .disciplines__figure,
+    .disciplines__description {
+      transition: none;
+    }
+  }
+</style>

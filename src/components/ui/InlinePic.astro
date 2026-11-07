@@ -1,0 +1,34 @@
+---
+import { Image } from 'astro:assets';
+import type { MediaItem } from '@/types/content';
+
+interface Props {
+  image: MediaItem;
+}
+
+const { image } = Astro.props;
+---
+
+<span class="inline-pic" data-inline-pic>
+  <Image src={image.src} alt="" width={96} height={96} class="inline-pic__image" loading="lazy" />
+</span>
+
+<style>
+  .inline-pic {
+    display: inline-block;
+    width: 0.8em;
+    height: 0.8em;
+    margin: 0 0.06em;
+    vertical-align: -0.1em;
+    overflow: hidden;
+    border-radius: 0.16em;
+    transform: translate3d(0, var(--rise-y, 0), 0);
+    opacity: var(--rise-a, 1);
+  }
+
+  .inline-pic :global(.inline-pic__image) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+</style>

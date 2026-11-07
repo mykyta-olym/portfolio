@@ -1,0 +1,51 @@
+---
+import { Image } from 'astro:assets';
+import avatar from '@/assets/profile/avatar.jpg';
+
+interface Props {
+  href: string;
+  class?: string;
+}
+
+const { href, class: className } = Astro.props;
+---
+
+<a class:list={['avatar-button', className]} href={href}>
+  <Image src={avatar} alt="" width={64} height={64} class="avatar-button__image" loading="eager" />
+  <span>
+    <slot />
+  </span>
+</a>
+
+<style>
+  .avatar-button {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.625rem;
+    height: 2.875rem;
+    padding: 0.3125rem 1.25rem 0.3125rem 0.3125rem;
+    background: var(--color-chip);
+    color: var(--color-black);
+    border-radius: 3px;
+    font-size: var(--fs-small);
+    font-weight: 400;
+    white-space: nowrap;
+    transition:
+      background-color 0.3s var(--ease-button),
+      transform 0.3s var(--ease-button);
+  }
+
+  .avatar-button:hover,
+  .avatar-button:focus-visible {
+    background: var(--color-white);
+    transform: translateY(-2px);
+  }
+
+  .avatar-button :global(.avatar-button__image) {
+    width: 2.25rem;
+    height: 2.25rem;
+    border-radius: 2px;
+    object-fit: cover;
+    filter: grayscale(1);
+  }
+</style>

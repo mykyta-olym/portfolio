@@ -1,0 +1,92 @@
+---
+import { Image } from 'astro:assets';
+import showcase from '@/assets/renders/showcase.webp';
+---
+
+<section class="showcase" aria-labelledby="showcase-title">
+  <div class="showcase__wrapper" data-module="showcase">
+    <div class="showcase__frame" data-showcase-frame>
+      <Image
+        src={showcase}
+        alt="A single column rises out of a dark field of blocks, lit from above."
+        widths={[960, 1600, 2400]}
+        sizes="100vw"
+        class="showcase__image"
+        loading="lazy"
+      />
+      <div class="showcase__content">
+        <h2 class="showcase__title" id="showcase-title" data-showcase-content>
+          Design. Build. Measure.
+        </h2>
+        <p class="showcase__text" data-showcase-content>
+          I design the system, build it in small tested parts, and measure it before I write about it.
+        </p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<style>
+  .showcase {
+    position: relative;
+    background: var(--color-surface);
+  }
+
+  .showcase__wrapper {
+    position: relative;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  .showcase__frame {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    overflow: hidden;
+    background: #020101;
+    transform-origin: 50% 50%;
+    will-change: transform;
+  }
+
+  .showcase__frame :global(.showcase__image) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  .showcase__content {
+    position: relative;
+    display: grid;
+    justify-items: center;
+    padding: clamp(4rem, 9vh, 6rem) 10.4vw 0;
+    text-align: center;
+  }
+
+  .showcase__title {
+    font-size: var(--fs-banner);
+    font-weight: 300;
+    line-height: 1.12;
+    letter-spacing: -0.015em;
+    color: var(--color-white);
+  }
+
+  .showcase__text {
+    max-width: 40rem;
+    margin-top: 1.2rem;
+    font-size: var(--fs-banner-sub);
+    font-weight: 300;
+    line-height: 1.4;
+    color: #dadada;
+  }
+
+  :global(.js) .showcase__wrapper:not(:global(.is-static)) [data-showcase-content] {
+    opacity: 0;
+  }
+
+  .showcase__wrapper:global(.is-static) .showcase__frame {
+    transform: scale(0.8);
+    border-radius: 4px;
+  }
+</style>

@@ -1,0 +1,203 @@
+---
+import SectionLabel from '@/components/ui/SectionLabel.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { primaryNavigation } from '@/data/navigation';
+import { links, profile } from '@/data/profile';
+import { href } from '@/lib/paths';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="footer" aria-labelledby="footer-title">
+  <h2 class="visually-hidden" id="footer-title">
+    Site footer
+  </h2>
+  <div class="footer__mark" data-module="pixel-wordmark" data-text="MYKYTA OLYM" data-cursor="Play">
+    <canvas aria-hidden="true"></canvas>
+    <p class="footer__mark-fallback" aria-hidden="true">
+      MYKYTA OLYM
+    </p>
+  </div>
+  <div class="footer__grid">
+    <nav class="footer__column" aria-label="Footer">
+      <SectionLabel text="Navigation" />
+      <ul>
+        <li>
+          <a href={href()}>Home</a>
+        </li>
+        {primaryNavigation.map((item) => (
+          <li>
+            <a href={href(item.path)}>{item.label}</a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <div class="footer__column">
+      <SectionLabel text="Write to me" />
+      <ul>
+        <li>
+          <a href={links.email.href}>{profile.email}</a>
+        </li>
+        <li>{profile.location}</li>
+      </ul>
+    </div>
+    <ul class="footer__social">
+      {[links.github, links.linkedin, links.telegram].map((link) => (
+        <li>
+          <a href={link.href} target="_blank" rel="noopener">
+            {link.label}
+          </a>
+        </li>
+      ))}
+    </ul>
+  </div>
+  <div class="footer__bottom">
+    <p class="footer__copyright">&copy;{year} Mykyta Olym</p>
+    <button class="footer__top" type="button" data-module="back-to-top">
+      Back to top <Icon name="chevron-up" size={10} />
+    </button>
+    <p class="footer__note">Built with Astro and GSAP</p>
+  </div>
+</footer>
+
+<style>
+  .footer {
+    position: sticky;
+    bottom: 0;
+    z-index: var(--layer-footer);
+    background: var(--color-black);
+    padding-top: clamp(4rem, 9vw, 8.5rem);
+  }
+
+  .footer__mark {
+    position: relative;
+    padding-inline: clamp(0.75rem, 1.5vw, 1.75rem);
+    line-height: 0;
+  }
+
+  .footer__mark canvas {
+    display: block;
+    width: 100%;
+  }
+
+  .footer__mark-fallback {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    font-family: var(--font-mono);
+    font-size: clamp(2rem, 9vw, 9rem);
+    font-weight: 500;
+    line-height: 1;
+    letter-spacing: 0.04em;
+    opacity: 0;
+  }
+
+  :global(.no-js) .footer__mark canvas {
+    display: none;
+  }
+
+  :global(.no-js) .footer__mark-fallback {
+    position: static;
+    opacity: 1;
+  }
+
+  .footer__grid {
+    display: grid;
+    grid-template-columns: auto auto 1fr;
+    align-items: start;
+    gap: clamp(2.5rem, 6vw, 6.5rem);
+    padding: clamp(3rem, 5vw, 4.5rem) var(--gutter) clamp(3rem, 6vw, 5.5rem);
+    border-bottom: 1px solid var(--color-line);
+  }
+
+  .footer__column ul {
+    display: grid;
+    gap: 0.5rem;
+    margin-top: 1.25rem;
+    padding-left: 1.75rem;
+    font-size: var(--fs-small);
+    color: var(--color-text-muted);
+  }
+
+  .footer__column a:hover,
+  .footer__social a:hover {
+    color: var(--color-white);
+  }
+
+  .footer__social {
+    display: flex;
+    justify-content: flex-end;
+    gap: clamp(1.5rem, 4vw, 4.5rem);
+    font-size: var(--fs-small);
+  }
+
+  .footer__social a {
+    text-decoration: underline;
+    text-underline-offset: 4px;
+    text-decoration-color: rgb(255 255 255 / 40%);
+    transition: text-decoration-color var(--duration-fast) ease;
+  }
+
+  .footer__social a:hover {
+    text-decoration-color: var(--color-white);
+  }
+
+  .footer__bottom {
+    display: grid;
+    grid-template-columns: 1fr auto 1fr;
+    align-items: center;
+    padding: 1.5rem var(--gutter);
+    font-size: var(--fs-small);
+    color: var(--color-text-muted);
+  }
+
+  .footer__copyright,
+  .footer__note {
+    font-family: var(--font-label);
+    font-size: 0.6875rem;
+    letter-spacing: var(--tracking-label);
+    text-transform: uppercase;
+  }
+
+  .footer__note {
+    justify-self: end;
+    color: var(--color-text-dim);
+  }
+
+  .footer__top {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.375rem;
+    padding: 0.75rem 1rem;
+    color: var(--color-text-muted);
+    font-size: var(--fs-small);
+    font-weight: 300;
+  }
+
+  .footer__top:hover {
+    color: var(--color-white);
+  }
+
+  @media (max-width: 767px) {
+    .footer__grid {
+      grid-template-columns: 1fr 1fr;
+      gap: 2.5rem 1.5rem;
+    }
+
+    .footer__social {
+      grid-column: 1 / -1;
+      justify-content: space-between;
+    }
+
+    .footer__bottom {
+      grid-template-columns: 1fr;
+      justify-items: center;
+      gap: 0.25rem;
+    }
+
+    .footer__note {
+      justify-self: center;
+    }
+  }
+</style>

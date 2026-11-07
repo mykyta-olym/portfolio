@@ -1,0 +1,30 @@
+---
+interface Props {
+  text: string;
+}
+
+const { text } = Astro.props;
+---
+
+<li class="tag">
+  <span data-scramble>{text}</span>
+</li>
+
+<style>
+  .tag {
+    display: inline-flex;
+    align-items: center;
+    height: 1.25rem;
+    padding: 0 0.625rem;
+    background: var(--color-black);
+    border: 1px solid rgb(255 255 255 / 10%);
+    border-radius: var(--radius-small);
+    font-family: var(--font-label);
+    font-size: var(--fs-tag);
+    font-weight: 500;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-white);
+    white-space: nowrap;
+  }
+</style>

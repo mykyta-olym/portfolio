@@ -1,0 +1,193 @@
+---
+import LogoMark from './LogoMark.astro';
+import Icon from '@/components/ui/Icon.astro';
+import { primaryNavigation } from '@/data/navigation';
+import { profile } from '@/data/profile';
+import { href, isCurrent } from '@/lib/paths';
+
+const current = Astro.url.pathname;
+---
+
+<div class="menu" id="site-menu" data-module="menu" hidden>
+  <div class="menu__backdrop" data-menu-backdrop></div>
+  <div class="menu__panel" data-menu-panel role="dialog" aria-modal="true" aria-label="Site menu">
+    <div class="menu__head">
+      <a class="menu__logo" href={href()} aria-label="Mykyta Olym, home">
+        <LogoMark size={22} />
+      </a>
+      <button class="menu__close" type="button" data-menu-close>
+        <span class="visually-hidden">Close menu</span>
+        <Icon name="close" size={16} />
+      </button>
+    </div>
+    <nav class="menu__nav" aria-label="Primary">
+      <ul>
+        {primaryNavigation.map((item) => (
+          <li data-menu-item>
+            <a class="menu__link" href={href(item.path)} aria-current={isCurrent(current, item.path) ? 'page' : undefined}>
+              {item.label}
+              <Icon name="arrow-up-right" size={18} class="menu__arrow" />
+            </a>
+          </li>
+        ))}
+      </ul>
+    </nav>
+    <div class="menu__foot">
+      <ul class="menu__social">
+        {profile.links.map((link) => (
+          <li data-menu-item>
+            <a href={link.href} target={link.href.startsWith('mailto:') ? undefined : '_blank'} rel="noopener">
+              {link.label}
+            </a>
+          </li>
+        ))}
+      </ul>
+      <figure class="menu__media" data-menu-media>
+        <video
+          data-menu-video
+          muted
+          loop
+          playsinline
+          preload="none"
+          poster={href('media/menu/garden-poster.webp')}
+          aria-hidden="true"
+          tabindex="-1"
+        >
+          <source src={href('media/menu/garden.mp4')} type="video/mp4" />
+        </video>
+        <figcaption class="visually-hidden">Gameplay from Garden of Lost Paths</figcaption>
+      </figure>
+    </div>
+  </div>
+</div>
+
+<style>
+  .menu {
+    position: fixed;
+    inset: 0;
+    z-index: var(--layer-menu);
+  }
+
+  .menu__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgb(0 0 0 / 28%);
+    -webkit-backdrop-filter: blur(14px);
+    backdrop-filter: blur(14px);
+  }
+
+  .menu__panel {
+    position: absolute;
+    top: calc(var(--nav-top) - 0.0625rem);
+    bottom: 0;
+    left: 50%;
+    display: flex;
+    flex-direction: column;
+    width: var(--nav-width);
+    transform: translateX(-50%);
+    background: var(--color-black);
+    border-radius: var(--radius-pill) var(--radius-pill) 0 0;
+    overflow: hidden;
+  }
+
+  .menu__head {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    height: 3.25rem;
+    padding: 0.3125rem;
+  }
+
+  .menu__logo,
+  .menu__close {
+    display: grid;
+    place-items: center;
+    width: 2.75rem;
+    height: 2.5rem;
+    border-radius: 0.375rem;
+    color: var(--color-white);
+  }
+
+  .menu__close:hover,
+  .menu__logo:hover {
+    background: rgb(255 255 255 / 8%);
+  }
+
+  .menu__nav {
+    padding: 1.75rem 1.5rem 0;
+  }
+
+  .menu__nav ul {
+    display: grid;
+    justify-items: end;
+    gap: 0.125rem;
+  }
+
+  .menu__link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-size: var(--fs-menu);
+    font-weight: 400;
+    letter-spacing: -0.01em;
+    line-height: 1.12;
+    color: var(--color-white);
+    transition: opacity var(--duration-fast) ease;
+  }
+
+  .menu__nav ul:hover .menu__link:not(:hover) {
+    opacity: 0.45;
+  }
+
+  .menu__link[aria-current='page'] {
+    opacity: 0.45;
+  }
+
+  .menu__link :global(.menu__arrow) {
+    transition: transform var(--duration-base) var(--ease-button);
+  }
+
+  .menu__link:hover :global(.menu__arrow) {
+    transform: translate(2px, -2px);
+  }
+
+  .menu__foot {
+    margin-top: auto;
+    padding: 1.5rem;
+  }
+
+  .menu__social {
+    display: grid;
+    gap: 0.3rem;
+    margin-bottom: 1.25rem;
+    font-size: var(--fs-small);
+    font-weight: 300;
+    color: #ccc;
+  }
+
+  .menu__social a:hover {
+    color: var(--color-white);
+    text-decoration: underline;
+    text-underline-offset: 3px;
+  }
+
+  .menu__media {
+    position: relative;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: var(--radius-small);
+    background: linear-gradient(160deg, #2a2a2a, #121212);
+  }
+
+  .menu__media video {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  @media (max-height: 640px) {
+    .menu__media {
+      display: none;
+    }
+  }
+</style>
