@@ -1,0 +1,9 @@
+$ phishlens score --top 3 "http://secure-login.paypa1-account-verify.example/signin/update.php" "https://github.com/mykyta-olym/phishlens"
+0.958  likely_phishing  http://secure-login.paypa1-account-verify.example/signin/update.php
+  +1.64 towards phishing: the top-level domain (other)
+  +0.73 towards phishing: hyphens in the host name (3)
+  +0.69 towards phishing: length of the host name (42)
+0.009  no_strong_signal  https://github.com/mykyta-olym/phishlens
+  -0.89 away from phishing: the top-level domain (com)
+  -0.65 away from phishing: the host is on a shared hosting platform (no)
+  -0.43 away from phishing: randomness of the path (3.789)
