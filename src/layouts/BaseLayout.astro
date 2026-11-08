@@ -1,5 +1,6 @@
 ---
 import '@/styles/global.css';
+import pageTransitions from '@/styles/page-transitions.css?raw';
 import interLatin from '@fontsource-variable/inter/files/inter-latin-wght-normal.woff2?url';
 import NavPill from '@/components/navigation/NavPill.astro';
 import MenuPanel from '@/components/navigation/MenuPanel.astro';
@@ -42,6 +43,8 @@ const fullTitle = title === site.title ? `${site.title} | Software developer` : 
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <!-- The opt-in must exist before the first rendering opportunity, even on a cold cache. -->
+    <style is:inline set:html={pageTransitions} />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -74,10 +77,15 @@ const fullTitle = title === site.title ? `${site.title} | Software developer` : 
         root.classList.remove('no-js');
         root.classList.add('js');
         try {
-          if (sessionStorage.getItem('page-transition')) root.classList.add('is-arriving');
+          if (sessionStorage.getItem('page-transition') === location.pathname) root.classList.add('is-arriving', 'is-internal-navigation');
+          sessionStorage.removeItem('page-transition');
         } catch {
           /* storage unavailable */
         }
+        // Capture this early event before the deferred application bundle runs.
+        window.addEventListener('pagereveal', (event) => {
+          window.pageReveal = event.viewTransition;
+        });
       })();
     </script>
   </head>

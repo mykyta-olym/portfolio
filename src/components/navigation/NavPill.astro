@@ -19,7 +19,6 @@ const phrase = pillPhrases[context];
     <p class="nav__phrase" data-module="typewriter" data-words={JSON.stringify(phrase.words.map((w) => w.toUpperCase()))}>
       {phrase.prefix && <span class="nav__prefix">{phrase.prefix.toUpperCase()}&nbsp;</span>}
       <span data-typewriter-text>{phrase.words[0]?.toUpperCase()}</span>
-      <span class="nav__caret" aria-hidden="true"></span>
     </p>
     <button class="nav__toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu">
       <span class="visually-hidden">Open menu</span>
@@ -104,18 +103,14 @@ const phrase = pillPhrases[context];
     text-transform: uppercase;
   }
 
-  .nav__caret {
+  .nav__phrase :global(.typed-cursor) {
     display: inline-block;
     width: 0.3125rem;
     height: 0.625rem;
     margin-left: 0.1875rem;
     background: var(--color-white);
-    opacity: 0;
-  }
-
-  :global(.is-typing) > .nav__caret {
-    opacity: 1;
-    animation: caret-blink 0.55s steps(1) infinite;
+    color: transparent;
+    flex: none;
   }
 
   .nav__lines {
@@ -148,14 +143,8 @@ const phrase = pillPhrases[context];
     visibility: hidden;
   }
 
-  @keyframes caret-blink {
-    50% {
-      opacity: 0;
-    }
-  }
-
   @media (prefers-reduced-motion: reduce) {
-    :global(.is-typing) > .nav__caret {
+    .nav__phrase :global(.typed-cursor) {
       animation: none;
     }
   }

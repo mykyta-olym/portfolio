@@ -58,6 +58,11 @@ function trackImage(progress: LoadProgress, name: string, image: HTMLImageElemen
 }
 
 export function startPreloader(root: HTMLElement): void {
+  // Internal navigation has its own transition. Do not replay the initial-load sequence.
+  if (document.documentElement.classList.contains('is-internal-navigation')) {
+    root.remove();
+    return;
+  }
   const canvas = root.querySelector<HTMLCanvasElement>('[data-loader-mark]');
   const digits = root.querySelector<HTMLElement>('[data-loader-digits]');
   if (!canvas || !digits) return;

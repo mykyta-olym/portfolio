@@ -1,6 +1,10 @@
 // Small uppercase labels decode from random characters when they come into view. A group
 // replays only after it has fully left the screen, and not more often than every 1.5 s.
 import { reducedMotion, type Cleanup } from '@/scripts/core/motion';
+import { gsap } from '@/scripts/core/gsap';
+import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
+
+gsap.registerPlugin(ScrambleTextPlugin);
 
 const CHARACTERS = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789/#+=';
 const DURATION = 520;
@@ -10,21 +14,13 @@ const COOLDOWN = 1500;
 export function scrambleText(element: HTMLElement, delay = 0): void {
   const finalText = element.dataset['text'] ?? element.textContent ?? '';
   element.dataset['text'] = finalText;
-  const start = performance.now() + delay;
-  const frame = (now: number): void => {
-    if (now < start) {
-      requestAnimationFrame(frame);
-      return;
-    }
-    const progress = Math.min(1, (now - start) / DURATION);
-    const revealed = Math.floor(progress * finalText.length);
-    element.textContent = [...finalText]
-      .map((char, index) => (index < revealed || /\s/.test(char) ? char : CHARACTERS[Math.floor(Math.random() * CHARACTERS.length)]))
-      .join('');
-    if (progress < 1) requestAnimationFrame(frame);
-    else element.textContent = finalText;
-  };
-  requestAnimationFrame(frame);
+  gsap.to(element, {
+    duration: DURATION / 1000,
+    delay: delay / 1000,
+    scrambleText: { text: finalText, chars: CHARACTERS, speed: 0.6 },
+    ease: 'none',
+    overwrite: true,
+  });
 }
 
 export function initScramble(scope: ParentNode = document): Cleanup {
@@ -60,5 +56,6 @@ export function initScramble(scope: ParentNode = document): Cleanup {
   return () => {
     trigger.disconnect();
     rearm.disconnect();
+    groups.forEach((group) => gsap.killTweensOf(group.querySelectorAll('[data-scramble]')));
   };
 }

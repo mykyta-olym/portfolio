@@ -10,7 +10,15 @@ const { size = 22, class: className } = Astro.props;
 const cells = monogram.flatMap((row, y) => [...row].map((cell, x) => (cell === '#' ? { x, y } : null)).filter((c) => c !== null));
 ---
 
-<svg class={className} width={size} height={size} viewBox="0 0 6 6" aria-hidden="true" focusable="false" shape-rendering="crispEdges">
+<svg
+  class={className}
+  width={size}
+  height={size}
+  viewBox={`0 0 ${monogram.length} ${monogram.length}`}
+  aria-hidden="true"
+  focusable="false"
+  shape-rendering="crispEdges"
+>
   {cells.map((cell) => (
     <rect x={cell.x} y={cell.y} width="1" height="1" fill="currentColor" />
   ))}

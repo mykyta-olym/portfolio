@@ -46,9 +46,8 @@ describe('content', () => {
     expect(projects.filter((p) => p.featuredOnHome)).toHaveLength(3);
   });
 
-  it('links every gallery card to an existing project', () => {
-    const slugs = new Set(projects.map((p) => p.slug));
-    for (const card of galleryCards) expect(slugs.has(card.slug)).toBe(true);
+  it('uses the orbit for six distinct stages of work', () => {
+    expect(galleryCards.map((card) => card.title)).toEqual(['Understand', 'Plan', 'Build', 'Test', 'Refine', 'Ship']);
   });
 
   it('keeps contact details to the approved public channels', () => {

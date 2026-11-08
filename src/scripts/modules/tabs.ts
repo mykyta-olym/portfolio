@@ -35,31 +35,6 @@ export function initTabs(root: HTMLElement): Cleanup {
   };
   select(0, false);
 
-  // Preserve the gallery's position when switching between differently sized paragraphs.
-  const measure = (): void => {
-    root.style.minHeight = '';
-    const selected = tabs.findIndex((tab) => tab.getAttribute('aria-selected') === 'true');
-    let height = 0;
-    panels.forEach((panel, index) => {
-      panels.forEach((other, otherIndex) => {
-        if (other) other.hidden = index !== otherIndex;
-      });
-      if (panel) height = Math.max(height, root.getBoundingClientRect().height);
-    });
-    panels.forEach((panel, index) => {
-      if (panel) panel.hidden = index !== selected;
-    });
-    root.style.minHeight = `${Math.ceil(height)}px`;
-  };
-  measure();
-  let width = root.clientWidth;
-  const observer = new ResizeObserver(() => {
-    if (width === root.clientWidth) return;
-    width = root.clientWidth;
-    measure();
-  });
-  observer.observe(root);
-
   const onClick = (event: MouseEvent): void => {
     const index = tabs.indexOf(event.currentTarget as HTMLButtonElement);
     if (index >= 0) select(index, false);
@@ -78,8 +53,6 @@ export function initTabs(root: HTMLElement): Cleanup {
   });
   return () => {
     animation?.cancel();
-    observer.disconnect();
-    root.style.minHeight = '';
     tabs.forEach((tab) => {
       tab.removeEventListener('click', onClick);
       tab.removeEventListener('keydown', onKey);

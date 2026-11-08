@@ -30,7 +30,8 @@
     animation: loader-failsafe 0.01s linear 9s forwards;
   }
 
-  :global(.no-js) .loader {
+  :global(.no-js) .loader,
+  :global(.is-internal-navigation) .loader {
     display: none;
   }
 

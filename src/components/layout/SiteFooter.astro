@@ -28,7 +28,11 @@ const year = new Date().getFullYear();
         </li>
         {primaryNavigation.map((item) => (
           <li>
-            <HoverLink href={href(item.path)} label={item.label} />
+            <HoverLink
+              href={href(item.path)}
+              label={item.label}
+              hoverText={item.path === 'contact/' ? 'Hire me' : item.path === 'about/' ? 'Meet me' : 'Explore'}
+            />
           </li>
         ))}
       </ul>
@@ -37,7 +41,7 @@ const year = new Date().getFullYear();
       <SectionLabel text="Write to me" />
       <ul>
         <li>
-          <HoverLink href={links.email.href} label={profile.email} />
+          <HoverLink href={links.email.href} label={profile.email} hoverText="Write to me" />
         </li>
         <li>{profile.location}</li>
       </ul>
@@ -45,7 +49,7 @@ const year = new Date().getFullYear();
     <ul class="footer__social">
       {[links.github, links.linkedin, links.telegram].map((link) => (
         <li>
-          <HoverLink href={link.href} label={link.label} external />
+          <HoverLink href={link.href} label={link.label} hoverText={link.hoverText} external />
         </li>
       ))}
     </ul>
@@ -53,7 +57,10 @@ const year = new Date().getFullYear();
   <div class="footer__bottom">
     <p class="footer__copyright">&copy;{year} Mykyta Olym</p>
     <button class="footer__top" type="button" data-module="back-to-top">
-      Back to top <Icon name="chevron-up" size={10} />
+      <span class="footer__top-label">Back to top</span>
+      <span class="footer__top-arrow" aria-hidden="true">
+        <Icon name="arrow-up-right" size={16} />
+      </span>
     </button>
     <p class="footer__note">Built with Astro and GSAP</p>
   </div>
@@ -180,11 +187,55 @@ const year = new Date().getFullYear();
   .footer__top {
     display: inline-flex;
     align-items: center;
-    gap: 0.375rem;
-    padding: 0.75rem 1rem;
+    gap: 0.75rem;
+    padding: 0.6rem 0 0.6rem 0.75rem;
     color: var(--color-text-muted);
     font-size: var(--fs-small);
     font-weight: 300;
+  }
+  .footer__top-arrow {
+    display: grid;
+    place-items: center;
+    width: 2rem;
+    height: 2rem;
+    border: 1px solid #454545;
+    border-radius: 50%;
+    transition:
+      color 0.4s,
+      background-color 0.4s,
+      transform 0.45s var(--ease-out);
+  }
+  .footer__top-arrow :global(svg) {
+    rotate: -45deg;
+  }
+  .footer__top:is(:hover, :focus-visible) .footer__top-arrow,
+  .footer__top:global(.is-returning) .footer__top-arrow {
+    color: #000;
+    background: #fff;
+    transform: translateY(-3px);
+  }
+  .footer__top-label {
+    position: relative;
+  }
+  .footer__top-label::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -4px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: left;
+    transition: transform 0.45s var(--ease-out);
+  }
+  .footer__top:is(:hover, :focus-visible) .footer__top-label::after {
+    transform: scaleX(1);
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .footer__top-arrow,
+    .footer__top-label::after {
+      transition: none;
+      transform: none !important;
+    }
   }
 
   .footer__top:hover {

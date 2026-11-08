@@ -27,7 +27,9 @@ import { href } from '@/lib/paths';
         Tell me about a project, a role or a question about my code. Email reaches me fastest.
       </p>
       <div data-reveal="fade" data-reveal-delay="0.5">
-        <AvatarButton href={links.email.href}>Send an Email</AvatarButton>
+        <AvatarButton href={links.email.href} hoverText="Say hello">
+          Send an Email
+        </AvatarButton>
       </div>
     </div>
 
@@ -51,7 +53,7 @@ import { href } from '@/lib/paths';
         <ul>
           {[links.github, links.linkedin, links.telegram].map((link) => (
             <li>
-              <HoverLink href={link.href} label={`[${link.label}]`} external />
+              <HoverLink href={link.href} label={`[${link.label}]`} hoverText={link.hoverText} align="center" external />
             </li>
           ))}
         </ul>
@@ -288,7 +290,7 @@ import { href } from '@/lib/paths';
     .contact__card {
       position: relative;
       inset: auto;
-      width: 250px;
+      width: 290px;
       max-width: calc(100% - 32px);
       padding: 0 3px 3px;
       font-size: 12px;

@@ -4,30 +4,33 @@ interface Props {
   label: string;
   hoverText?: string;
   external?: boolean;
+  as?: 'a' | 'span';
+  align?: 'start' | 'center' | 'end';
 }
-const { href, label, hoverText = label, external = false } = Astro.props;
+const { href, label, hoverText = label, external = false, as: Tag = 'a', align = 'start' } = Astro.props;
 ---
 
-<a
+<Tag
   class="hover-link"
-  href={href}
+  href={Tag === 'a' ? href : undefined}
   data-hover-text={hoverText}
-  aria-label={label}
-  target={external ? '_blank' : undefined}
-  rel={external ? 'noopener' : undefined}
+  style={`--hover-align: ${align}`}
+  aria-label={Tag === 'a' ? label : undefined}
+  target={Tag === 'a' && external ? '_blank' : undefined}
+  rel={Tag === 'a' && external ? 'noopener' : undefined}
 >
   <span class="hover-link__inner">{label}</span>
   <span class="hover-link__next" aria-hidden="true">
     {hoverText}
   </span>
-</a>
+</Tag>
 
 <style>
   /* Both labels travel the same distance inside a fixed mask, including on reversal. */
   .hover-link {
     position: relative;
     display: inline-grid;
-    place-items: center;
+    place-items: center var(--hover-align);
     min-height: 24px;
     overflow: hidden;
     vertical-align: middle;
@@ -36,7 +39,7 @@ const { href, label, hoverText = label, external = false } = Astro.props;
     position: absolute;
     inset: 0;
     display: grid;
-    place-items: center;
+    place-items: center var(--hover-align);
     transform: translate3d(0, 110%, 0);
     overflow: hidden;
   }
@@ -54,14 +57,16 @@ const { href, label, hoverText = label, external = false } = Astro.props;
   .hover-link__inner {
     grid-area: 1 / 1;
     display: grid;
-    place-items: center;
+    place-items: center var(--hover-align);
     min-height: 24px;
     height: 100%;
   }
-  .hover-link:is(:hover, :focus-visible) .hover-link__next {
+  .hover-link:is(:hover, :focus-visible) .hover-link__next,
+  :global(a:is(:hover, :focus-visible)) > .hover-link .hover-link__next {
     transform: translate3d(0, 0, 0);
   }
-  .hover-link:is(:hover, :focus-visible) .hover-link__inner {
+  .hover-link:is(:hover, :focus-visible) .hover-link__inner,
+  :global(a:is(:hover, :focus-visible)) > .hover-link .hover-link__inner {
     transform: translate3d(0, -110%, 0);
   }
   @media (prefers-reduced-motion: reduce) {

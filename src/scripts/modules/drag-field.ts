@@ -15,6 +15,11 @@ import {
 } from 'three';
 import { damp } from '@/lib/math';
 import { coarsePointer, reducedMotion, type Cleanup } from '@/scripts/core/motion';
+import { gsap } from '@/scripts/core/gsap';
+import { Draggable } from 'gsap/Draggable';
+import { InertiaPlugin } from 'gsap/InertiaPlugin';
+
+gsap.registerPlugin(Draggable, InertiaPlugin);
 
 export function initDragField(field: HTMLElement): Cleanup {
   if (reducedMotion()) {
@@ -51,17 +56,12 @@ export function initDragField(field: HTMLElement): Cleanup {
     visible = true,
     frame = 0,
     previous = 0;
-  let pointer: number | null = null;
-  let lastX = 0,
-    lastY = 0,
-    lastTime = 0;
+  let dragging = false;
   let targetX = 0,
     targetY = 0,
     offsetX = 0,
     offsetY = 0;
-  let velocityX = 0,
-    velocityY = 0,
-    curve = 0;
+  let curve = 0;
   let titleX = 0,
     titleY = 0,
     titleTargetX = 0,
@@ -93,16 +93,10 @@ export function initDragField(field: HTMLElement): Cleanup {
   const render = (now: number): void => {
     const dt = previous ? Math.min(0.064, (now - previous) / 1000) : 1 / 60;
     previous = now;
-    if (pointer === null) {
-      targetX += velocityX * dt;
-      targetY += velocityY * dt;
-      velocityX *= 1 - damp(5, dt);
-      velocityY *= 1 - damp(5, dt);
-    }
     offsetX += (targetX - offsetX) * damp(21, dt);
     offsetY += (targetY - offsetY) * damp(21, dt);
-    curve += ((pointer === null ? 0 : 1) - curve) * damp(13, dt);
-    camera.position.z += ((pointer === null ? 500 : 450) - camera.position.z) * damp(5, dt);
+    curve += ((dragging ? 1 : 0) - curve) * damp(13, dt);
+    camera.position.z += ((dragging ? 450 : 500) - camera.position.z) * damp(5, dt);
     planes.forEach((plane, i) => {
       const position = base[i];
       if (!position) return;
@@ -130,8 +124,8 @@ export function initDragField(field: HTMLElement): Cleanup {
     }
     renderer.render(scene, camera);
     const moving =
-      pointer !== null ||
-      Math.hypot(targetX - offsetX, targetY - offsetY, velocityX, velocityY, titleX, titleY) > 0.02 ||
+      dragging ||
+      Math.hypot(targetX - offsetX, targetY - offsetY, titleX, titleY) > 0.02 ||
       curve > 0.001 ||
       blur > 0.01 ||
       Math.abs(camera.position.z - 500) > 0.05;
@@ -147,41 +141,42 @@ export function initDragField(field: HTMLElement): Cleanup {
     cancelAnimationFrame(frame);
     frame = 0;
   };
-  const onDown = (event: PointerEvent): void => {
-    if (event.button !== 0) return;
-    pointer = event.pointerId;
-    lastX = event.clientX;
-    lastY = event.clientY;
-    lastTime = event.timeStamp;
-    velocityX = velocityY = 0;
-    field.setPointerCapture(pointer);
-    field.classList.add('is-dragging');
+  // A detached proxy lets Draggable own pointer capture and inertia without moving the canvas.
+  const proxy = document.createElement('div');
+  const syncDrag = function (this: Draggable): void {
+    targetX = this.x * 1.2;
+    targetY = touch ? 0 : this.y * 1.2;
+    if (dragging) {
+      titleTargetX = this.deltaX * 0.5;
+      titleTargetY = touch ? 0 : this.deltaY * 0.5;
+      targetBlur = Math.min(8, Math.hypot(this.deltaX, touch ? 0 : this.deltaY) * 0.3);
+    }
     kick();
   };
-  const onMove = (event: PointerEvent): void => {
-    if (event.pointerId !== pointer) return;
-    const dx = event.clientX - lastX,
-      dy = touch ? 0 : event.clientY - lastY;
-    const dt = Math.max(0.008, (event.timeStamp - lastTime) / 1000);
-    lastX = event.clientX;
-    lastY = event.clientY;
-    lastTime = event.timeStamp;
-    targetX += dx * 1.2;
-    targetY += dy * 1.2;
-    velocityX = Math.max(-3000, Math.min(3000, (dx * 1.2) / dt));
-    velocityY = Math.max(-3000, Math.min(3000, (dy * 1.2) / dt));
-    titleTargetX = dx * 0.5;
-    titleTargetY = dy * 0.5;
-    targetBlur = Math.min(8, Math.hypot(dx, dy) * 0.3);
-  };
-  const onUp = (event: PointerEvent): void => {
-    if (event.pointerId !== pointer) return;
-    pointer = null;
-    titleTargetX = titleTargetY = targetBlur = 0;
-    if (event.timeStamp - lastTime > 100) velocityX = velocityY = 0;
-    field.classList.remove('is-dragging');
-    kick();
-  };
+  const [drag] = Draggable.create(proxy, {
+    trigger: field,
+    type: touch ? 'x' : 'x,y',
+    inertia: true,
+    throwResistance: 1800,
+    maxDuration: 1.1,
+    minimumMovement: 3,
+    zIndexBoost: false,
+    cursor: 'grab',
+    activeCursor: 'grabbing',
+    onPress() {
+      dragging = true;
+      field.classList.add('is-dragging');
+      kick();
+    },
+    onDrag: syncDrag,
+    onThrowUpdate: syncDrag,
+    onRelease() {
+      dragging = false;
+      titleTargetX = titleTargetY = targetBlur = 0;
+      field.classList.remove('is-dragging');
+      kick();
+    },
+  });
   const onVisibility = (): void => {
     if (document.hidden) stop();
     else kick();
@@ -218,20 +213,14 @@ export function initDragField(field: HTMLElement): Cleanup {
       canvas.remove();
       field.classList.add('is-static');
     });
-  field.addEventListener('pointerdown', onDown);
-  field.addEventListener('pointermove', onMove);
-  field.addEventListener('pointerup', onUp);
-  field.addEventListener('pointercancel', onUp);
   document.addEventListener('visibilitychange', onVisibility);
   return () => {
     disposed = true;
     stop();
     observer.disconnect();
     resize.disconnect();
-    field.removeEventListener('pointerdown', onDown);
-    field.removeEventListener('pointermove', onMove);
-    field.removeEventListener('pointerup', onUp);
-    field.removeEventListener('pointercancel', onUp);
+    drag?.tween?.kill();
+    drag?.kill();
     document.removeEventListener('visibilitychange', onVisibility);
     planes.forEach((plane) => {
       plane.geometry.dispose();

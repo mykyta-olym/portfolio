@@ -4,10 +4,10 @@ import { activeIndex } from '@/scripts/modules/disciplines';
 import { clamp, damp, easeOutCubic } from '@/lib/math';
 
 describe('pixel artwork', () => {
-  it('draws the monogram and every loader stage on a 6 by 6 grid', () => {
+  it('draws the monogram and every loader stage on the same square grid', () => {
     for (const grid of [monogram, ...loaderStages]) {
-      expect(grid).toHaveLength(6);
-      for (const row of grid) expect(row).toMatch(/^[.#]{6}$/);
+      expect(grid).toHaveLength(monogram.length);
+      for (const row of grid) expect(row).toMatch(new RegExp(`^[.#]{${monogram.length}}$`));
     }
     expect(loaderStages.at(-1)).toBe(monogram);
     expect(filled(monogram, 0, 0)).toBe(true);

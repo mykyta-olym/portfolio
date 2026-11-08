@@ -1,4 +1,4 @@
-// Favicons and the social preview image. The icons come from the 6 by 6 monogram in
+// Favicons and the social preview image. The icons come from the shared monogram in
 // src/lib/pixels.ts; the preview is HTML rendered in Chrome over the showcase still.
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { join, resolve } from 'node:path';
@@ -12,11 +12,11 @@ mkdirSync(join(pub, 'social'), { recursive: true });
 const source = readFileSync(join(root, 'src/lib/pixels.ts'), 'utf8');
 const match = source.match(/export const monogram: Grid = \[([^\]]+)\]/);
 if (!match) throw new Error('monogram not found in src/lib/pixels.ts');
-const rows = [...match[1].matchAll(/'([.#]{6})'/g)].map((m) => m[1]);
+const rows = [...match[1].matchAll(/'([.#]+)'/g)].map((m) => m[1]);
 
 function iconSvg({ padding, background, radius }) {
   const cells = rows.flatMap((row, y) => [...row].map((c, x) => (c === '#' ? `<rect x="${x}" y="${y}" width="1" height="1"/>` : '')));
-  const size = 6 + padding * 2;
+  const size = rows.length + padding * 2;
   return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-padding} ${-padding} ${size} ${size}" shape-rendering="crispEdges">${
     background ? `<rect x="${-padding}" y="${-padding}" width="${size}" height="${size}" rx="${radius}" fill="${background}"/>` : ''
   }<g fill="#fff">${cells.join('')}</g></svg>`;

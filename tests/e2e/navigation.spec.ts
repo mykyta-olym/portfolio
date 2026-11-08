@@ -104,6 +104,37 @@ test('page navigation uses all four source slices with a white backdrop @native'
   await waitForStage(page);
 });
 
+test('home CTA transitions and the logo returns home without another loader @native', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.addEventListener('pagereveal', (event) => {
+      const transition = (event as Event & { viewTransition?: ViewTransition }).viewTransition;
+      if (!transition) return;
+      void transition.ready
+        .then(() => {
+          const animations = document
+            .getAnimations()
+            .filter((animation) => animation instanceof CSSAnimation && animation.animationName.startsWith('gm-'));
+          (window as Window & { homeTransitionAudit?: number }).homeTransitionAudit = animations.length;
+        })
+        .catch(() => undefined);
+    });
+  });
+  await page.goto('./');
+  test.skip(!(await page.evaluate(() => 'CSSViewTransitionRule' in window)), 'browser does not support cross-document transitions');
+  await waitForStage(page);
+  await page.bringToFront();
+  await page.getByRole('link', { name: 'See the Work' }).click();
+  await expect(page).toHaveURL(/\/work\/$/);
+  await expect.poll(() => page.evaluate(() => (window as Window & { homeTransitionAudit?: number }).homeTransitionAudit)).toBe(8);
+  await waitForStage(page);
+  await page.locator('.nav__logo').click();
+  await expect(page).toHaveURL(/\/portfolio\/$/);
+  await expect.poll(() => page.evaluate(() => (window as Window & { homeTransitionAudit?: number }).homeTransitionAudit)).toBe(8);
+  await expect(page.locator('[data-preloader]')).toHaveCount(0);
+  await waitForStage(page);
+  await expect(page.locator('html')).not.toHaveClass(/is-locked/);
+});
+
 test('unknown addresses show the 404 page', async ({ page }) => {
   const response = await page.goto('no-such-page/');
   expect(response?.status()).toBe(404);

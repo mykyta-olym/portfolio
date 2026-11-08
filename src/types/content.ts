@@ -2,6 +2,7 @@ import type { ImageMetadata } from 'astro';
 
 export interface ExternalLink {
   readonly label: string;
+  readonly hoverText?: string;
   readonly href: string;
   /** Short visible form, for example a handle or an address. */
   readonly display?: string;

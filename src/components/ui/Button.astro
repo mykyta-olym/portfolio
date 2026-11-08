@@ -4,9 +4,10 @@ interface Props {
   variant?: 'light' | 'dark';
   external?: boolean;
   class?: string;
+  hoverText?: string;
 }
 
-const { href, variant = 'light', external = false, class: className } = Astro.props;
+const { href, variant = 'light', external = false, class: className, hoverText } = Astro.props;
 ---
 
 <a
@@ -16,7 +17,16 @@ const { href, variant = 'light', external = false, class: className } = Astro.pr
   rel={external ? 'noopener' : undefined}
 >
   <span class="button__label">
-    <slot />
+    <span class="button__text" data-hover-text={hoverText}>
+      <span class="button__original">
+        <slot />
+      </span>
+      {hoverText && (
+        <span class="button__next" aria-hidden="true">
+          {hoverText}
+        </span>
+      )}
+    </span>
   </span>
   <svg class="button__icon" width="12" height="16" viewBox="0 0 19 24" fill="currentColor" aria-hidden="true">
     <rect x="0.5" y="0.75" width="8" height="6" rx="0.45" />
@@ -58,6 +68,35 @@ const { href, variant = 'light', external = false, class: className } = Astro.pr
     transform: translate3d(-10px, 0, 0);
     transition: transform 0.3s var(--ease-button);
   }
+  .button__text {
+    position: relative;
+    display: grid;
+    line-height: 1.5;
+    overflow: hidden;
+  }
+  .button__text::after {
+    content: attr(data-hover-text);
+    grid-area: 1 / 1;
+    visibility: hidden;
+  }
+  .button__original {
+    grid-area: 1 / 1;
+  }
+  .button__next {
+    position: absolute;
+    inset: 0;
+    transform: translateY(110%);
+  }
+  .button__original,
+  .button__next {
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .button:is(:hover, :focus-visible) .button__text[data-hover-text] .button__original {
+    transform: translateY(-110%);
+  }
+  .button:is(:hover, :focus-visible) .button__next {
+    transform: translateY(0);
+  }
 
   .button:hover .button__label,
   .button:focus-visible .button__label {
@@ -97,6 +136,8 @@ const { href, variant = 'light', external = false, class: className } = Astro.pr
   @media (prefers-reduced-motion: reduce) {
     .button,
     .button__label,
+    .button__original,
+    .button__next,
     .button :global(.button__icon) {
       transition: none;
     }

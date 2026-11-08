@@ -239,9 +239,27 @@ const { project } = Astro.props;
     margin-bottom: 1rem;
   }
 
+  .case__tabs:global(.is-enhanced) {
+    display: grid;
+    grid-template-rows: auto 1fr;
+  }
+
   .case__tabs:global(.is-enhanced) .case__tablist {
+    grid-area: 1 / 1;
     display: flex;
     flex-wrap: wrap;
+  }
+
+  /* All panels size one grid cell; only the selected panel is visible or accessible. */
+  .case__tabs:global(.is-enhanced) .case__tabpanel {
+    grid-area: 2 / 1;
+    align-content: start;
+  }
+
+  .case__tabs:global(.is-enhanced) .case__tabpanel[hidden] {
+    display: grid !important;
+    visibility: hidden;
+    pointer-events: none;
   }
 
   .case__tab {

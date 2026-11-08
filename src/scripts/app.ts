@@ -8,11 +8,12 @@ import { ScrollTrigger } from '@/scripts/core/gsap';
 import { initFadeReveals, initLineReveals } from '@/scripts/text/line-reveal';
 import { initScramble } from '@/scripts/text/scramble';
 import { initScrollRise } from '@/scripts/text/scroll-rise';
+import { initMenu } from '@/scripts/modules/menu';
 
 type Init = (element: HTMLElement) => Cleanup;
 
 const modules: Record<string, () => Promise<Init>> = {
-  menu: () => import('@/scripts/modules/menu').then((m) => m.initMenu),
+  menu: () => Promise.resolve(initMenu),
   typewriter: () => import('@/scripts/modules/typewriter').then((m) => m.initTypewriter),
   'background-video': () => Promise.resolve((element: HTMLElement) => initBackgroundVideo(element as HTMLVideoElement)),
   'back-to-top': () => Promise.resolve(initBackToTop),
@@ -25,7 +26,6 @@ const modules: Record<string, () => Promise<Init>> = {
   'drag-scroll': () => import('@/scripts/modules/drag-scroll').then((m) => m.initDragScroll),
   marquee: () => import('@/scripts/modules/marquee').then((m) => m.initMarquee),
   'drag-field': () => import('@/scripts/modules/drag-field').then((m) => m.initDragField),
-  faq: () => import('@/scripts/modules/faq').then((m) => m.initFaq),
   tabs: () => import('@/scripts/modules/tabs').then((m) => m.initTabs),
   'media-gallery': () => import('@/scripts/modules/media-gallery').then((m) => m.initMediaGallery),
 };

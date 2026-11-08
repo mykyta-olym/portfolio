@@ -1,9 +1,9 @@
-import { filled, type Grid } from '@/lib/pixels';
+import { filled, monogram, type Grid } from '@/lib/pixels';
 import { smoothstep } from '@/lib/math';
 
-const SIZE = 6;
+const SIZE = monogram.length;
 
-/** Draws the 6 by 6 mark on a canvas, morphing between two grids. */
+/** Draws the shared mark on a canvas, morphing between two grids. */
 export class PixelMark {
   private readonly context: CanvasRenderingContext2D;
   private readonly cssSize: number;

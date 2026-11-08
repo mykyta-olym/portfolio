@@ -11,6 +11,8 @@ test('opens with focus inside and closes with Escape, returning focus', async ({
   const dialog = page.getByRole('dialog', { name: 'Site menu' });
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await toggle.click();
+  // The close control must be available immediately, before the body wipe finishes.
+  await expect(page.getByRole('button', { name: 'Close menu' })).toBeInViewport();
   await expect(dialog).toBeVisible();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
   await expect(page.getByRole('button', { name: 'Close menu' })).toBeFocused();

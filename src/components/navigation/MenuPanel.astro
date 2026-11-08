@@ -1,6 +1,7 @@
 ---
 import LogoMark from './LogoMark.astro';
 import Icon from '@/components/ui/Icon.astro';
+import HoverLink from '@/components/ui/HoverLink.astro';
 import { primaryNavigation } from '@/data/navigation';
 import { profile } from '@/data/profile';
 import { href, isCurrent } from '@/lib/paths';
@@ -10,7 +11,7 @@ const current = Astro.url.pathname;
 
 <div class="menu" id="site-menu" data-module="menu" hidden>
   <div class="menu__backdrop" data-menu-backdrop></div>
-  <div class="menu__panel" data-menu-panel role="dialog" aria-modal="true" aria-label="Site menu">
+  <div class="menu__panel" role="dialog" aria-modal="true" aria-label="Site menu">
     <div class="menu__head">
       <a class="menu__logo" href={href()} aria-label="Mykyta Olym, home">
         <LogoMark size={32} />
@@ -24,13 +25,19 @@ const current = Astro.url.pathname;
         </span>
       </button>
     </div>
-    <div class="menu__body" data-menu-surface>
+    <div class="menu__body" data-menu-panel data-menu-surface>
       <nav class="menu__nav" aria-label="Primary">
         <ul>
           {primaryNavigation.map((item) => (
             <li data-menu-item>
               <a class="menu__link" href={href(item.path)} aria-current={isCurrent(current, item.path) ? 'page' : undefined}>
-                {item.label}
+                <HoverLink
+                  as="span"
+                  align="end"
+                  href={href(item.path)}
+                  label={item.label}
+                  hoverText={item.path === 'contact/' ? 'Hire me' : item.path === 'about/' ? 'Meet me' : 'Explore'}
+                />
                 <Icon name="arrow-up-right" size={18} class="menu__arrow" />
               </a>
             </li>
@@ -41,9 +48,12 @@ const current = Astro.url.pathname;
         <ul class="menu__social">
           {profile.links.map((link) => (
             <li data-menu-item>
-              <a href={link.href} target={link.href.startsWith('mailto:') ? undefined : '_blank'} rel="noopener">
-                {link.label}
-              </a>
+              <HoverLink
+                href={link.href}
+                label={link.label}
+                hoverText={link.hoverText ?? link.label}
+                external={!link.href.startsWith('mailto:')}
+              />
             </li>
           ))}
         </ul>
@@ -100,9 +110,9 @@ const current = Astro.url.pathname;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 88px;
+    height: 52px;
     flex: none;
-    padding: 0 20px 0 30px;
+    padding: 0 5px;
     background: var(--color-black);
   }
 
@@ -164,7 +174,7 @@ const current = Astro.url.pathname;
   }
 
   .menu__nav {
-    padding: 42px 44px 0;
+    padding: 66px 44px 0;
   }
 
   .menu__nav ul {
@@ -185,6 +195,12 @@ const current = Astro.url.pathname;
     min-height: 38px;
     color: var(--color-white);
     transition: opacity var(--duration-fast) ease;
+  }
+  .menu__link :global(.hover-link) {
+    min-height: 1.2em;
+  }
+  .menu__link :global(.hover-link__inner) {
+    min-height: 1.2em;
   }
 
   .menu__link::after {
@@ -278,8 +294,7 @@ const current = Astro.url.pathname;
 
   @media (max-width: 767px) {
     .menu__head {
-      padding-left: 15px;
-      padding-right: 10px;
+      padding-inline: 5px;
     }
     .menu__nav {
       padding-inline: 36px;

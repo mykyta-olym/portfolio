@@ -3,6 +3,12 @@
 import { fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
 import { lockScroll, markStageReady } from '@/scripts/core/stage';
 
+declare global {
+  interface Window {
+    pageReveal?: ViewTransition | null;
+  }
+}
+
 export const TRANSITION_KEY = 'page-transition';
 const LEAVE_MS = 700;
 
@@ -20,6 +26,7 @@ function shouldIntercept(event: MouseEvent, anchor: HTMLAnchorElement): URL | nu
 export function initPageTransitions(panel: HTMLElement): Cleanup {
   const root = document.documentElement;
   const hasLoader = Boolean(document.querySelector('[data-preloader]'));
+  const native = typeof CSSViewTransitionRule !== 'undefined';
   let leaving = false;
 
   try {
@@ -28,13 +35,19 @@ export function initPageTransitions(panel: HTMLElement): Cleanup {
     // Without storage the next page simply arrives uncovered.
   }
 
-  if (typeof CSSViewTransitionRule !== 'undefined') {
+  if (native) {
     root.classList.remove('is-departing', 'is-arriving', 'is-uncovering');
-    if (!hasLoader) void fontsReady(1500).then(markStageReady);
-    return () => undefined;
-  }
-
-  if (root.classList.contains('is-arriving') && !hasLoader && !reducedMotion()) {
+    if (!hasLoader)
+      void fontsReady(1500).then(() =>
+        requestAnimationFrame(() => {
+          const transition = (window as Window & { pageReveal?: ViewTransition }).pageReveal;
+          if (transition && !reducedMotion()) {
+            // Start text just before the incoming top slice opens, rather than behind it.
+            void transition.ready.then(() => window.setTimeout(markStageReady, 1050)).catch(markStageReady);
+          } else markStageReady();
+        }),
+      );
+  } else if (root.classList.contains('is-arriving') && !hasLoader && !reducedMotion()) {
     const unlock = lockScroll();
     void fontsReady(1500).then(() => {
       requestAnimationFrame(() => {
@@ -56,19 +69,27 @@ export function initPageTransitions(panel: HTMLElement): Cleanup {
 
   const onClick = (event: MouseEvent): void => {
     const anchor = (event.target as Element | null)?.closest?.('a[href]');
-    if (!(anchor instanceof HTMLAnchorElement) || reducedMotion()) return;
+    if (!(anchor instanceof HTMLAnchorElement)) return;
     const url = shouldIntercept(event, anchor);
     if (!url) return;
-    event.preventDefault();
-    if (leaving) return;
+    if (leaving) {
+      event.preventDefault();
+      return;
+    }
     leaving = true;
+    // A second navigation can arrive before the previous reveal finishes. End that
+    // reveal now so the browser can capture a fresh outgoing page without a delay.
+    if (native) window.pageReveal?.skipTransition();
     try {
-      sessionStorage.setItem(TRANSITION_KEY, '1');
+      sessionStorage.setItem(TRANSITION_KEY, url.pathname);
     } catch {
       // Navigation still works; the next page just will not start covered.
     }
-    root.classList.add('is-departing');
-    window.setTimeout(() => location.assign(url.href), LEAVE_MS);
+    if (!native && !reducedMotion()) {
+      event.preventDefault();
+      root.classList.add('is-departing');
+      window.setTimeout(() => location.assign(url.href), LEAVE_MS);
+    }
   };
 
   // Back and forward can restore this page from memory with the cover still raised.

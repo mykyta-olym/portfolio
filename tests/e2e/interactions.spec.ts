@@ -1,5 +1,5 @@
 import { expect, test } from '@playwright/test';
-import { waitForStage } from './helpers';
+import { waitForStage, watchErrors } from './helpers';
 
 test('FAQ items open and close', async ({ page }) => {
   await page.goto('work/');
@@ -91,6 +91,7 @@ test('contact hover labels slide inside their link without changing its destinat
     .toBe(true);
   await expect(link).toHaveAttribute('href', destination ?? '');
   await expect(link).toHaveAttribute('aria-label', '[GitHub]');
+  await expect(link.locator('.hover-link__next')).toHaveText('Read the code');
   await link.focus();
   await expect(link).toBeFocused();
 });
@@ -101,6 +102,53 @@ test('back to top returns to the top of the page', async ({ page }) => {
   await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
   await page.getByRole('button', { name: /Back to top/ }).click();
   await expect.poll(() => page.evaluate(() => window.scrollY), { timeout: 5000 }).toBeLessThan(5);
+  await expect(page.locator('#main')).toBeFocused();
+  await expect(page.locator('[data-module="back-to-top"]')).not.toHaveClass(/is-returning/);
+});
+
+test('a manual scroll interrupts the return to top without stealing focus', async ({ page }) => {
+  await page.goto('work/');
+  await waitForStage(page);
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight));
+  const button = page.getByRole('button', { name: /Back to top/ });
+  await button.click();
+  await page.waitForTimeout(250);
+  await page.mouse.wheel(0, 300);
+  await expect(button).not.toHaveClass(/is-returning/);
+  await page.waitForTimeout(250);
+  const top = await page.evaluate(() => window.scrollY);
+  await page.waitForTimeout(500);
+  expect(Math.abs((await page.evaluate(() => window.scrollY)) - top)).toBeLessThan(2);
+  expect(top).toBeGreaterThan(300);
+  await expect(page.locator('#main')).not.toBeFocused();
+});
+
+test('process cards turn to explanations and stay still while being read', async ({ page }) => {
+  await page.goto('./');
+  await waitForStage(page);
+  await page.locator('.orbit').evaluate((element) => window.scrollTo(0, (element as HTMLElement).offsetTop));
+  await page.waitForTimeout(4200);
+  const card = page.locator('[data-orbit-card]').first();
+  await card.click({ force: true });
+  await expect(card).toHaveAttribute('aria-expanded', 'true');
+  await page.waitForTimeout(800);
+  const before = await card.boundingBox();
+  await page.waitForTimeout(350);
+  const after = await card.boundingBox();
+  expect(Math.abs((before?.x ?? 0) - (after?.x ?? 0))).toBeLessThan(1);
+  expect(Math.abs((before?.y ?? 0) - (after?.y ?? 0))).toBeLessThan(1);
+  await expect(card.locator('.orbit__back')).toContainText('constraints');
+  expect(await card.locator('.orbit__back').evaluate((element) => element.scrollHeight - element.clientHeight)).toBeLessThanOrEqual(1);
+  for (const next of (await page.locator('[data-orbit-card]').all()).slice(1)) {
+    await page.keyboard.press('Escape');
+    await page.waitForTimeout(700);
+    await next.click({ force: true });
+    await expect(next).toHaveAttribute('aria-expanded', 'true');
+    await page.waitForTimeout(800);
+    expect(await next.locator('.orbit__back').evaluate((element) => element.scrollHeight - element.clientHeight)).toBeLessThanOrEqual(1);
+  }
+  await page.keyboard.press('Escape');
+  await expect(page.locator('[data-orbit-card][aria-expanded="true"]')).toHaveCount(0);
 });
 
 test('image strips scroll sideways by dragging without opening the project', async ({ page, isMobile }) => {
@@ -136,10 +184,34 @@ test('the about field moves when dragged', async ({ page, isMobile }) => {
   await expect.poll(async () => (await canvas.screenshot()).equals(before)).toBe(false);
 });
 
-test('the typed phrase in the navigation types the home words', async ({ page }) => {
+test('typing, pauses and backspacing keep one cursor in the navigation', async ({ page }) => {
+  const errors = watchErrors(page);
   await page.goto('./');
   await waitForStage(page);
   await expect(page.locator('[data-typewriter-text]')).toHaveText('WORK', { timeout: 8000 });
+  const cursor = page.locator('.nav__phrase .typed-cursor');
+  await expect(cursor).toHaveCount(1);
+  // Observe every DOM change: a short erased state can fall between 100 ms polls.
+  const changes = await page.locator('[data-typewriter-text]').evaluateHandle((output) => {
+    const states: { text: string; cursors: number; visibility: string }[] = [];
+    const record = (): void => {
+      const cursors = output.parentElement?.querySelectorAll('.typed-cursor');
+      states.push({
+        text: output.textContent ?? '',
+        cursors: cursors?.length ?? 0,
+        visibility: cursors?.[0] ? getComputedStyle(cursors[0]).visibility : '',
+      });
+    };
+    record();
+    new MutationObserver(record).observe(output, { childList: true, characterData: true, subtree: true });
+    return states;
+  });
+  await expect
+    .poll(() => changes.evaluate((states) => states.map((state) => state.text)), { timeout: 15_000 })
+    .toEqual(expect.arrayContaining(['WORK', 'RIGHT', 'FAST', '']));
+  expect(await changes.evaluate((states) => states.every((state) => state.cursors === 1 && state.visibility === 'visible'))).toBe(true);
+  await changes.dispose();
+  expect(errors).toEqual([]);
 });
 
 test('project images enlarge, cycle with arrow keys and restore focus on close', async ({ page }) => {

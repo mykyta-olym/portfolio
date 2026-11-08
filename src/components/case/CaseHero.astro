@@ -1,5 +1,6 @@
 ---
 import LogoMark from '@/components/navigation/LogoMark.astro';
+import CaseBackdrop from './CaseBackdrop.astro';
 import type { Project } from '@/types/content';
 
 interface Props {
@@ -10,6 +11,7 @@ const { project } = Astro.props;
 ---
 
 <header class="case-hero">
+  <CaseBackdrop slug={project.slug} />
   <div class="case-hero__content">
     <LogoMark size={28} class="case-hero__mark" />
     <p class="case-hero__kind" data-reveal="fade">

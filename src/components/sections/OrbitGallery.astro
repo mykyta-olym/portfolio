@@ -1,41 +1,64 @@
 ---
 import { Image } from 'astro:assets';
 import { galleryCards } from '@/data/disciplines';
-import { projectBySlug } from '@/data/projects';
-import { projectHref } from '@/lib/paths';
 ---
 
 <section class="orbit" data-module="orbit-gallery" aria-labelledby="orbit-title">
   <div class="orbit__stage">
     <div class="orbit__heading" data-orbit-heading>
       <h2 class="orbit__title" id="orbit-title">
-        Built in public
+        From idea to release
       </h2>
-      <p class="orbit__meta">2026 // Selected work</p>
+      <p class="orbit__meta">Six steps // Hover or tap to turn</p>
     </div>
     <ul class="orbit__ring" data-orbit-ring>
       {galleryCards.map((card, index) => {
-        const project = projectBySlug(card.slug);
         const angle = (index * Math.PI * 2) / galleryCards.length - Math.PI / 4;
         return (
           <li
             class="orbit__slot"
             style={`--dx:${Math.cos(angle)};--dy:${Math.sin(angle)};--angle:${(angle * 180) / Math.PI + 90}deg;z-index:${index + 1}`}
           >
-            <a class="orbit__card" data-orbit-card href={projectHref(project.slug)} aria-label={`${project.name} case study`}>
-              <Image
-                src={card.image.src}
-                alt=""
-                widths={[240, 420]}
-                sizes="(min-width: 768px) 14vw, 32vw"
-                class="orbit__image"
-                loading="lazy"
-              />
-            </a>
+            <button class="orbit__card" type="button" data-orbit-card aria-expanded="false" aria-label={`${card.title}: ${card.text}`}>
+              <span class="orbit__flip">
+                <span class="orbit__face orbit__front" aria-hidden="true">
+                  <Image
+                    src={card.image}
+                    alt=""
+                    widths={[240, 420]}
+                    sizes="(min-width: 768px) 14vw, 32vw"
+                    class="orbit__image"
+                    loading="lazy"
+                  />
+                  <span class="orbit__caption">
+                    <span>{String(index + 1).padStart(2, '0')}</span>
+                    {card.title}
+                    <span>↻</span>
+                  </span>
+                </span>
+                <span class="orbit__face orbit__back" aria-hidden="true">
+                  <span class="orbit__number">
+                    {String(index + 1).padStart(2, '0')} / {card.title}
+                  </span>
+                  <span class="orbit__explanation">{card.text}</span>
+                  <span class="orbit__source">{card.source}</span>
+                </span>
+              </span>
+            </button>
           </li>
         );
       })}
     </ul>
+    <noscript>
+      <ol class="orbit__plain">
+        {galleryCards.map((card) => (
+          <li>
+            <h3>{card.title}</h3>
+            <p>{card.text}</p>
+          </li>
+        ))}
+      </ol>
+    </noscript>
   </div>
 </section>
 
@@ -52,7 +75,7 @@ import { projectHref } from '@/lib/paths';
     height: 100vh;
     min-height: 34rem;
     overflow: hidden;
-    --ring-radius: min(280px, 34vw);
+    --ring-radius: min(350px, 32vw, max(174px, 32vh));
   }
 
   .orbit__heading {
@@ -61,8 +84,10 @@ import { projectHref } from '@/lib/paths';
     display: grid;
     justify-items: center;
     gap: 0.75rem;
+    max-width: min(260px, 28vw, 36vh);
     text-align: center;
     pointer-events: none;
+    transition: opacity 0.45s var(--ease-out);
   }
 
   .orbit__title {
@@ -97,25 +122,153 @@ import { projectHref } from '@/lib/paths';
     place-items: center;
     perspective: 1000px;
     pointer-events: none;
+    transition: opacity 0.45s var(--ease-out);
   }
 
   .orbit__card {
     display: block;
-    width: min(205px, 26vw);
-    aspect-ratio: 205 / 120;
+    width: min(240px, 20vw, 28vh);
+    aspect-ratio: 1.5;
     border-radius: 5px;
-    overflow: hidden;
-    background: #0b0b0c;
+    overflow: visible;
+    background: transparent;
     pointer-events: auto;
     transform-style: flat;
-    transform: translate(calc(var(--dx) * var(--ring-radius)), calc(var(--dy) * var(--ring-radius))) rotate(var(--angle));
+    transform: translate(calc(var(--dx) * var(--ring-radius)), calc(var(--dy) * var(--ring-radius)));
     will-change: transform;
+    transition: width 0.65s cubic-bezier(0.65, 0, 0.35, 1);
+  }
+  .orbit:global(.has-expanded) .orbit__slot {
+    opacity: 0.18;
+  }
+  .orbit:global(.has-expanded) .orbit__heading {
+    opacity: 0 !important;
+  }
+  .orbit__slot:has([aria-expanded='true']) {
+    z-index: 20 !important;
+    opacity: 1 !important;
+  }
+  .orbit__card[aria-expanded='true'] {
+    width: min(300px, 72vw);
+    aspect-ratio: 1.2;
+  }
+  .orbit__card[aria-expanded='true'] .orbit__back {
+    padding: 1.25rem;
+  }
+  .orbit__card[aria-expanded='true'] .orbit__explanation {
+    font-size: 20px;
+  }
+  .orbit__card[aria-expanded='true'] .orbit__number {
+    font-size: 11px;
+  }
+  .orbit__flip {
+    position: relative;
+    display: block;
+    width: 100%;
+    height: 100%;
+    transform-style: preserve-3d;
+    transition: transform 0.75s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .orbit__face {
+    position: absolute;
+    inset: 0;
+    display: block;
+    overflow: hidden;
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    border-radius: 5px;
+  }
+  .orbit__front {
+    background: #151515;
+  }
+  .orbit__back {
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 1.1rem;
+    background: #e7e7e2;
+    color: #141414;
+    transform: rotateY(180deg);
+    text-align: left;
+  }
+  .orbit__number {
+    font-family: var(--font-mono);
+    font-size: 10px;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+  .orbit__explanation {
+    font-size: clamp(11px, 1vw, 14px);
+    line-height: 1.2;
+    font-weight: 400;
+  }
+  .orbit__source {
+    font-family: var(--font-mono);
+    font-size: 9px;
+    opacity: 0.7;
+  }
+  .orbit__caption {
+    position: absolute;
+    inset: auto 0 0;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0.6rem 0.75rem;
+    background: linear-gradient(transparent, #000);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .orbit__caption > :first-child {
+    font: 10px var(--font-mono);
+  }
+  .orbit__caption > :last-child {
+    margin-left: auto;
+  }
+  .orbit__card[aria-expanded='true'] .orbit__flip,
+  .orbit__card:focus-visible .orbit__flip {
+    transform: rotateY(180deg);
+  }
+  @media (hover: hover) and (pointer: fine) {
+    .orbit__card:hover .orbit__flip {
+      transform: rotateY(180deg);
+    }
   }
 
   .orbit__card :global(.orbit__image) {
     width: 100%;
     height: 100%;
-    object-fit: cover;
+    object-fit: contain;
+  }
+  :global(.no-js) .orbit__ring {
+    display: none;
+  }
+  :global(.no-js) .orbit__stage {
+    height: auto;
+    min-height: 0;
+    padding: 5rem var(--gutter);
+    gap: 2rem;
+  }
+  :global(.no-js) .orbit__heading {
+    max-width: none;
+  }
+  :global(.no-js) .orbit__meta {
+    display: none;
+  }
+  .orbit__plain {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 2rem;
+    max-width: 70rem;
+  }
+  .orbit__plain h3 {
+    margin-bottom: 0.75rem;
+    font-size: 1.5rem;
+  }
+  .orbit__plain p {
+    color: var(--color-text-muted);
+    font-size: var(--fs-body);
+    line-height: 1.5;
   }
 
   :global(.js) .orbit:not(:global(.is-static)) .orbit__card {
@@ -129,8 +282,59 @@ import { projectHref } from '@/lib/paths';
   }
 
   @media (max-width: 767px) {
+    .orbit__stage {
+      --ring-radius: 124px;
+    }
+    .orbit__card {
+      width: min(110px, 28vw);
+      aspect-ratio: 1.25;
+    }
+    .orbit__back {
+      padding: 0.65rem;
+    }
+    .orbit__number {
+      font-size: 8px;
+      letter-spacing: 0;
+    }
+    .orbit__explanation {
+      font-size: 11px;
+    }
+    .orbit__caption {
+      padding: 0.5rem;
+      font-size: 11px;
+      gap: 0.3rem;
+    }
+    .orbit__heading {
+      max-width: 130px;
+    }
+    .orbit__meta {
+      max-width: 130px;
+      font-size: 9px;
+      line-height: 1.4;
+    }
     .orbit__title {
-      font-size: 25px;
+      font-size: 21px;
+    }
+    .orbit__card[aria-expanded='false']:is(:hover, :focus-visible) .orbit__flip {
+      transform: none;
+    }
+  }
+  @media (max-width: 1023px) {
+    .orbit__card[aria-expanded='false']:is(:hover, :focus-visible) .orbit__flip {
+      transform: none;
+    }
+  }
+  @media (max-height: 640px) {
+    .orbit__card[aria-expanded='false']:is(:hover, :focus-visible) .orbit__flip {
+      transform: none;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .orbit__flip,
+    .orbit__card,
+    .orbit__slot,
+    .orbit__heading {
+      transition: none;
     }
   }
 </style>

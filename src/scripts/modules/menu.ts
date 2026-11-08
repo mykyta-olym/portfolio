@@ -13,6 +13,7 @@ const OPEN = 'inset(0% 0% 0% 0%)';
 export function initMenu(root: HTMLElement): Cleanup {
   const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
   const panel = root.querySelector<HTMLElement>('[data-menu-panel]');
+  const dialog = root.querySelector<HTMLElement>('[role="dialog"]');
   const surface = root.querySelector<HTMLElement>('[data-menu-surface]');
   const head = root.querySelector<HTMLElement>('.menu__head');
   const nav = document.querySelector<HTMLElement>('[data-nav]');
@@ -59,7 +60,7 @@ export function initMenu(root: HTMLElement): Cleanup {
     if (starting) {
       gsap.set(backdrop, { opacity: 0 });
       gsap.set(panel, { clipPath: CLOSED_FROM_BOTTOM });
-      gsap.set(head, { opacity: 0 });
+      gsap.set(head, { opacity: 1 });
       gsap.set(items, { y: 30, opacity: 0 });
       if (media) gsap.set(media, { clipPath: CLOSED_FROM_BOTTOM });
     }
@@ -78,7 +79,7 @@ export function initMenu(root: HTMLElement): Cleanup {
         .to(panel, { clipPath: OPEN, duration: 1.2, ease: 'wipe' }, 0)
         .to(links, { y: 0, opacity: 1, duration: 0.8, stagger: 0.08, ease: 'power3.out' }, 0.6)
         .to(socials, { y: 0, opacity: 1, duration: 0.6, stagger: 0.05, ease: 'power3.out' }, 0.6)
-        .to(head, { opacity: 1, duration: 0.6 }, 0.8);
+        .to(head, { opacity: 1, duration: 0.15 }, 0);
       if (media) timeline.to(media, { clipPath: OPEN, duration: 1.5, ease: 'wipe' }, 0.4);
     }
     closeButton.focus({ preventScroll: true });
@@ -104,9 +105,9 @@ export function initMenu(root: HTMLElement): Cleanup {
     else {
       timeline = gsap
         .timeline({ onComplete: finish })
-        .to(head, { opacity: 0, duration: 0.3 }, 0)
-        .to(navContent, { opacity: 1, duration: 0.6 }, 0.5)
-        .to(toggle, { opacity: 1, duration: 0.6 }, 0.5)
+        .to(head, { opacity: 0, duration: 0.25 }, 0.9)
+        .to(navContent, { opacity: 1, duration: 0.25 }, 0.9)
+        .to(toggle, { opacity: 1, duration: 0.25 }, 0.9)
         .to(panel, { clipPath: CLOSED_TO_TOP, duration: 1.2, ease: 'wipe' }, 0)
         .to(backdrop, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 0.5);
     }
@@ -121,7 +122,7 @@ export function initMenu(root: HTMLElement): Cleanup {
       return;
     }
     if (event.key !== 'Tab') return;
-    const focusable = [...panel.querySelectorAll<HTMLElement>(FOCUSABLE)].filter((el) => el.offsetParent !== null);
+    const focusable = [...(dialog ?? panel).querySelectorAll<HTMLElement>(FOCUSABLE)].filter((el) => el.offsetParent !== null);
     const first = focusable[0];
     const last = focusable.at(-1);
     if (!first || !last) return;

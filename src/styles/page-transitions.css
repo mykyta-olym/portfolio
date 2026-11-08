@@ -188,8 +188,3 @@
     animation-duration: 0.01ms !important;
   }
 }
-/* HOMEPAGE PRELOADER EXCEPTION */
-
-html:has(body[data-home])::view-transition {
-  display: none !important;
-}

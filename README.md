@@ -11,8 +11,9 @@ Live: https://mykyta-olym.github.io/portfolio/
 - [Astro 7](https://astro.build) with static output: every route is a real HTML file, so
   nested pages work on reload and without JavaScript.
 - TypeScript in strict mode for all page scripts and data.
-- [GSAP 3](https://gsap.com) with ScrollTrigger and CustomEase for the motion system.
+- [GSAP 3](https://gsap.com) with ScrollTrigger, SplitText, ScrambleText, Draggable, Inertia, CustomEase and ScrollToPlugin for the motion system.
 - [Swiper](https://swiperjs.com) for the project carousels and continuous tool-logo strip.
+- [Typed.js](https://github.com/mattboldt/typed.js/tree/v2.1.0) for navigation typing and its persistent cursor.
 - [Three.js](https://threejs.org) for the photographic About field, adapting the reference's camera and curved-plane motion.
 - Plain CSS with design tokens in `src/styles/tokens.css`; component styles are scoped.
 - Self-hosted Inter, Inter Tight, Figtree and IBM Plex Mono from Fontsource (SIL OFL).
@@ -25,11 +26,11 @@ Sources and the laptop edit prompt are in [ASSETS.md](ASSETS.md).
 ## What is on the site
 
 - Home: the reference's synchronized four-beat loader, the monochrome hero loop, a scroll-linked line reveal,
-  a ring gallery, a pinned list of disciplines, a picture that shrinks into a frame, selected
+  a two-sided orbit of real work artifacts, a pinned list of disciplines with matching examples, a picture that shrinks into a frame, selected
   projects with Swiper image strips, contact and FAQ, and a footer that reveals itself
   under the page with a pixel wordmark that reacts to the pointer.
 - Work: all six projects.
-- Case studies: a sticky panel with stack, key numbers and tabbed sections next to a column
+- Case studies: a neutral illustrated background specific to each subject, a sticky panel with stack, key numbers and tabbed sections next to a column
   of real visuals: screenshots, verbatim code, diagrams and charts drawn from each repository.
 - About: a draggable field of faceless process photographs and design imagery, a short prologue and working principles.
 - Contact: the reference's animated cubic background and paper cards, with Mykyta's links and email copy control; a 404 page.
@@ -37,7 +38,30 @@ Sources and the laptop edit prompt are in [ASSETS.md](ASSETS.md).
 Page changes use the reference's four rising horizontal slices and white pause through
 native cross-document View Transitions. Browsers without support use the page cover. With
 `prefers-reduced-motion` all of this becomes static, and the content is complete without
-JavaScript.
+JavaScript. Internal returns to home use the page transition without replaying the first-load
+sequence. Navigation, social links and calls to action have contextual hover labels; portrait
+buttons reveal the actual photo in colour. Back to top uses an interruptible eased scroll and
+only moves keyboard focus after arrival.
+
+## Existing solutions and application code
+
+| Interaction                               | Implementation                                                                             |
+| ----------------------------------------- | ------------------------------------------------------------------------------------------ |
+| Typing, erasing and cursor                | Typed.js 2.1.0                                                                             |
+| Responsive text lines and decoding labels | GSAP SplitText and ScrambleTextPlugin                                                      |
+| About pointer input and momentum          | GSAP Draggable and InertiaPlugin; Three.js renders the reference's curved image field      |
+| Pointer label                             | GSAP quickTo; no separate animation loop                                                   |
+| Return to top                             | GSAP ScrollToPlugin                                                                        |
+| Image strips and continuous logos         | Swiper, A11y, Mousewheel and Autoplay                                                      |
+| FAQ                                       | Native details/summary, CSS details-content and interpolate-size; no JavaScript controller |
+| Tab panel height                          | CSS Grid keeps all panels in one cell; no measuring or ResizeObserver                      |
+| Full-size images                          | Native dialog with the project's caption and keyboard controls                             |
+| Navigation                                | Native cross-document View Transitions and the reference's slice keyframes                 |
+
+The remaining application code supplies content, accessible controls, cleanup, reference timing
+and composition. The personalised pixel mark, canvas wordmark and Three.js scene still need
+their own drawing code. Unsupported CSS features retain the native content and controls;
+FAQ opens immediately if size interpolation is unavailable.
 
 ## Running it
 

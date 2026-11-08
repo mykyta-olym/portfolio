@@ -1,29 +1,16 @@
 // A small label that follows the pointer over elements with data-cursor, such as "Drag" on
 // the about field. Mouse only; hidden on touch screens.
-import { damp } from '@/lib/math';
+import { gsap } from '@/scripts/core/gsap';
 import { coarsePointer, reducedMotion, type Cleanup } from '@/scripts/core/motion';
 
 export function initCursorLabel(label: HTMLElement): Cleanup {
   if (coarsePointer()) return () => undefined;
   const text = label.querySelector<HTMLElement>('[data-cursor-text]') ?? label;
   const reduce = reducedMotion();
-  let x = 0;
-  let y = 0;
   let tx = 0;
   let ty = 0;
-  let frame = 0;
-  let previous = 0;
-
-  const render = (now: number): void => {
-    const dt = previous ? (now - previous) / 1000 : 1 / 60;
-    previous = now;
-    const k = reduce ? 1 : damp(18, dt);
-    x += (tx - x) * k;
-    y += (ty - y) * k;
-    label.style.transform = `translate3d(${x.toFixed(1)}px, ${y.toFixed(1)}px, 0)`;
-    frame = Math.abs(tx - x) + Math.abs(ty - y) > 0.2 ? requestAnimationFrame(render) : 0;
-    if (!frame) previous = 0;
-  };
+  const xTo = gsap.quickTo(label, 'x', { duration: 0.2, ease: 'power3.out' });
+  const yTo = gsap.quickTo(label, 'y', { duration: 0.2, ease: 'power3.out' });
 
   const onMove = (event: PointerEvent): void => {
     if (event.pointerType !== 'mouse') return;
@@ -42,14 +29,19 @@ export function initCursorLabel(label: HTMLElement): Cleanup {
       const value = host.dataset['cursor'] ?? '';
       if (text.textContent !== value) text.textContent = value;
       if (!label.classList.contains('is-visible')) {
-        x = tx;
-        y = ty;
+        xTo.tween.pause();
+        yTo.tween.pause();
+        gsap.set(label, { x: tx, y: ty });
       }
       label.classList.add('is-visible');
+      if (reduce) gsap.set(label, { x: tx, y: ty });
+      else {
+        xTo(tx);
+        yTo(ty);
+      }
     } else {
       label.classList.remove('is-visible');
     }
-    if (!frame) frame = requestAnimationFrame(render);
   };
   const onScroll = (): void => {
     if (hasPointer) refresh(document.elementFromPoint(tx, ty));
@@ -63,7 +55,8 @@ export function initCursorLabel(label: HTMLElement): Cleanup {
   window.addEventListener('scroll', onScroll, { passive: true });
   document.documentElement.addEventListener('pointerleave', onLeave);
   return () => {
-    cancelAnimationFrame(frame);
+    xTo.tween.kill();
+    yTo.tween.kill();
     document.removeEventListener('pointermove', onMove);
     window.removeEventListener('scroll', onScroll);
     document.documentElement.removeEventListener('pointerleave', onLeave);
