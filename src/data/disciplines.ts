@@ -15,33 +15,33 @@ export const disciplines: readonly Discipline[] = [
   {
     title: 'Backend Systems',
     description: 'Queues, transactions and event pipelines that keep their guarantees when processes die.',
-    image: projectMedia.relayqStates,
+    image: projectMedia.relayqCover,
   },
   {
     title: 'Web Applications',
     description: 'Server-rendered dashboards with live updates, sign-in and access control.',
-    image: projectMedia.gitpulseStudent,
+    image: projectMedia.gitpulseCover,
   },
   {
     title: 'Machine Learning',
     description: 'Models judged on honest splits, with explanations and their weak spots reported.',
-    image: projectMedia.phishlensEvaluation,
+    image: projectMedia.phishlensCover,
   },
   {
     title: 'Interactive Graphics',
     description: 'Browser games and rendering: procedural worlds, isometric engines, offline 3D.',
-    image: projectMedia.gardenPlay,
+    image: projectMedia.gardenCover,
   },
 ];
 
 /** Cards for the rotating gallery on the home page, each linked to its case study. */
 export const galleryCards: readonly { readonly image: MediaItem; readonly slug: string }[] = [
-  { image: projectMedia.gitpulseStudent, slug: 'gitpulse' },
-  { image: projectMedia.gardenFlight, slug: 'garden-of-lost-paths' },
-  { image: projectMedia.phishlensScore, slug: 'phishlens' },
-  { image: projectMedia.relayqFailures, slug: 'relayq' },
-  { image: projectMedia.speechTransfer, slug: 'speech-domain-adaptation' },
-  { image: projectMedia.stockroomOrders, slug: 'stockroom' },
+  { image: projectMedia.gitpulseCover, slug: 'gitpulse' },
+  { image: projectMedia.gardenCover, slug: 'garden-of-lost-paths' },
+  { image: projectMedia.phishlensCover, slug: 'phishlens' },
+  { image: projectMedia.relayqCover, slug: 'relayq' },
+  { image: projectMedia.speechCover, slug: 'speech-domain-adaptation' },
+  { image: projectMedia.stockroomCover, slug: 'stockroom' },
 ];
 
 /** Tiles for the draggable field on the about page. */

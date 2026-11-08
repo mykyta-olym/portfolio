@@ -1,170 +1,162 @@
 import type { Project } from '@/types/content';
 
+import relayqCover from '@/assets/work/relayq/cover.webp';
 import relayqFailures from '@/assets/work/relayq/failures.webp';
 import relayqStates from '@/assets/work/relayq/states.webp';
-import relayqDequeue from '@/assets/work/relayq/dequeue.webp';
-import relayqThroughput from '@/assets/work/relayq/throughput.webp';
-import relayqArchitecture from '@/assets/work/relayq/architecture.webp';
+import phishlensCover from '@/assets/work/phishlens/cover.webp';
 import phishlensScore from '@/assets/work/phishlens/score.webp';
 import phishlensEvaluation from '@/assets/work/phishlens/evaluation.webp';
 import phishlensPrevalence from '@/assets/work/phishlens/prevalence.webp';
-import phishlensIntegrity from '@/assets/work/phishlens/integrity.webp';
+import gitpulseCover from '@/assets/work/gitpulse/cover.webp';
 import gitpulseStudent from '@/assets/work/gitpulse/student.webp';
 import gitpulseChecks from '@/assets/work/gitpulse/checks.webp';
-import gitpulsePipeline from '@/assets/work/gitpulse/pipeline.webp';
-import gitpulseRules from '@/assets/work/gitpulse/rules.webp';
+import gitpulseDashboard from '@/assets/work/gitpulse/dashboard.webp';
+import stockroomCover from '@/assets/work/stockroom/cover.webp';
 import stockroomConcurrency from '@/assets/work/stockroom/concurrency.webp';
 import stockroomOrders from '@/assets/work/stockroom/orders.webp';
-import stockroomCheckout from '@/assets/work/stockroom/checkout.webp';
+import gardenCover from '@/assets/work/garden/cover.webp';
 import gardenPlay from '@/assets/work/garden/play.webp';
-import gardenFlight from '@/assets/work/garden/flight.webp';
 import gardenBook from '@/assets/work/garden/book.webp';
-import gardenGardener from '@/assets/work/garden/gardener.webp';
-import gardenCloseup from '@/assets/work/garden/closeup.webp';
-import gardenRain from '@/assets/work/garden/rain.webp';
+import gardenFlight from '@/assets/work/garden/flight.webp';
+import speechCover from '@/assets/work/speech/cover.webp';
 import speechInDomain from '@/assets/work/speech/in-domain.webp';
-import speechTransfer from '@/assets/work/speech/transfer.webp';
 import speechMultiSource from '@/assets/work/speech/multi-source.webp';
 import speechProtocol from '@/assets/work/speech/protocol.webp';
-import speechGrl from '@/assets/work/speech/grl.webp';
 
 const github = (repo: string) => `https://github.com/mykyta-olym/${repo}`;
 
 const media = {
+  relayqCover: {
+    src: relayqCover,
+    kind: 'diagram',
+    alt: 'An illustrated stack of jobs connected to three workers.',
+    caption: 'Queue architecture illustrated from the actual Go and Redis implementation.',
+  },
   relayqFailures: {
     src: relayqFailures,
-    kind: 'terminal',
-    alt: 'Table of relayq failure tests: a killed worker job is redelivered after 2.0 seconds, a poison job ends in the dead letter queue after 3 deliveries, and a chaos run kills 34 workers with 0 jobs lost.',
+    kind: 'diagram',
+    alt: 'Failure test results: zero jobs lost, 34 workers killed and redelivery after 2 seconds.',
+    caption: 'Recorded failure suite: 20,000 jobs, 34 workers killed, one allowed duplicate finish.',
   },
   relayqStates: {
     src: relayqStates,
     kind: 'diagram',
-    alt: 'Diagram of relayq job states: delayed, ready, active with a lease, completed and dead letter, with the transitions between them.',
+    alt: 'Job lifecycle with ready, active, completed and dead letter states and a retry path.',
+    caption: 'State transitions from the queue implementation. Each change is an atomic Lua script.',
   },
-  relayqDequeue: {
-    src: relayqDequeue,
-    kind: 'code',
-    alt: 'The relayq dequeue Lua script, which pops jobs and leases them in one atomic step.',
-  },
-  relayqThroughput: {
-    src: relayqThroughput,
-    kind: 'chart',
-    alt: 'Bar chart of relayq median throughput: 7,637 jobs per second enqueued one at a time, 17,774 in batches of 100, 4,096 processing a full queue, 3,571 producing and processing together.',
-  },
-  relayqArchitecture: {
-    src: relayqArchitecture,
+  phishlensCover: {
+    src: phishlensCover,
     kind: 'diagram',
-    alt: 'relayq components: Go producers and HTTP callers reach Redis through the client, workers lease and acknowledge jobs, and Prometheus scrapes the API.',
+    alt: 'A made-up URL scores 0.756, explained by three contributions from the actual model.',
+    caption: 'Editorial visualisation of a real CLI result. A score is not a safety verdict.',
   },
   phishlensScore: {
     src: phishlensScore,
     kind: 'terminal',
-    alt: 'Terminal output of phishlens score: a made-up phishing-style URL scores 0.958 and a GitHub URL scores 0.009, each with the three features that moved the score.',
+    alt: 'The actual phishlens CLI output with score 0.756 and three feature contributions.',
+    caption: 'CLI run on 8 November 2026. The example domain is fictional; the model output is real.',
   },
   phishlensEvaluation: {
     src: phishlensEvaluation,
     kind: 'chart',
-    alt: 'Chart of phishlens F1 and ROC AUC on six test sets. On later dates and unseen domains F1 is 0.869 and ROC AUC 0.942; on two older outside datasets the scores are lower.',
+    alt: 'Evaluation table comparing later dates, random splits, unseen domains and two outside datasets.',
+    caption: 'Evaluation from reports/metrics.json. External datasets expose the limits of transfer.',
   },
   phishlensPrevalence: {
     src: phishlensPrevalence,
     kind: 'chart',
-    alt: 'Table of phishlens precision at realistic phishing shares of 5, 1 and 0.1 percent, falling from 0.458 to 0.016 at the default cut.',
+    alt: 'Precision falls from 45.8 percent to 1.6 percent as phishing becomes rarer.',
+    caption: 'Measured precision at 5%, 1% and 0.1% phishing prevalence.',
   },
-  phishlensIntegrity: {
-    src: phishlensIntegrity,
-    kind: 'code',
-    alt: 'Python code that verifies the SHA-256 of the model file and its feature list before LightGBM parses it.',
+  gitpulseCover: {
+    src: gitpulseCover,
+    kind: 'screenshot',
+    alt: 'The real GitPulse course overview, showing three demonstration teams and their scores.',
+    caption: 'Actual application, running against an isolated database with synthetic demonstration data.',
   },
   gitpulseStudent: {
     src: gitpulseStudent,
     kind: 'screenshot',
-    alt: 'GitPulse student view with a score trend, a skill profile and a week-by-week grid of passed and failed checks.',
+    alt: 'The real GitPulse student progress view with a score trend and skill profile.',
+    caption: 'Actual student view. All names, events and scores belong to the seeded demonstration course.',
   },
   gitpulseChecks: {
     src: gitpulseChecks,
     kind: 'screenshot',
-    alt: 'GitPulse settings listing the teamwork checks with their categories and weights.',
+    alt: 'GitPulse course analytics with summary cards and a bar chart of checklist pass rates.',
+    caption: 'Actual course analytics: the real rule engine computes the demonstration results.',
   },
-  gitpulsePipeline: {
-    src: gitpulsePipeline,
+  gitpulseDashboard: {
+    src: gitpulseDashboard,
+    kind: 'screenshot',
+    alt: 'The GitPulse teacher dashboard with courses, team shortcuts and items requiring attention.',
+    caption: 'Actual teacher dashboard, captured locally on 8 November 2026.',
+  },
+  stockroomCover: {
+    src: stockroomCover,
     kind: 'diagram',
-    alt: 'GitPulse event pipeline: a GitLab webhook passes three deduplication layers, is stored, processed on a high priority queue, then team metrics are recomputed, caches invalidated and open dashboards notified. Failures retry with backoff and end in a dead letter queue.',
-  },
-  gitpulseRules: {
-    src: gitpulseRules,
-    kind: 'code',
-    alt: 'JSON definition of the first built-in GitPulse check, Issue Assigned, with its parameters.',
+    alt: 'Forty numbered buyers, seven highlighted as the available stock in the concurrency test.',
+    caption: 'Illustration of the real 40-buyer, 7-unit integration test.',
   },
   stockroomConcurrency: {
     src: stockroomConcurrency,
-    kind: 'code',
-    alt: 'Names of the stockroom concurrency tests, such as selling exactly the stock when 40 buyers race for 7 units, plus a control test that oversells without row locks.',
+    kind: 'diagram',
+    alt: 'Concurrent checkout tests: forty buyers share seven units; two submits create one order.',
+    caption: 'Re-run against an isolated PostgreSQL database. The unlocked control oversells.',
   },
   stockroomOrders: {
     src: stockroomOrders,
     kind: 'diagram',
-    alt: 'stockroom order states: pending payment to paid, payment failed or cancelled; paid to shipped or cancelled; shipped to delivered.',
+    alt: 'Order lifecycle from pending payment through paid, shipped and delivered, with cancellation paths.',
+    caption: 'The actual six-state transition map from src/domain/order-status.ts.',
   },
-  stockroomCheckout: {
-    src: stockroomCheckout,
-    kind: 'code',
-    alt: 'TypeScript checkout code that locks the cart row, then product rows in id order, with SELECT FOR UPDATE.',
+  gardenCover: {
+    src: gardenCover,
+    kind: 'screenshot',
+    alt: 'The real illustrated garden maze, framed on a warm paper presentation.',
+    caption: 'Actual Garden of Lost Paths gameplay. Original bundled artwork and game interface.',
   },
   gardenPlay: {
     src: gardenPlay,
     kind: 'screenshot',
-    alt: 'Isometric garden maze drawn in ink on paper, with hedges, trees, benches and a small figure on the path.',
-  },
-  gardenFlight: {
-    src: gardenFlight,
-    kind: 'screenshot',
-    alt: 'A flight over the whole generated maze, seen from above on a book page.',
+    alt: 'The player walking through the illustrated isometric garden maze.',
+    caption: 'Actual playable scene, captured after the chapter entrance finishes.',
   },
   gardenBook: {
     src: gardenBook,
     kind: 'screenshot',
-    alt: 'The game opens as a leather book on a wooden table, titled Garden of Lost Paths in Slovak.',
+    alt: 'The game opens as a book on a wooden table.',
+    caption: 'Actual storybook menu from the game.',
   },
-  gardenGardener: {
-    src: gardenGardener,
+  gardenFlight: {
+    src: gardenFlight,
     kind: 'screenshot',
-    alt: 'A villager speaks to the player in a speech bubble inside the garden maze.',
+    alt: 'The prologue presents the generated garden as a drawing on the page.',
+    caption: 'Actual storybook prologue from the game.',
   },
-  gardenCloseup: {
-    src: gardenCloseup,
-    kind: 'screenshot',
-    alt: 'Zoomed-in view of the maze with an arch, benches and the player.',
-  },
-  gardenRain: {
-    src: gardenRain,
-    kind: 'screenshot',
-    alt: 'The garden maze in the rain.',
+  speechCover: {
+    src: speechCover,
+    kind: 'diagram',
+    alt: 'A conceptual waveform introducing seven speaking tasks, one hundred speakers and five seeds.',
+    caption: 'Conceptual waveform; experiment structure verified against PCGITA_EXPERIMENTS.md.',
   },
   speechInDomain: {
     src: speechInDomain,
     kind: 'chart',
-    alt: 'Bar chart of in-domain ROC AUC by speaking task, from 0.920 for monologue to 0.768 for diadochokinetic tasks.',
-  },
-  speechTransfer: {
-    src: speechTransfer,
-    kind: 'chart',
-    alt: 'Heatmap of mean AUC for six source to target task pairs and seven methods, including CORAL, MMD and DANN.',
+    alt: 'In-domain ROC AUC by task, from 0.920 for monologue to 0.768 for DDK.',
+    caption: 'Patient-wise cross-validation results from the project report.',
   },
   speechMultiSource: {
     src: speechMultiSource,
     kind: 'chart',
-    alt: 'Bar chart of the best mean AUC per target task when training on all other tasks; ExtraTrees is best for most targets.',
+    alt: 'In-domain and held-out task results, including 0.900 AUC for held-out monologue.',
+    caption: 'Source: reports/pcgita/05_domain_gap.csv. Values rounded to three decimals.',
   },
   speechProtocol: {
     src: speechProtocol,
     kind: 'diagram',
-    alt: 'Protocol diagram: 100 speakers split into 60 for adaptation and 40 for testing, with target labels never used during adaptation.',
-  },
-  speechGrl: {
-    src: speechGrl,
-    kind: 'code',
-    alt: 'PyTorch gradient reversal function: identity on the forward pass and a negated, scaled gradient on the backward pass.',
+    alt: 'One hundred speakers split into sixty adaptation and forty test speakers.',
+    caption: 'No speaker overlap. Target-task labels are withheld during adaptation.',
   },
 } as const satisfies Record<string, Project['gallery'][number]>;
 
@@ -211,8 +203,8 @@ export const projects: readonly Project[] = [
         ],
       },
     ],
-    strip: [media.relayqFailures, media.relayqStates, media.relayqDequeue],
-    gallery: [media.relayqFailures, media.relayqStates, media.relayqThroughput, media.relayqArchitecture, media.relayqDequeue],
+    strip: [media.relayqCover, media.relayqStates, media.relayqFailures],
+    gallery: [media.relayqCover, media.relayqFailures, media.relayqStates],
     featuredOnHome: true,
   },
   {
@@ -258,8 +250,8 @@ export const projects: readonly Project[] = [
         ],
       },
     ],
-    strip: [media.phishlensScore, media.phishlensPrevalence, media.phishlensIntegrity],
-    gallery: [media.phishlensScore, media.phishlensEvaluation, media.phishlensPrevalence, media.phishlensIntegrity],
+    strip: [media.phishlensCover, media.phishlensEvaluation, media.phishlensPrevalence],
+    gallery: [media.phishlensCover, media.phishlensScore, media.phishlensEvaluation, media.phishlensPrevalence],
     featuredOnHome: true,
   },
   {
@@ -304,8 +296,8 @@ export const projects: readonly Project[] = [
         ],
       },
     ],
-    strip: [media.gitpulseStudent, media.gitpulseRules, media.gitpulseChecks],
-    gallery: [media.gitpulseStudent, media.gitpulsePipeline, media.gitpulseChecks, media.gitpulseRules],
+    strip: [media.gitpulseCover, media.gitpulseStudent, media.gitpulseChecks],
+    gallery: [media.gitpulseCover, media.gitpulseStudent, media.gitpulseChecks, media.gitpulseDashboard],
     featuredOnHome: true,
   },
   {
@@ -349,12 +341,17 @@ export const projects: readonly Project[] = [
         ],
       },
     ],
-    strip: [media.stockroomConcurrency, media.stockroomOrders, media.stockroomCheckout],
-    gallery: [media.stockroomConcurrency, media.stockroomCheckout, media.stockroomOrders],
+    strip: [media.stockroomCover, media.stockroomConcurrency, media.stockroomOrders],
+    gallery: [media.stockroomCover, media.stockroomConcurrency, media.stockroomOrders],
     featuredOnHome: false,
   },
   {
     slug: 'garden-of-lost-paths',
+    video: {
+      src: 'media/projects/garden-walk.mp4',
+      poster: 'media/projects/garden-poster.webp',
+      label: 'A short recording of actual gameplay, without audio.',
+    },
     name: 'Garden of Lost Paths',
     repository: github('zahrada-stratenych-ciest'),
     summary: 'An isometric storybook maze in Phaser 4. Seeded mazes from rot.js, A* hints, and narration synced word by word to the page.',
@@ -392,8 +389,8 @@ export const projects: readonly Project[] = [
         ],
       },
     ],
-    strip: [media.gardenPlay, media.gardenBook, media.gardenFlight],
-    gallery: [media.gardenPlay, media.gardenFlight, media.gardenGardener, media.gardenCloseup, media.gardenRain, media.gardenBook],
+    strip: [media.gardenCover, media.gardenPlay, media.gardenBook],
+    gallery: [media.gardenCover, media.gardenPlay, media.gardenBook, media.gardenFlight],
     credits:
       'Illustrations and sounds are third-party assets credited in the repository: the city game tileset by Withering Systems and Comigo UI elements (CC BY 4.0) and CC0 assets from OpenGameArt, Poly Haven, Kenney and Freesound. Narration voices were synthesised with ElevenLabs. The code is original.',
     featuredOnHome: false,
@@ -439,8 +436,8 @@ export const projects: readonly Project[] = [
         ],
       },
     ],
-    strip: [media.speechTransfer, media.speechProtocol, media.speechGrl],
-    gallery: [media.speechInDomain, media.speechTransfer, media.speechMultiSource, media.speechProtocol, media.speechGrl],
+    strip: [media.speechCover, media.speechInDomain, media.speechProtocol],
+    gallery: [media.speechCover, media.speechInDomain, media.speechMultiSource, media.speechProtocol],
     featuredOnHome: false,
   },
 ];

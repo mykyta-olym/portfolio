@@ -74,13 +74,13 @@ See [ASSETS.md](ASSETS.md) for reference assets, stock footage, reduced-motion s
 The scripts below preserve the original local media-generation workflow; the new hero, menu,
 contact background and laptop image use the sources documented there.
 
-| Script                      | Produces                                                                             | Needs                                            |
-| --------------------------- | ------------------------------------------------------------------------------------ | ------------------------------------------------ |
-| `render/render.mjs`         | Frames of the three.js scenes in `render/scenes`, rendered in Chrome on the GPU      | Chrome                                           |
-| `encode-video.mjs`          | H.264 and VP9 loops and a poster from rendered frames                                | ffmpeg                                           |
-| `cards/render-cards.mjs`    | Project visuals: code, test names and numbers are read from the project repositories | Chrome, the repositories cloned next to this one |
-| `capture/record-garden.mjs` | An optional Garden gameplay capture                                                  | Chrome, ffmpeg, the game repository              |
-| `social/render-social.mjs`  | Favicons and the social preview image                                                | Chrome                                           |
+| Script                      | Produces                                                                        | Needs                                           |
+| --------------------------- | ------------------------------------------------------------------------------- | ----------------------------------------------- |
+| `render/render.mjs`         | Frames of the three.js scenes in `render/scenes`, rendered in Chrome on the GPU | Chrome                                          |
+| `encode-video.mjs`          | H.264 and VP9 loops and a poster from rendered frames                           | ffmpeg                                          |
+| `cards/render-cards.mjs`    | Project presentation plates, real screenshots and source-derived diagrams       | Chrome, sibling repositories and local captures |
+| `capture/record-garden.mjs` | An optional Garden gameplay capture                                             | Chrome, ffmpeg, the game repository             |
+| `social/render-social.mjs`  | Favicons and the social preview image                                           | Chrome                                          |
 
 Example, the hero loop:
 
@@ -92,6 +92,13 @@ node scripts/media/encode-video.mjs .media-cache/blocks-landscape public/media/h
 The renderer averages sub-pixel jittered frames for anti-aliasing and blurs with a gather
 depth-of-field pass, so each 1080p frame takes about 1.6 s on an Intel UHD 630. Every wave
 in the scene completes whole cycles per loop, so the video repeats without a seam.
+
+The current project plates use `cards/presentations.mjs`. Run
+`node scripts/media/cards/render-cards.mjs [projectPrefix]` to render them at 2400 x 1500.
+GitPulse and Garden require the actual screenshots listed in that manifest under
+`.media-cache/project-captures/`. These are presentation assets, not fabricated app screens.
+The full-resolution plates open in the case study image viewer; Garden also has a
+user-controlled gameplay recording. See ASSETS.md for provenance and result sources.
 
 ## Performance measurement
 

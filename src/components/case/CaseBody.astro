@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import SectionLabel from '@/components/ui/SectionLabel.astro';
 import Icon from '@/components/ui/Icon.astro';
 import type { Project } from '@/types/content';
+import { href } from '@/lib/paths';
 
 interface Props {
   project: Project;
@@ -76,18 +77,60 @@ const { project } = Astro.props;
     </div>
   </aside>
 
-  <div class="case__gallery">
+  <div class="case__gallery" data-module="media-gallery">
+    {project.video && (
+      <figure class="case__film" data-reveal="fade">
+        <video controls playsinline preload="none" poster={href(project.video.poster)} aria-label={project.video.label}>
+          <source src={href(project.video.src)} type="video/mp4" />
+        </video>
+        <figcaption>{project.video.label}</figcaption>
+      </figure>
+    )}
     {project.gallery.map((item, index) => (
       <figure class="case__figure" data-reveal="fade">
-        <Image
-          src={item.src}
-          alt={item.alt}
-          widths={[640, 1080, 1600]}
-          sizes="(min-width: 1024px) 58vw, 100vw"
-          loading={index === 0 ? 'eager' : 'lazy'}
-        />
+        <a
+          href={item.src.src}
+          data-gallery-image
+          data-caption={item.caption ?? item.alt}
+          aria-label={`Enlarge image ${index + 1}: ${project.name}`}
+        >
+          <Image
+            src={item.src}
+            alt={item.alt}
+            widths={[640, 1080, 1600]}
+            sizes="(min-width: 1024px) 58vw, 100vw"
+            loading={index === 0 ? 'eager' : 'lazy'}
+          />
+          <span class="case__enlarge" aria-hidden="true">
+            <Icon name="arrow-up-right" size={18} />
+          </span>
+        </a>
+        {item.caption && <figcaption>{item.caption}</figcaption>}
       </figure>
     ))}
+    <dialog class="viewer" aria-labelledby="viewer-title" data-gallery-dialog>
+      <div class="viewer__bar">
+        <h2 id="viewer-title">{project.name}</h2>
+        <span data-gallery-count aria-live="polite"></span>
+        <button type="button" data-gallery-close aria-label="Close image viewer">
+          Close <Icon name="close" size={14} />
+        </button>
+      </div>
+      <div class="viewer__image">
+        <img data-gallery-full alt="" />
+      </div>
+      <div class="viewer__foot">
+        <button type="button" data-gallery-prev aria-label="Previous image">
+          <span class="viewer__previous-icon">
+            <Icon name="chevron-right" size={18} />
+          </span>
+        </button>
+        <p data-gallery-caption></p>
+        <button type="button" data-gallery-next aria-label="Next image">
+          <Icon name="chevron-right" size={18} />
+        </button>
+      </div>
+    </dialog>
   </div>
 </section>
 
@@ -266,15 +309,170 @@ const { project } = Astro.props;
   }
 
   .case__figure {
+    min-width: 0;
+  }
+
+  .case__figure > a {
+    position: relative;
+    display: block;
     overflow: hidden;
     border-radius: 3px;
-    background: #0b0b0c;
+    background: #161718;
+    cursor: zoom-in;
   }
 
   .case__figure :global(img) {
     width: 100%;
     height: auto;
-    filter: grayscale(1);
+    display: block;
+    transition: transform 0.7s var(--ease-out);
+  }
+
+  .case__enlarge {
+    position: absolute;
+    right: 16px;
+    bottom: 16px;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    background: #fff;
+    color: #111;
+    transform: translateY(8px);
+    opacity: 0;
+    transition:
+      opacity 0.3s,
+      transform 0.3s var(--ease-out);
+  }
+
+  .case__figure > a:is(:hover, :focus-visible) .case__enlarge {
+    opacity: 1;
+    transform: none;
+  }
+
+  .case__figure figcaption,
+  .case__film figcaption {
+    max-width: 58rem;
+    margin-top: 0.8rem;
+    font-size: 0.8125rem;
+    line-height: 1.5;
+    color: var(--color-text-dim);
+  }
+
+  .case__film video {
+    display: block;
+    width: 100%;
+    aspect-ratio: 16 / 10;
+    object-fit: contain;
+    background: #161718;
+    border-radius: 3px;
+  }
+
+  .viewer {
+    position: fixed;
+    inset: 0;
+    width: calc(100vw - 32px);
+    max-width: 2400px;
+    height: calc(100svh - 32px);
+    max-height: none;
+    margin: auto;
+    border: 1px solid #ffffff26;
+    padding: 20px;
+    background: #111213;
+    color: #ededeb;
+    border-radius: 8px;
+  }
+  .viewer[open] {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    gap: 16px;
+  }
+  .viewer::backdrop {
+    background: #000c;
+    backdrop-filter: blur(10px);
+  }
+  .viewer__bar,
+  .viewer__foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+    font-size: 0.875rem;
+  }
+  .viewer__bar h2 {
+    font-size: 1rem;
+    font-weight: 400;
+  }
+  .viewer button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    flex: none;
+    min-width: 44px;
+    min-height: 44px;
+    padding: 10px 14px;
+    border: 1px solid #ffffff40;
+    border-radius: 24px;
+    transition:
+      background-color 0.2s,
+      color 0.2s;
+  }
+  .viewer__previous-icon {
+    display: inline-flex;
+    rotate: 180deg;
+  }
+  .viewer button:hover {
+    background: #ededeb;
+    color: #111;
+  }
+  .viewer__image {
+    display: grid;
+    place-items: center;
+    min-height: 0;
+  }
+  .viewer__image img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    object-fit: contain;
+  }
+  .viewer__foot p {
+    text-align: center;
+    max-width: 65rem;
+    line-height: 1.5;
+    color: #bdbdbd;
+  }
+  @media (hover: hover) {
+    .case__figure > a:hover :global(img) {
+      transform: scale(1.018);
+    }
+  }
+  @media (max-width: 600px) {
+    .viewer {
+      width: 100vw;
+      height: 100svh;
+      border: 0;
+      border-radius: 0;
+      padding: 12px;
+    }
+    .viewer__bar,
+    .viewer__foot {
+      gap: 10px;
+      font-size: 0.75rem;
+    }
+    .viewer__bar h2 {
+      max-width: 45%;
+      font-size: 0.875rem;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .case__figure :global(img),
+    .case__enlarge {
+      transition: none;
+    }
   }
 
   @media (max-width: 1023px) {

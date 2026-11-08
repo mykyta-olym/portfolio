@@ -27,6 +27,7 @@ const modules: Record<string, () => Promise<Init>> = {
   'drag-field': () => import('@/scripts/modules/drag-field').then((m) => m.initDragField),
   faq: () => import('@/scripts/modules/faq').then((m) => m.initFaq),
   tabs: () => import('@/scripts/modules/tabs').then((m) => m.initTabs),
+  'media-gallery': () => import('@/scripts/modules/media-gallery').then((m) => m.initMediaGallery),
 };
 
 const cleanups: Cleanup[] = [];

@@ -61,6 +61,8 @@ export interface Project {
   readonly strip: readonly [MediaItem, MediaItem, MediaItem];
   /** The tall image column on the case study page. */
   readonly gallery: readonly MediaItem[];
+  /** Optional real application recording, played on request in the case study. */
+  readonly video?: { readonly src: string; readonly poster: string; readonly label: string };
   readonly credits?: string;
   readonly featuredOnHome: boolean;
 }

@@ -1,16 +1,16 @@
-// Renders the project visuals listed in cards.mjs to src/assets/work/<project>/<name>.webp.
+// Renders the source-derived presentation plates to src/assets/work/<project>/<name>.webp.
 // Usage: node scripts/media/cards/render-cards.mjs [idPrefix]
 import { createServer } from 'node:http';
 import { copyFileSync, mkdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { basename, dirname, extname, join, normalize, resolve, sep } from 'node:path';
 import { chromium } from '@playwright/test';
 import sharp from 'sharp';
-import { allCards } from './cards.mjs';
+import { presentationCards } from './presentations.mjs';
 
 const root = resolve(import.meta.dirname, '../../..');
 const cache = join(root, '.media-cache', 'cards');
 const outRoot = join(root, 'src', 'assets', 'work');
-const filter = process.argv[2] ?? '';
+const filter = process.argv.slice(2).find((arg) => !arg.startsWith('--')) ?? '';
 mkdirSync(join(cache, 'assets'), { recursive: true });
 
 const types = { '.html': 'text/html', '.woff2': 'font/woff2', '.png': 'image/png', '.jpg': 'image/jpeg' };
@@ -34,7 +34,7 @@ const context = await browser.newContext({ viewport: { width: 1200, height: 900 
 const page = await context.newPage();
 page.on('pageerror', (error) => console.error('page error:', error.message));
 
-const cards = allCards().filter((card) => card.id.startsWith(filter));
+const cards = presentationCards().filter((card) => card.id.startsWith(filter));
 for (const card of cards) {
   const target = join(outRoot, `${card.id}.webp`);
   mkdirSync(dirname(target), { recursive: true });
