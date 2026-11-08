@@ -22,3 +22,18 @@ test('the menu dialog has no violations while open', async ({ page }) => {
   const results = await new AxeBuilder({ page }).include('#site-menu').withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();
   expect(results.violations.map((v) => v.id)).toEqual([]);
 });
+
+test('navigation over light project media and the open image viewer remain accessible', async ({ page }) => {
+  await page.goto('work/gitpulse/');
+  await waitForStage(page);
+  const image = page.locator('[data-gallery-image]').first();
+  await image.scrollIntoViewIfNeeded();
+  await page.waitForTimeout(1200);
+  const nav = await new AxeBuilder({ page }).include('[data-nav]').withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();
+  expect(nav.violations.map((violation) => violation.id)).toEqual([]);
+  await image.click();
+  const viewer = page.locator('[data-gallery-dialog]');
+  await expect(viewer).toBeVisible();
+  const result = await new AxeBuilder({ page }).include('[data-gallery-dialog]').withTags(['wcag2a', 'wcag2aa', 'wcag22aa']).analyze();
+  expect(result.violations.map((violation) => violation.id)).toEqual([]);
+});

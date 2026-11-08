@@ -1,78 +1,46 @@
-// The reference's scroll rise: measured text rows share a 1.15em rise and cubic fade.
-import { clamp, easeOutCubic } from '@/lib/math';
+import { SplitText } from 'gsap/SplitText';
+import { gsap } from '@/scripts/core/gsap';
 import { fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
-import { lineIndices, splitWords } from './split';
 
-interface Group {
-  element: HTMLElement;
-  words: HTMLElement[];
-  rows: number[];
-  restore(): void;
-}
+gsap.registerPlugin(SplitText);
 
-const WINDOW = 0.68;
-
+/** The source's line rise, measured again whenever fonts or paragraph widths change. */
 export async function initScrollRise(scope: ParentNode = document): Promise<Cleanup> {
-  const elements = [...scope.querySelectorAll<HTMLElement>('[data-scroll-rise]')];
-  if (elements.length === 0 || reducedMotion()) return () => undefined;
+  if (reducedMotion()) return () => undefined;
+  const groups = [...scope.querySelectorAll<HTMLElement>('[data-scroll-rise]')];
   await fontsReady();
-
-  const groups: Group[] = elements.map((element) => {
-    const { words, restore } = splitWords(element, 'rise-word', 'rise-inner');
-    words.forEach((word, i) => {
-      if (!word.hasAttribute('data-inline-pic')) return;
-      const outer = document.createElement('span');
-      const inner = document.createElement('span');
-      outer.className = 'rise-word';
-      inner.className = 'rise-inner';
-      word.replaceWith(outer);
-      outer.append(inner);
-      inner.append(word);
-      words[i] = outer;
-    });
-    element.classList.add('is-rising');
-    return { element, words, rows: lineIndices(words), restore };
+  const splits = groups.flatMap((group) => {
+    const paragraphs = [...group.querySelectorAll<HTMLElement>('p')];
+    return (paragraphs.length ? paragraphs : [group]).map((element) =>
+      SplitText.create(element, {
+        type: 'lines,words',
+        aria: 'none',
+        linesClass: 'rise-line',
+        mask: 'lines',
+        autoSplit: true,
+        ignore: '[data-inline-pic]',
+        onSplit(self) {
+          return gsap.fromTo(
+            self.lines,
+            { yPercent: 115, opacity: 0 },
+            {
+              yPercent: 0,
+              opacity: 1,
+              duration: 0.68,
+              stagger: self.lines.length > 1 ? 0.32 / (self.lines.length - 1) : 0,
+              ease: 'power3.out',
+              scrollTrigger: {
+                trigger: element,
+                start: 'top 85%',
+                end: 'top 30%',
+                scrub: 0.2,
+                invalidateOnRefresh: true,
+              },
+            },
+          );
+        },
+      }),
+    );
   });
-
-  const update = (): void => {
-    const vh = window.innerHeight;
-    for (const group of groups) {
-      const top = group.element.getBoundingClientRect().top;
-      const progress = clamp((vh * 0.85 - top) / (vh * 0.55));
-      const count = Math.max(...group.rows) + 1;
-      const step = (1 - WINDOW) / Math.max(1, count - 1);
-      group.words.forEach((word, index) => {
-        const eased = easeOutCubic((progress - (group.rows[index] ?? 0) * step) / WINDOW);
-        word.style.setProperty('--rise-y', `${((1 - eased) * 1.15).toFixed(3)}em`);
-        word.style.setProperty('--rise-a', Math.min(1, eased * 1.5).toFixed(3));
-      });
-    }
-  };
-
-  let frame = 0;
-  const schedule = (): void => {
-    if (frame) return;
-    frame = requestAnimationFrame(() => {
-      frame = 0;
-      update();
-    });
-  };
-  update();
-  const refresh = (): void => {
-    groups.forEach((group) => {
-      group.rows = lineIndices(group.words);
-    });
-    schedule();
-  };
-  window.addEventListener('scroll', schedule, { passive: true });
-  window.addEventListener('resize', refresh);
-  return () => {
-    cancelAnimationFrame(frame);
-    window.removeEventListener('scroll', schedule);
-    window.removeEventListener('resize', refresh);
-    for (const group of groups) {
-      group.restore();
-      group.element.classList.remove('is-rising');
-    }
-  };
+  return () => splits.forEach((split) => split.revert());
 }

@@ -51,7 +51,7 @@ import { href } from '@/lib/paths';
         <ul>
           {[links.github, links.linkedin, links.telegram].map((link) => (
             <li>
-              <HoverLink href={link.href} label={`[${link.label}]`} hoverText="View profile" external />
+              <HoverLink href={link.href} label={`[${link.label}]`} external />
             </li>
           ))}
         </ul>
@@ -135,7 +135,9 @@ import { href } from '@/lib/paths';
     background: rgb(255 255 255 / 71%);
     color: #454545;
     font-size: var(--fs-small);
-    transition: transform 0.4s ease;
+    transition:
+      translate 0.4s var(--ease-out),
+      scale 0.4s var(--ease-out);
   }
   .contact__paper {
     position: relative;
@@ -226,7 +228,8 @@ import { href } from '@/lib/paths';
 
   @media (hover: hover) and (pointer: fine) {
     .contact__card:hover {
-      transform: translateY(-6px) scale(1.02);
+      translate: 0 -6px;
+      scale: 1.02;
     }
   }
 

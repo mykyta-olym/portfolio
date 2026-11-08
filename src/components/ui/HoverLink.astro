@@ -17,10 +17,13 @@ const { href, label, hoverText = label, external = false } = Astro.props;
   rel={external ? 'noopener' : undefined}
 >
   <span class="hover-link__inner">{label}</span>
+  <span class="hover-link__next" aria-hidden="true">
+    {hoverText}
+  </span>
 </a>
 
 <style>
-  /* Essential Addons' Rayen effect used by the reference's text links. */
+  /* Both labels travel the same distance inside a fixed mask, including on reversal. */
   .hover-link {
     position: relative;
     display: inline-grid;
@@ -29,13 +32,12 @@ const { href, label, hoverText = label, external = false } = Astro.props;
     overflow: hidden;
     vertical-align: middle;
   }
-  .hover-link::before {
-    content: attr(data-hover-text);
+  .hover-link__next {
     position: absolute;
     inset: 0;
     display: grid;
     place-items: center;
-    transform: translate3d(-100%, 0, 0);
+    transform: translate3d(0, 110%, 0);
     overflow: hidden;
   }
   .hover-link::after {
@@ -45,8 +47,8 @@ const { href, label, hoverText = label, external = false } = Astro.props;
     white-space: nowrap;
   }
   .hover-link__inner,
-  .hover-link::before {
-    transition: transform 0.3s cubic-bezier(0.75, 0, 0.125, 1);
+  .hover-link__next {
+    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
     white-space: nowrap;
   }
   .hover-link__inner {
@@ -56,15 +58,15 @@ const { href, label, hoverText = label, external = false } = Astro.props;
     min-height: 24px;
     height: 100%;
   }
-  .hover-link:is(:hover, :focus-visible)::before {
+  .hover-link:is(:hover, :focus-visible) .hover-link__next {
     transform: translate3d(0, 0, 0);
   }
   .hover-link:is(:hover, :focus-visible) .hover-link__inner {
-    transform: translate3d(0, 100%, 0);
+    transform: translate3d(0, -110%, 0);
   }
   @media (prefers-reduced-motion: reduce) {
     .hover-link__inner,
-    .hover-link::before {
+    .hover-link__next {
       transition: none;
     }
   }

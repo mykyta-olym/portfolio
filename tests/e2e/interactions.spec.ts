@@ -80,8 +80,12 @@ test('contact hover labels slide inside their link without changing its destinat
   await expect
     .poll(() =>
       link.evaluate((element) => {
-        const inner = element.querySelector('span');
-        return inner ? inner.getBoundingClientRect().top >= element.getBoundingClientRect().bottom - 1 : false;
+        const inner = element.querySelector('.hover-link__inner');
+        const next = element.querySelector('.hover-link__next');
+        return inner && next
+          ? inner.getBoundingClientRect().bottom <= element.getBoundingClientRect().top + 1 &&
+              Math.abs(next.getBoundingClientRect().top - element.getBoundingClientRect().top) < 1
+          : false;
       }),
     )
     .toBe(true);
@@ -136,4 +140,59 @@ test('the typed phrase in the navigation types the home words', async ({ page })
   await page.goto('./');
   await waitForStage(page);
   await expect(page.locator('[data-typewriter-text]')).toHaveText('WORK', { timeout: 8000 });
+});
+
+test('project images enlarge, cycle with arrow keys and restore focus on close', async ({ page }) => {
+  await page.goto('work/relayq/');
+  await waitForStage(page);
+  const first = page.locator('[data-gallery-image]').first();
+  await first.click();
+  const viewer = page.getByRole('dialog', { name: 'relayq' });
+  await expect(viewer).toBeVisible();
+  await expect(viewer.locator('[data-gallery-count]')).toHaveText('1 / 3');
+  await expect.poll(() => viewer.locator('img').evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth)).toBe(2400);
+  await page.keyboard.press('ArrowRight');
+  await expect(viewer.locator('[data-gallery-count]')).toHaveText('2 / 3');
+  await expect(viewer.locator('[data-gallery-caption]')).toContainText('20,000 jobs');
+  await page.keyboard.press('ArrowLeft');
+  await expect(viewer.locator('[data-gallery-count]')).toHaveText('1 / 3');
+  await page.keyboard.press('Escape');
+  await expect(viewer).not.toBeVisible();
+  await expect(first).toBeFocused();
+  await expect(page.locator('html')).not.toHaveClass(/is-locked/);
+});
+
+test('scroll text reflows during a reveal and returns intact after reverse scrolling', async ({ page }) => {
+  await page.goto('./');
+  await waitForStage(page);
+  const text = page.locator('.statement__text');
+  const paragraphs = text.locator('p');
+  const original = await paragraphs.allTextContents();
+  const top = await text.evaluate((element) => element.getBoundingClientRect().top + window.scrollY);
+  await page.evaluate((y) => window.scrollTo(0, y - innerHeight * 0.7), top);
+  await page.waitForTimeout(80);
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.waitForTimeout(350);
+  await page.setViewportSize({ width: 1440, height: 900 });
+  await page.waitForTimeout(350);
+  const settledTop = await text.evaluate((element) => element.getBoundingClientRect().top + window.scrollY);
+  await page.evaluate((y) => window.scrollTo(0, y - 40), settledTop);
+  await page.waitForTimeout(450);
+  expect((await paragraphs.allTextContents()).map((value) => value.replace(/\s+/g, ' ').trim())).toEqual(
+    original.map((value) => value.replace(/\s+/g, ' ').trim()),
+  );
+  await expect(text.locator('[data-inline-pic]')).toHaveCount(2);
+  expect(await text.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
+  expect(
+    await text.locator('.rise-line').evaluateAll((lines) => lines.every((line) => Number(getComputedStyle(line).opacity) > 0.99)),
+  ).toBe(true);
+  const freshTop = await text.evaluate((element) => element.getBoundingClientRect().top + window.scrollY);
+  await page.evaluate((y) => window.scrollTo(0, y - innerHeight * 0.83), freshTop);
+  await page.waitForTimeout(450);
+  expect(
+    await text
+      .locator('.rise-line')
+      .first()
+      .evaluate((line) => Number(getComputedStyle(line).opacity)),
+  ).toBeLessThan(0.5);
 });

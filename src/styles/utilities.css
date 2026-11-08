@@ -42,15 +42,14 @@
   visibility: visible;
 }
 
-.line-clip {
-  display: block;
-  /* Clipping past the line box keeps descenders and accents without changing its height. */
-  clip-path: inset(-0.15em -0.1em -0.2em -0.1em);
-}
-
 .line-slide {
   display: block;
-  will-change: transform;
+}
+
+.line-slide-mask,
+.rise-line-mask {
+  overflow: visible !important;
+  clip-path: inset(-0.15em -0.08em -0.2em -0.08em);
 }
 
 .js [data-reveal='fade'] {
@@ -64,21 +63,6 @@
 .js [data-reveal='fade'].is-done {
   opacity: 1;
   transform: none;
-}
-
-/* Source line-rise clipping leaves room for accents and descenders. */
-.is-rising .rise-word {
-  display: inline-block;
-  vertical-align: baseline;
-  line-height: inherit;
-  white-space: nowrap;
-  clip-path: inset(-0.12em -0.08em -0.18em -0.08em);
-}
-
-.is-rising .rise-inner {
-  display: inline-block;
-  transform: translate3d(0, var(--rise-y, 1.15em), 0);
-  opacity: var(--rise-a, 0);
 }
 
 @media (prefers-reduced-motion: reduce) {

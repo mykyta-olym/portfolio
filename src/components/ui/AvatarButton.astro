@@ -45,4 +45,14 @@ const { href, class: className } = Astro.props;
     object-fit: cover;
     filter: grayscale(1);
   }
+
+  @media (prefers-reduced-motion: reduce) {
+    .avatar-button {
+      transition: none;
+    }
+    .avatar-button:hover,
+    .avatar-button:focus-visible {
+      transform: none;
+    }
+  }
 </style>

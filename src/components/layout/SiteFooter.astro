@@ -45,7 +45,7 @@ const year = new Date().getFullYear();
     <ul class="footer__social">
       {[links.github, links.linkedin, links.telegram].map((link) => (
         <li>
-          <HoverLink href={link.href} label={link.label} hoverText="View profile" external />
+          <HoverLink href={link.href} label={link.label} external />
         </li>
       ))}
     </ul>
