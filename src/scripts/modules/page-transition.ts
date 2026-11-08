@@ -1,7 +1,5 @@
-// Page transitions for a multi-page site. Leaving: a black panel rises over the page, then
-// the browser navigates normally. Arriving: a tiny inline script in <head> has already
-// marked the page as covered before first paint, and this module lifts the panel once fonts
-// are ready. The home page has its own loader, which takes the place of the panel.
+// Supporting browsers use the reference's CSS-only cross-document transition. The cover
+// below is the fallback; normal navigation remains intact in both paths.
 import { fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
 import { lockScroll, markStageReady } from '@/scripts/core/stage';
 
@@ -28,6 +26,12 @@ export function initPageTransitions(panel: HTMLElement): Cleanup {
     sessionStorage.removeItem(TRANSITION_KEY);
   } catch {
     // Without storage the next page simply arrives uncovered.
+  }
+
+  if (typeof CSSViewTransitionRule !== 'undefined') {
+    root.classList.remove('is-departing', 'is-arriving', 'is-uncovering');
+    if (!hasLoader) void fontsReady(1500).then(markStageReady);
+    return () => undefined;
   }
 
   if (root.classList.contains('is-arriving') && !hasLoader && !reducedMotion()) {

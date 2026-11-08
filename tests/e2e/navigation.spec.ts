@@ -70,6 +70,37 @@ test('a nested page survives a reload', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('GitPulse');
 });
 
+test('page navigation uses all four source slices with a white backdrop', async ({ page }) => {
+  await page.addInitScript(() => {
+    window.addEventListener('pagereveal', (event) => {
+      const transition = (event as Event & { viewTransition?: ViewTransition }).viewTransition;
+      if (!transition) return;
+      void transition.ready
+        .then(() => {
+          const audit = {
+            names: document.getAnimations().flatMap((animation) => (animation instanceof CSSAnimation ? [animation.animationName] : [])),
+            background: getComputedStyle(document.documentElement, '::view-transition').backgroundColor,
+          };
+          (window as Window & { slicesAudit?: typeof audit }).slicesAudit = audit;
+        })
+        .catch(() => undefined);
+    });
+  });
+  await page.goto('about/');
+  test.skip(!(await page.evaluate(() => 'CSSViewTransitionRule' in window)), 'browser does not support cross-document transitions');
+  await waitForStage(page);
+  await page.getByRole('button', { name: 'Open menu' }).click();
+  await page.getByRole('dialog').getByRole('link', { name: 'Contact' }).click();
+  await expect(page).toHaveURL(/\/contact\/$/);
+  await expect
+    .poll(() => page.evaluate(() => (window as Window & { slicesAudit?: { names: string[] } }).slicesAudit?.names))
+    .toEqual(expect.arrayContaining(['gm-out-1', 'gm-out-2', 'gm-out-3', 'gm-out-4', 'gm-in-1', 'gm-in-2', 'gm-in-3', 'gm-in-4']));
+  expect(await page.evaluate(() => (window as Window & { slicesAudit?: { background: string } }).slicesAudit?.background)).toBe(
+    'rgb(255, 255, 255)',
+  );
+  await waitForStage(page);
+});
+
 test('unknown addresses show the 404 page', async ({ page }) => {
   const response = await page.goto('no-such-page/');
   expect(response?.status()).toBe(404);

@@ -1,0 +1,195 @@
+/* Gian Media: Smooth Staggered Slices V4. Source and adaptations: ASSETS.md. */
+@view-transition {
+  navigation: auto;
+}
+
+/* Each value controls a separate horizontal reveal boundary.
+   Escaped syntax keeps this CSS safe for Elementor's CSS editor. */
+@property --gm-s1 {
+  syntax: '\3c percentage\3e';
+  inherits: false;
+  initial-value: 100%;
+}
+@property --gm-s2 {
+  syntax: '\3c percentage\3e';
+  inherits: false;
+  initial-value: 100%;
+}
+@property --gm-s3 {
+  syntax: '\3c percentage\3e';
+  inherits: false;
+  initial-value: 100%;
+}
+@property --gm-s4 {
+  syntax: '\3c percentage\3e';
+  inherits: false;
+  initial-value: 100%;
+}
+
+/* Real white backdrop between the old and new page. */
+::view-transition {
+  background: #fff;
+}
+
+::view-transition-group(root) {
+  animation: none;
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 2.25s;
+  animation-timing-function: cubic-bezier(0.48, 0, 0.23, 1);
+  animation-fill-mode: both;
+  mix-blend-mode: normal;
+  -webkit-mask-size:
+    100% 25.4%,
+    100% 25.4%,
+    100% 25.4%,
+    100% 25.4%;
+  mask-size:
+    100% 25.4%,
+    100% 25.4%,
+    100% 25.4%,
+    100% 25.4%;
+  -webkit-mask-position:
+    0 0%,
+    0 33.5121%,
+    0 67.0241%,
+    0 100.5362%;
+  mask-position:
+    0 0%,
+    0 33.5121%,
+    0 67.0241%,
+    0 100.5362%;
+  -webkit-mask-repeat: no-repeat;
+  mask-repeat: no-repeat;
+}
+
+/* Old page: each boundary travels UP inside its own fixed band. */
+::view-transition-old(root) {
+  z-index: 1;
+  -webkit-mask-image:
+    linear-gradient(to bottom, #000 var(--gm-s1), transparent var(--gm-s1)),
+    linear-gradient(to bottom, #000 var(--gm-s2), transparent var(--gm-s2)),
+    linear-gradient(to bottom, #000 var(--gm-s3), transparent var(--gm-s3)),
+    linear-gradient(to bottom, #000 var(--gm-s4), transparent var(--gm-s4));
+  mask-image:
+    linear-gradient(to bottom, #000 var(--gm-s1), transparent var(--gm-s1)),
+    linear-gradient(to bottom, #000 var(--gm-s2), transparent var(--gm-s2)),
+    linear-gradient(to bottom, #000 var(--gm-s3), transparent var(--gm-s3)),
+    linear-gradient(to bottom, #000 var(--gm-s4), transparent var(--gm-s4));
+  animation-name: gm-out-1, gm-out-2, gm-out-3, gm-out-4;
+}
+
+/* New page: each band reveals UPWARD, matching the first half's motion.
+   Top band begins first, then the others follow. */
+::view-transition-new(root) {
+  z-index: 2;
+  -webkit-mask-image:
+    linear-gradient(to top, #000 var(--gm-s1), transparent var(--gm-s1)),
+    linear-gradient(to top, #000 var(--gm-s2), transparent var(--gm-s2)),
+    linear-gradient(to top, #000 var(--gm-s3), transparent var(--gm-s3)),
+    linear-gradient(to top, #000 var(--gm-s4), transparent var(--gm-s4));
+  mask-image:
+    linear-gradient(to top, #000 var(--gm-s1), transparent var(--gm-s1)),
+    linear-gradient(to top, #000 var(--gm-s2), transparent var(--gm-s2)),
+    linear-gradient(to top, #000 var(--gm-s3), transparent var(--gm-s3)),
+    linear-gradient(to top, #000 var(--gm-s4), transparent var(--gm-s4));
+  animation-name: gm-in-1, gm-in-2, gm-in-3, gm-in-4;
+}
+
+/* Outgoing slices overlap in time, instead of snapping. */
+@keyframes gm-out-1 {
+  0%,
+  6% {
+    --gm-s1: 100%;
+  }
+  28%,
+  100% {
+    --gm-s1: 0%;
+  }
+}
+@keyframes gm-out-2 {
+  0%,
+  12% {
+    --gm-s2: 100%;
+  }
+  34%,
+  100% {
+    --gm-s2: 0%;
+  }
+}
+@keyframes gm-out-3 {
+  0%,
+  18% {
+    --gm-s3: 100%;
+  }
+  40%,
+  100% {
+    --gm-s3: 0%;
+  }
+}
+@keyframes gm-out-4 {
+  0%,
+  24% {
+    --gm-s4: 100%;
+  }
+  46%,
+  100% {
+    --gm-s4: 0%;
+  }
+}
+
+/* Incoming slices rise within each band, in staggered top-to-bottom order.
+   First half, duration and white pause are unchanged. */
+@keyframes gm-in-1 {
+  0%,
+  51% {
+    --gm-s1: 0%;
+  }
+  76%,
+  100% {
+    --gm-s1: 100%;
+  }
+}
+@keyframes gm-in-2 {
+  0%,
+  56% {
+    --gm-s2: 0%;
+  }
+  82%,
+  100% {
+    --gm-s2: 100%;
+  }
+}
+@keyframes gm-in-3 {
+  0%,
+  62% {
+    --gm-s3: 0%;
+  }
+  91%,
+  100% {
+    --gm-s3: 100%;
+  }
+}
+@keyframes gm-in-4 {
+  0%,
+  68% {
+    --gm-s4: 0%;
+  }
+  100% {
+    --gm-s4: 100%;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root),
+  ::view-transition-new(root) {
+    animation-duration: 0.01ms !important;
+  }
+}
+/* HOMEPAGE PRELOADER EXCEPTION */
+
+html:has(body[data-home])::view-transition {
+  display: none !important;
+}

@@ -34,7 +34,8 @@ Sources and the laptop edit prompt are in [ASSETS.md](ASSETS.md).
 - About: a draggable field of faceless process photographs and design imagery, a short prologue and working principles.
 - Contact: the reference's animated cubic background and paper cards, with Mykyta's links and email copy control; a 404 page.
 
-Page changes use a cover that rises over the old page and lifts off the new one. With
+Page changes use the reference's four rising horizontal slices and white pause through
+native cross-document View Transitions. Browsers without support use the page cover. With
 `prefers-reduced-motion` all of this becomes static, and the content is complete without
 JavaScript.
 
