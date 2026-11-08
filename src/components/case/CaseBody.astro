@@ -112,6 +112,9 @@ const { project } = Astro.props;
       <div class="viewer__bar">
         <h2 id="viewer-title">{project.name}</h2>
         <span data-gallery-count aria-live="polite"></span>
+        <a data-gallery-original href={project.gallery[0]?.src.src} target="_blank" rel="noopener">
+          Open original
+        </a>
         <button type="button" data-gallery-close aria-label="Close image viewer">
           Close <Icon name="close" size={14} />
         </button>
@@ -400,8 +403,17 @@ const { project } = Astro.props;
     background: #111213;
     color: #ededeb;
     border-radius: 8px;
+    clip-path: inset(0 0 100% 0);
+    transform: translateY(14px) scale(0.985);
+    transition:
+      clip-path 0.4s var(--ease-in-out),
+      transform 0.4s var(--ease-out),
+      display 0.4s allow-discrete,
+      overlay 0.4s allow-discrete;
   }
   .viewer[open] {
+    clip-path: inset(0);
+    transform: none;
     display: grid;
     grid-template-rows: auto minmax(0, 1fr) auto;
     gap: 16px;
@@ -409,6 +421,31 @@ const { project } = Astro.props;
   .viewer::backdrop {
     background: #000c;
     backdrop-filter: blur(10px);
+    opacity: 0;
+    transition:
+      opacity 0.3s,
+      display 0.4s allow-discrete,
+      overlay 0.4s allow-discrete;
+  }
+  .viewer[open]::backdrop {
+    opacity: 1;
+  }
+  @starting-style {
+    .viewer[open] {
+      clip-path: inset(100% 0 0 0);
+      transform: translateY(14px) scale(0.985);
+    }
+    .viewer[open]::backdrop {
+      opacity: 0;
+    }
+  }
+  .viewer__bar a {
+    margin-left: auto;
+    text-decoration: underline;
+    text-underline-offset: 4px;
+  }
+  .viewer__bar a:hover {
+    color: #fff;
   }
   .viewer__bar,
   .viewer__foot {
@@ -449,6 +486,13 @@ const { project } = Astro.props;
     display: grid;
     place-items: center;
     min-height: 0;
+    transition: opacity 0.2s;
+  }
+  .viewer[aria-busy='true'] {
+    cursor: progress;
+  }
+  .viewer[aria-busy='true'] .viewer__image {
+    opacity: 0.55;
   }
   .viewer__image img {
     display: block;
@@ -482,11 +526,36 @@ const { project } = Astro.props;
       font-size: 0.75rem;
     }
     .viewer__bar h2 {
-      max-width: 45%;
+      max-width: none;
       font-size: 0.875rem;
+    }
+    .viewer__bar {
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) auto;
+      grid-template-areas: 'title close' 'original count';
+    }
+    .viewer__bar h2 {
+      grid-area: title;
+    }
+    .viewer__bar [data-gallery-count] {
+      grid-area: count;
+      text-align: right;
+      white-space: nowrap;
+    }
+    .viewer__bar a {
+      grid-area: original;
+      margin-left: 0;
+      justify-self: start;
+      white-space: nowrap;
+    }
+    .viewer__bar button {
+      grid-area: close;
     }
   }
   @media (prefers-reduced-motion: reduce) {
+    .viewer,
+    .viewer::backdrop,
+    .viewer__image,
     .case__figure :global(img),
     .case__enlarge {
       transition: none;

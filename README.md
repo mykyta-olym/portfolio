@@ -30,8 +30,9 @@ Sources and the laptop edit prompt are in [ASSETS.md](ASSETS.md).
   projects with Swiper image strips, contact and FAQ, and a footer that reveals itself
   under the page with a pixel wordmark that reacts to the pointer.
 - Work: all six projects.
-- Case studies: a neutral illustrated background specific to each subject, a sticky panel with stack, key numbers and tabbed sections next to a column
+- Case studies: ready-made photographic backgrounds with restrained scroll motion, a sticky panel with stack, key numbers and tabbed sections next to a column
   of real visuals: screenshots, verbatim code, diagrams and charts drawn from each repository.
+  One next-project link follows each case, without repeating three complete project galleries.
 - About: a draggable field of faceless process photographs and design imagery, a short prologue and working principles.
 - Contact: the reference's animated cubic background and paper cards, with Mykyta's links and email copy control; a 404 page.
 
@@ -55,7 +56,7 @@ only moves keyboard focus after arrival.
 | Image strips and continuous logos         | Swiper, A11y, Mousewheel and Autoplay                                                      |
 | FAQ                                       | Native details/summary, CSS details-content and interpolate-size; no JavaScript controller |
 | Tab panel height                          | CSS Grid keeps all panels in one cell; no measuring or ResizeObserver                      |
-| Full-size images                          | Native dialog with the project's caption and keyboard controls                             |
+| Full-size images                          | Native dialog, CSS entry/exit, decoded image swaps, captions and keyboard controls         |
 | Navigation                                | Native cross-document View Transitions and the reference's slice keyframes                 |
 
 The remaining application code supplies content, accessible controls, cleanup, reference timing

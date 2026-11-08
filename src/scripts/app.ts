@@ -27,6 +27,7 @@ const modules: Record<string, () => Promise<Init>> = {
   marquee: () => import('@/scripts/modules/marquee').then((m) => m.initMarquee),
   'drag-field': () => import('@/scripts/modules/drag-field').then((m) => m.initDragField),
   tabs: () => import('@/scripts/modules/tabs').then((m) => m.initTabs),
+  'case-hero': () => import('@/scripts/modules/case-hero').then((m) => m.initCaseHero),
   'media-gallery': () => import('@/scripts/modules/media-gallery').then((m) => m.initMediaGallery),
 };
 

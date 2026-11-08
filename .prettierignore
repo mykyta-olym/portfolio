@@ -2,6 +2,7 @@ dist/
 .astro/
 node_modules/
 .media-cache/
+.playwright-cli/
 test-results/
 playwright-report/
 package-lock.json

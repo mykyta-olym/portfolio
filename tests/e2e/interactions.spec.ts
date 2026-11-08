@@ -149,6 +149,7 @@ test('process cards turn to explanations and stay still while being read', async
   }
   await page.keyboard.press('Escape');
   await expect(page.locator('[data-orbit-card][aria-expanded="true"]')).toHaveCount(0);
+  await expect(page.locator('[data-orbit-card]').last()).toBeFocused();
 });
 
 test('image strips scroll sideways by dragging without opening the project', async ({ page, isMobile }) => {
@@ -228,6 +229,8 @@ test('project images enlarge, cycle with arrow keys and restore focus on close',
   await expect(viewer.locator('[data-gallery-caption]')).toContainText('20,000 jobs');
   await page.keyboard.press('ArrowLeft');
   await expect(viewer.locator('[data-gallery-count]')).toHaveText('1 / 3');
+  await page.keyboard.press('ArrowRight');
+  await expect(viewer.locator('[data-gallery-count]')).toHaveText('2 / 3');
   await page.keyboard.press('Escape');
   await expect(viewer).not.toBeVisible();
   await expect(first).toBeFocused();

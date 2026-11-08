@@ -3,7 +3,7 @@ import type { GetStaticPaths } from 'astro';
 import BaseLayout from '@/layouts/BaseLayout.astro';
 import CaseHero from '@/components/case/CaseHero.astro';
 import CaseBody from '@/components/case/CaseBody.astro';
-import ProjectRow from '@/components/projects/ProjectRow.astro';
+import Icon from '@/components/ui/Icon.astro';
 import SectionLabel from '@/components/ui/SectionLabel.astro';
 import Button from '@/components/ui/Button.astro';
 import ContactCta from '@/components/sections/ContactCta.astro';
@@ -20,26 +20,29 @@ interface Props {
 
 const { project } = Astro.props;
 const index = projects.findIndex((item) => item.slug === project.slug);
-const others = [1, 2, 3].map((step) => projects[(index + step) % projects.length]).filter((item): item is Project => item !== undefined);
+const next = projects[(index + 1) % projects.length];
 ---
 
 <BaseLayout title={project.name} pill="project" description={`${project.name}: ${project.summary}`} surface="grey">
   <CaseHero project={project} />
   <CaseBody project={project} />
-  <section class="more" aria-labelledby="more-title">
-    <header class="more__head">
-      <SectionLabel text="Other work" />
-      <h2 class="more__title" id="more-title" data-reveal="lines">
-        View more projects
-      </h2>
-    </header>
-    <div class="more__rows">
-      {others.map((item) => (
-        <ProjectRow project={item} />
-      ))}
-    </div>
+  <section class="more" aria-label="Continue exploring">
+    <SectionLabel text="Next project" />
+    {next && (
+      <a class="more__next" href={href(`work/${next.slug}/`)}>
+        <div>
+          <h2 class="more__title" data-reveal="lines">
+            {next.name}
+          </h2>
+          <p class="more__kind">{next.kind}</p>
+        </div>
+        <span class="more__arrow">
+          <Icon name="arrow-up-right" size={64} />
+        </span>
+      </a>
+    )}
     <div class="more__cta">
-      <Button href={href('work/')} variant="dark">
+      <Button href={href('work/')} variant="dark" hoverText="Explore all six">
         All Projects
       </Button>
     </div>
@@ -50,25 +53,54 @@ const others = [1, 2, 3].map((step) => projects[(index + step) % projects.length
 <style>
   .more {
     background: var(--color-surface);
-    padding-top: clamp(4.5rem, 8vw, 8rem);
+    padding: clamp(4.5rem, 8vw, 8rem) var(--gutter) 0;
   }
 
-  .more__head {
-    display: grid;
-    grid-template-columns: 19.6vw 1fr;
+  .more__next {
+    display: flex;
+    justify-content: space-between;
     align-items: center;
-    padding: 0 var(--gutter) clamp(2rem, 3vw, 3rem);
+    gap: 2rem;
+    padding-block: clamp(2rem, 4vw, 4rem);
+    border-bottom: 1px solid var(--color-line);
   }
 
   .more__title {
-    font-size: var(--fs-display);
-    font-weight: 500;
+    max-width: 18ch;
+    font-size: clamp(2.5rem, 6vw, 7rem);
+    font-weight: 400;
     letter-spacing: var(--tracking-display);
     line-height: 1.05;
   }
 
-  .more__rows {
-    border-bottom: 1px solid rgb(255 255 255 / 8%);
+  .more__kind {
+    margin-top: 1rem;
+    color: var(--color-text-muted);
+    font-size: var(--fs-small);
+  }
+  .more__arrow {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: clamp(48px, 6vw, 96px);
+    aspect-ratio: 1;
+    border: 1px solid var(--color-line-strong);
+    border-radius: 50%;
+    transition:
+      background-color 0.3s,
+      color 0.3s;
+  }
+  .more__arrow :global(svg) {
+    width: 50%;
+    height: 50%;
+    transition: transform 0.45s var(--ease-out);
+  }
+  .more__next:is(:hover, :focus-visible) .more__arrow {
+    color: #111;
+    background: #fff;
+  }
+  .more__next:is(:hover, :focus-visible) :global(svg) {
+    transform: rotate(45deg);
   }
 
   .more__cta {
@@ -77,10 +109,10 @@ const others = [1, 2, 3].map((step) => projects[(index + step) % projects.length
     padding: clamp(2.5rem, 3.2vw, 3.5rem) 0 clamp(4rem, 6vw, 6rem);
   }
 
-  @media (max-width: 1023px) {
-    .more__head {
-      grid-template-columns: 1fr;
-      gap: 1.25rem;
+  @media (prefers-reduced-motion: reduce) {
+    .more__arrow,
+    .more__arrow :global(svg) {
+      transition: none;
     }
   }
 </style>

@@ -12,6 +12,9 @@ export function initMediaGallery(root: HTMLElement): Cleanup {
   let current = 0;
   let release: (() => void) | undefined;
   let animation: Animation | undefined;
+  let opener: HTMLAnchorElement | null = null;
+  let revision = 0;
+  const original = root.querySelector<HTMLAnchorElement>('[data-gallery-original]');
   const videos = [...root.querySelectorAll('video')];
   const pauseVideos = (): void => videos.forEach((video) => video.pause());
   const videoObserver = new IntersectionObserver((entries) =>
@@ -25,37 +28,61 @@ export function initMediaGallery(root: HTMLElement): Cleanup {
   };
   document.addEventListener('visibilitychange', onVisibility);
 
-  const show = (index: number): void => {
+  const show = async (index: number): Promise<void> => {
     current = (index + links.length) % links.length;
     const link = links[current];
     if (!link) return;
+    const request = ++revision;
+    dialog.setAttribute('aria-busy', 'true');
+    counter.textContent = `${current + 1} / ${links.length}`;
+    caption.textContent = 'Loading image…';
+    if (original) original.href = link.href;
+    const nextImage = new Image();
+    nextImage.src = link.href;
+    try {
+      await nextImage.decode();
+    } catch {
+      if (request === revision) {
+        image.hidden = true;
+        caption.textContent = 'Image unavailable. Open the original to try again.';
+        dialog.setAttribute('aria-busy', 'false');
+      }
+      return;
+    }
+    if (request !== revision) return;
     animation?.cancel();
-    image.src = link.href;
+    image.src = nextImage.src;
+    image.hidden = false;
     image.alt = link.querySelector('img')?.alt ?? '';
     caption.textContent = link.dataset['caption'] ?? '';
-    counter.textContent = `${current + 1} / ${links.length}`;
-    if (!reducedMotion()) animation = image.animate([{ opacity: 0.35 }, { opacity: 1 }], { duration: 220 });
+    dialog.setAttribute('aria-busy', 'false');
+    if (!reducedMotion()) animation = image.animate([{ opacity: 0.5 }, { opacity: 1 }], { duration: 240 });
   };
   const open = (event: MouseEvent): void => {
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey || event.button !== 0) return;
     event.preventDefault();
     pauseVideos();
-    show(links.indexOf(event.currentTarget as HTMLAnchorElement));
+    opener = event.currentTarget as HTMLAnchorElement;
+    image.hidden = true;
+    caption.textContent = 'Loading image…';
+    void show(links.indexOf(opener));
     release = lockScroll();
     dialog.showModal();
   };
   const close = (): void => dialog.close();
   const afterClose = (): void => {
+    revision += 1;
+    animation?.cancel();
     release?.();
     release = undefined;
-    links[current]?.focus({ preventScroll: true });
+    opener?.focus({ preventScroll: true });
   };
-  const previous = (): void => show(current - 1);
-  const next = (): void => show(current + 1);
+  const previous = (): void => void show(current - 1);
+  const next = (): void => void show(current + 1);
   const onKey = (event: KeyboardEvent): void => {
     if (event.key === 'ArrowLeft' || event.key === 'ArrowRight') {
       event.preventDefault();
-      show(current + (event.key === 'ArrowRight' ? 1 : -1));
+      void show(current + (event.key === 'ArrowRight' ? 1 : -1));
     }
   };
   const onBackdrop = (event: MouseEvent): void => {
@@ -72,6 +99,7 @@ export function initMediaGallery(root: HTMLElement): Cleanup {
   dialog.addEventListener('keydown', onKey);
   dialog.addEventListener('click', onBackdrop);
   return () => {
+    revision += 1;
     animation?.cancel();
     videoObserver.disconnect();
     document.removeEventListener('visibilitychange', onVisibility);

@@ -1,134 +1,62 @@
 ---
-// Decorative diagrams echo the subject of each case. They are not application screenshots.
+import { Image } from 'astro:assets';
+import servers from '@/assets/backgrounds/servers.webp';
+import network from '@/assets/backgrounds/network.webp';
+import code from '@/assets/backgrounds/code.webp';
+import inventory from '@/assets/backgrounds/inventory.webp';
+import garden from '@/assets/backgrounds/garden.webp';
+import microphone from '@/assets/backgrounds/microphone.webp';
+
 interface Props {
   slug: string;
 }
-const { slug } = Astro.props;
-const waveform = Array.from({ length: 180 }, (_, i) => {
-  const envelope = Math.sin((i / 180) * Math.PI) ** 2;
-  return { x: 80 + i * 8, h: 8 + Math.abs(Math.sin(i * 1.7) * Math.cos(i * 0.19)) * envelope * 180 };
-});
+const backgrounds = {
+  relayq: { src: servers, position: '70% 50%' },
+  phishlens: { src: network, position: '50% 30%' },
+  gitpulse: { src: code, position: '58% 50%' },
+  stockroom: { src: inventory, position: '40% 50%' },
+  'garden-of-lost-paths': { src: garden, position: '50% 60%' },
+  'speech-domain-adaptation': { src: microphone, position: '60% 50%' },
+};
+const background = backgrounds[Astro.props.slug as keyof typeof backgrounds];
 ---
 
-<div class="case-backdrop" aria-hidden="true">
-  <svg viewBox="0 0 1600 900" fill="none" preserveAspectRatio="xMidYMid slice">
-    {slug === 'relayq' && (
-      <g>
-        {Array.from({ length: 12 }, (_, i) => (
-          <rect x={110 + i * 26} y={590 - i * 12} width="120" height="76" rx="8" />
-        ))}
-        <path d="M550 500H700Q800 500 800 350V260H1150M800 500H1150M800 500V690Q800 740 900 740H1150" />
-        {[220, 460, 700].map((y) => (
-          <g>
-            <rect x="1150" y={y} width="180" height="80" rx="12" />
-            <circle cx="1185" cy={y + 40} r="5" class="case-backdrop__filled" />
-          </g>
-        ))}
-        <path d="M550 500H700Q800 500 800 350V260H1150" class="case-backdrop__signal" />
-      </g>
-    )}
-    {slug === 'gitpulse' && (
-      <g>
-        <path d="M160 740L1440 100M160 580L1440 -60M480 740V580Q480 500 650 500L1000 325Q1120 265 1120 160V80" />
-        {Array.from({ length: 9 }, (_, i) => (
-          <circle cx={240 + i * 140} cy={700 - i * 70} r="11" />
-        ))}
-        {[240, 520, 800, 1080, 1360].map((x) => (
-          <circle cx={x} cy={620 - (x - 80) / 2} r="8" class="case-backdrop__filled" />
-        ))}
-      </g>
-    )}
-    {slug === 'stockroom' && (
-      <g transform="translate(150 140) skewY(-8)">
-        {Array.from({ length: 66 }, (_, i) => (
-          <rect
-            x={(i % 11) * 116}
-            y={Math.floor(i / 11) * 110}
-            width="96"
-            height="90"
-            rx="5"
-            class:list={{ 'case-backdrop__filled': i >= 44 && i < 51 }}
-          />
-        ))}
-      </g>
-    )}
-    {slug === 'phishlens' && (
-      <g transform="translate(220 110) rotate(12 600 350)">
-        {Array.from({ length: 64 }, (_, i) => (
-          <rect
-            x={(i % 8) * 145}
-            y={Math.floor(i / 8) * 90}
-            width="130"
-            height="75"
-            rx="8"
-            class:list={{ 'case-backdrop__filled': i % 7 === 0 }}
-          />
-        ))}
-        <circle cx="575" cy="350" r="220" />
-        <path d="M730 510L1030 810" />
-      </g>
-    )}
-    {slug === 'garden-of-lost-paths' && (
-      <g transform="translate(800 540) scale(1 .52) rotate(-45)">
-        {[160, 260, 360, 460, 560].map((size, i) => (
-          <g>
-            <path d={`M${-size} ${-size}H${size}V${size}H${-size}V${-size + 90}`} />
-            <path d={`M${-size + 60} ${-size + 60}H${size - 60}V${size - 60}H${-size + 60}V${-size + 150}`} />
-            {i < 3 && <circle cx="0" cy="0" r={size / 3} />}
-          </g>
-        ))}
-      </g>
-    )}
-    {slug === 'speech-domain-adaptation' && (
-      <g>
-        <path d="M80 330H1520M80 450H1520M80 570H1520" />
-        {waveform.map(({ x, h }) => (
-          <path d={`M${x} ${450 - h}V${450 + h}`} />
-        ))}
-      </g>
-    )}
-  </svg>
-</div>
+{background && (
+  <div class="case-backdrop" aria-hidden="true">
+    <Image
+      src={background.src}
+      alt=""
+      widths={[640, 1280, 1920, 2400]}
+      sizes="(max-aspect-ratio: 3/2) 180vh, 110vw"
+      loading="eager"
+      fetchpriority="high"
+      class="case-backdrop__image"
+      style={`object-position: ${background.position}`}
+      data-case-background
+    />
+  </div>
+)}
+
 <style>
   .case-backdrop {
     position: absolute;
     inset: 0;
+    overflow: hidden;
     pointer-events: none;
-    color: #3b3d3b;
-    background: radial-gradient(ellipse at 50% 120%, #181b19 0%, #090a09 48%, #000 78%);
+    background: #000;
   }
-  .case-backdrop svg {
+  .case-backdrop :global(img) {
+    position: absolute;
+    inset: -10% 0;
     width: 100%;
-    height: 100%;
-    stroke: currentColor;
-    stroke-width: 1.2;
-    opacity: 0.65;
-    mask-image: radial-gradient(ellipse 38% 26% at 50% 48%, transparent 15%, #000 100%);
+    height: 120%;
+    object-fit: cover;
+    filter: grayscale(1) brightness(0.58);
   }
-  .case-backdrop__filled {
-    fill: #555a55;
-    fill-opacity: 0.14;
-  }
-  .case-backdrop__signal {
-    stroke: #858c85;
-    stroke-dasharray: 8 24;
-  }
-  .case-backdrop svg {
-    animation: backdrop-in 2.2s cubic-bezier(0.22, 1, 0.36, 1) both;
-  }
-  @keyframes backdrop-in {
-    from {
-      opacity: 0;
-      transform: translateY(30px) scale(1.04);
-    }
-    to {
-      opacity: 0.65;
-      transform: none;
-    }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .case-backdrop svg {
-      animation: none;
-    }
+  .case-backdrop::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(180deg, #0006, #0005 35%, #0008 70%, #000 100%);
   }
 </style>

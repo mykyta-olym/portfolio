@@ -6,6 +6,7 @@ playwright-report/
 blob-report/
 coverage/
 .media-cache/
+.playwright-cli/
 *.log
 .env
 .env.*

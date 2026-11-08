@@ -74,7 +74,27 @@ links when JavaScript is unavailable. Playback starts only when the visitor requ
 - Navigation typing, erasing and cursor blinking use [Typed.js 2.1.0](https://github.com/mattboldt/typed.js/tree/v2.1.0), MIT licensed. The library owns the cursor throughout typing and pauses. It stops in background tabs and is omitted with reduced motion.
 - Label decoding uses [GSAP ScrambleTextPlugin](https://gsap.com/docs/v3/Plugins/ScrambleTextPlugin/); the pointer label uses GSAP quickTo. Both replace hand-written animation-frame loops. About pointer capture and momentum use [Draggable](https://gsap.com/docs/v3/Plugins/Draggable/) with InertiaPlugin, while retaining the reference's curved planes and camera movement.
 - FAQ uses native details/summary and the browser's details-content size interpolation, following [Chrome's documented pattern](https://developer.chrome.com/blog/styling-details) (code examples Apache 2.0). There is no JavaScript height controller. Case panel height is reserved by CSS Grid rather than script measurement. Both preserve the native keyboard behavior.
-- Case headers use neutral, decorative SVG diagrams of each project's subject. These are illustrations, not application screenshots or measured data. All actual project evidence is presented and labelled separately in the case gallery.
+- Case headers use the ready-made photographs listed below and actual Garden game art. The old custom SVG backdrops have been removed. Stock photos are decorative context, not project screenshots. CSS applies monochrome grading and a black contrast overlay. GSAP ScrollTrigger controls a small reversible camera move; reduced motion keeps the image still.
+
+## Case background photographs
+
+Downloaded from the original providers on 8 November 2026, encoded as WebP at up to 2400 px.
+The five stock photographs are used under the [Pexels License](https://www.pexels.com/license/).
+They contain equipment and workspaces, without identifiable people.
+
+| Asset / case                             | Original photographer and source                                                                                            |
+| ---------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `backgrounds/servers.webp` / relayq      | Brett Sayles, [Server Racks on Data Center](https://www.pexels.com/photo/server-racks-on-data-center-4508751/)              |
+| `backgrounds/network.webp` / phishlens   | Pixabay, [Close Up Photo of Ethernet Cable](https://www.pexels.com/photo/close-up-photo-of-ethernet-cable-163047/)          |
+| `backgrounds/code.webp` / GitPulse       | Nemuel Sereti, [Programming Code on Screen](https://www.pexels.com/photo/programming-code-on-screen-6424584/)               |
+| `backgrounds/inventory.webp` / stockroom | cottonbro studio, [Labeled Shelves in a Warehouse](https://www.pexels.com/photo/labeled-shelves-in-a-warehouse-7018662/)    |
+| `backgrounds/microphone.webp` / Speech   | Rene Terp, [Close-Up Shot of a Black Microphone](https://www.pexels.com/photo/close-up-shot-of-a-black-microphone-7710305/) |
+| `backgrounds/garden.webp` / Garden       | Actual game scene from the previously documented Garden capture; original game art credits remain in its repository.        |
+
+The image viewer's entry/exit uses the browser's `@starting-style`, `display` and `overlay`
+transitions, following [Chrome's top-layer animation pattern](https://developer.chrome.com/docs/modern-web-guidance/guides/ui-behaviors/animate-to-from-top-layer).
+Image changes wait for native `Image.decode()` and discard superseded requests. Closing restores
+focus to the original opener, including after navigating to a different image.
 
 ## Process artifacts
 

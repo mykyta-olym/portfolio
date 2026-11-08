@@ -52,9 +52,8 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
     updatePlayback();
   };
   const onKey = (event: KeyboardEvent): void => {
-    if (event.key !== 'Escape') return;
+    if (event.key !== 'Escape' || !selected) return;
     expand(null);
-    if (document.activeElement instanceof HTMLElement) document.activeElement.blur();
     updatePlayback();
   };
   const build = (animate = true): void => {
