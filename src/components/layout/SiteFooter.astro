@@ -40,9 +40,11 @@ const year = new Date().getFullYear();
     <div class="footer__column">
       <SectionLabel text="Write to me" />
       <ul>
-        <li class="footer__external">
-          <HoverLink href={links.email.href} label={profile.email} hoverText="Write to me" />
-          <Icon name="arrow-up-right" size={13} />
+        <li>
+          <a class="footer__external" href={links.email.href}>
+            <HoverLink as="span" href={links.email.href} label={profile.email} hoverText="Write to me" />
+            <Icon name="arrow-up-right" size={13} />
+          </a>
         </li>
         <li>{profile.location}</li>
       </ul>
@@ -50,8 +52,10 @@ const year = new Date().getFullYear();
     <ul class="footer__social">
       {[links.github, links.linkedin, links.telegram].map((link) => (
         <li>
-          <HoverLink href={link.href} label={link.label} hoverText={link.hoverText} external />
-          <Icon name="arrow-up-right" size={13} />
+          <a href={link.href} aria-label={link.label} target="_blank" rel="noopener">
+            <HoverLink as="span" href={link.href} label={link.label} hoverText={link.hoverText} />
+            <Icon name="arrow-up-right" size={13} />
+          </a>
         </li>
       ))}
     </ul>
@@ -154,7 +158,7 @@ const year = new Date().getFullYear();
   }
 
   .footer__external,
-  .footer__social li {
+  .footer__social a {
     display: flex;
     align-items: center;
     gap: 0.4rem;
