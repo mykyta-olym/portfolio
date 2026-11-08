@@ -44,9 +44,11 @@ sequence. Navigation, social links and calls to action have contextual hover lab
 buttons reveal the actual photo in colour. Back to top uses an interruptible eased scroll and
 only moves keyboard focus after arrival.
 
-Text waits for fonts and the loading or navigation cover to leave before starting.
-GSAP owns both line and fade reveals at the same viewport threshold; completed headings
+Text lines are measured while the cover is still present and start moving when it actually
+finishes. GSAP owns line and fade reveals at the same viewport threshold; completed headings
 stay visible after reflow, and navigation typing reserves its width while the cursor moves.
+Astro's built-in hover prefetch warms internal pages. The menu uses one opaque header during
+opening and closing, and project strips retain each image's native proportions.
 
 ## Existing solutions and application code
 

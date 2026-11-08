@@ -33,19 +33,25 @@ export function initPageTransitions(panel: HTMLElement): Cleanup {
   };
   if (root.classList.contains('is-arriving') && !hasLoader && !reduce) {
     unlock = lockScroll();
-    void fontsReady(1500).then(() => {
+    void fontsReady().then(() => {
       if (disposed) return;
       // Resolve the covered style before starting the incoming live-DOM reveal.
       panel.getBoundingClientRect();
       requestAnimationFrame(() => {
         if (disposed) return;
         root.classList.replace('is-arriving', 'is-uncovering');
-        timers.push(window.setTimeout(uncover, 850));
+        // Follow the actual CSS band transitions, including interrupted/disabled motion.
+        requestAnimationFrame(() => {
+          if (disposed) return;
+          void Promise.all(panel.getAnimations({ subtree: true }).map((animation) => animation.finished.catch(() => undefined))).then(
+            () => !disposed && uncover(),
+          );
+        });
       });
     });
   } else {
     root.classList.remove('is-arriving');
-    if (!hasLoader) void fontsReady(1500).then(() => !disposed && markStageReady());
+    if (!hasLoader) void fontsReady().then(() => !disposed && markStageReady());
   }
 
   const onClick = (event: MouseEvent): void => {
@@ -75,7 +81,6 @@ export function initPageTransitions(panel: HTMLElement): Cleanup {
     leaving = false;
     root.classList.remove('is-departing', 'is-arriving', 'is-uncovering');
     uncover();
-    markStageReady();
   };
   document.addEventListener('click', onClick);
   window.addEventListener('pageshow', onPageShow);

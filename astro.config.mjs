@@ -9,6 +9,7 @@ export default defineConfig({
   base,
   trailingSlash: 'always',
   compressHTML: true,
+  prefetch: { prefetchAll: true, defaultStrategy: 'hover' },
   build: {
     format: 'directory',
     assets: 'assets',

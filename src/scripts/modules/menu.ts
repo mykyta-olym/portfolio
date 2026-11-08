@@ -1,5 +1,6 @@
 // The navigation panel under the pill. Opening blurs the page, wipes the black panel up from
-// the bottom, lifts the links in, then reveals the media card. Closing reverses the body wipe.
+// the bottom, lifts the links in, then reveals the media card. One header remains opaque
+// throughout, so closing never cross-fades two logos or exposes the page under its controls.
 // Focus is kept inside while open; Escape, the close button and the backdrop all close it.
 import { gsap } from '@/scripts/core/gsap';
 import { reducedMotion, type Cleanup } from '@/scripts/core/motion';
@@ -14,9 +15,7 @@ export function initMenu(root: HTMLElement): Cleanup {
   const panel = root.querySelector<HTMLElement>('[data-menu-panel]');
   const dialog = root.querySelector<HTMLElement>('[role="dialog"]');
   const surface = root.querySelector<HTMLElement>('[data-menu-surface]');
-  const head = root.querySelector<HTMLElement>('.menu__head');
   const nav = document.querySelector<HTMLElement>('[data-nav]');
-  const navContent = document.querySelectorAll<HTMLElement>('.nav__logo, .nav__phrase');
   const backdrop = root.querySelector<HTMLElement>('[data-menu-backdrop]');
   const closeButton = root.querySelector<HTMLButtonElement>('[data-menu-close]');
   const media = root.querySelector<HTMLElement>('[data-menu-media]');
@@ -47,7 +46,6 @@ export function initMenu(root: HTMLElement): Cleanup {
     timeline?.kill();
     setOpen(true);
     root.hidden = false;
-    gsap.set(toggle, { opacity: 0 });
     nav?.classList.add('is-menu-active');
     surface.inert = false;
     unlock ??= lockScroll();
@@ -59,43 +57,34 @@ export function initMenu(root: HTMLElement): Cleanup {
     if (starting) {
       gsap.set(backdrop, { opacity: 0 });
       gsap.set(panel, { clipPath: CLOSED_FROM_BOTTOM });
-      gsap.set(head, { opacity: 1, borderRadius: '8px' });
-      gsap.set(head, { backgroundColor: '#1b1b1b' });
       gsap.set(items, { y: 30, opacity: 0 });
       if (media) gsap.set(media, { clipPath: CLOSED_FROM_BOTTOM });
     }
     if (reduce) {
       gsap.set(panel, { clipPath: OPEN });
-      gsap.set(head, { opacity: 1, backgroundColor: '#000' });
-      gsap.set(navContent, { opacity: 0 });
       gsap.set(items, { opacity: 1, y: 0 });
       if (media) gsap.set(media, { clipPath: OPEN });
       gsap.set(backdrop, { opacity: 1 });
     } else {
       timeline = gsap
         .timeline()
-        .to(backdrop, { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0)
-        .to(navContent, { opacity: 0, duration: 0.6 }, 0)
-        .to(panel, { clipPath: OPEN, duration: 1.2, ease: 'wipe' }, 0)
-        .to(links, { y: 0, opacity: 1, duration: 0.8, stagger: 0.08, ease: 'power3.out' }, 0.6)
-        .to(socials, { y: 0, opacity: 1, duration: 0.6, stagger: 0.05, ease: 'power3.out' }, 0.6)
-        .to(head, { opacity: 1, duration: 0.15 }, 0);
-      if (head) timeline.to(head, { backgroundColor: '#000', borderRadius: '8px 8px 0px 0px', duration: 0.5, ease: 'power2.inOut' }, 0.7);
-      if (media) timeline.to(media, { clipPath: OPEN, duration: 1.5, ease: 'wipe' }, 0.4);
+        .to(backdrop, { opacity: 1, duration: 0.4, ease: 'power2.out' }, 0)
+        .to(panel, { clipPath: OPEN, duration: 0.75, ease: 'wipe' }, 0)
+        .to(links, { y: 0, opacity: 1, duration: 0.55, stagger: 0.07, ease: 'power3.out' }, 0.2)
+        .to(socials, { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: 'power3.out' }, 0.25);
+      if (media) timeline.to(media, { clipPath: OPEN, duration: 0.85, ease: 'wipe' }, 0.15);
     }
     closeButton.focus({ preventScroll: true });
   };
 
-  const hide = (restoreFocus = true): void => {
-    if (!open) return;
+  const hide = (restoreFocus = true, immediate = false): void => {
+    if (!open && (!immediate || root.hidden)) return;
     setOpen(false);
     surface.inert = true;
     timeline?.kill();
     const finish = (): void => {
       root.hidden = true;
       nav?.classList.remove('is-menu-active');
-      gsap.set(navContent, { clearProps: 'opacity' });
-      gsap.set(toggle, { clearProps: 'opacity' });
       video?.pause();
       gsap.set(panel, { clipPath: CLOSED_FROM_BOTTOM });
       if (media) gsap.set(media, { clipPath: CLOSED_FROM_BOTTOM });
@@ -103,16 +92,12 @@ export function initMenu(root: HTMLElement): Cleanup {
       unlock = null;
       if (restoreFocus) toggle.focus({ preventScroll: true });
     };
-    if (reduce) finish();
+    if (reduce || immediate) finish();
     else {
       timeline = gsap
         .timeline({ onComplete: finish })
-        .to(head, { backgroundColor: '#1b1b1b', borderRadius: '8px', duration: 0.45, ease: 'power2.inOut' }, 0)
-        .to(head, { opacity: 0, duration: 0.25 }, 0.9)
-        .to(navContent, { opacity: 1, duration: 0.25 }, 0.9)
-        .to(toggle, { opacity: 1, duration: 0.25 }, 0.9)
-        .to(panel, { clipPath: CLOSED_FROM_BOTTOM, duration: 1.2, ease: 'wipe' }, 0)
-        .to(backdrop, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 0.5);
+        .to(panel, { clipPath: CLOSED_FROM_BOTTOM, duration: 0.6, ease: 'wipe' }, 0)
+        .to(backdrop, { opacity: 0, duration: 0.4, ease: 'power2.inOut' }, 0.2);
     }
   };
 
@@ -142,7 +127,7 @@ export function initMenu(root: HTMLElement): Cleanup {
   const onBackdrop = (): void => hide();
   // Links inside navigate away; the page transition covers the panel, so it can stay open.
   const onPageShow = (event: PageTransitionEvent): void => {
-    if (event.persisted && open) hide(false);
+    if (event.persisted) hide(false, true);
   };
 
   toggle.addEventListener('click', onToggle);
@@ -158,8 +143,6 @@ export function initMenu(root: HTMLElement): Cleanup {
     window.removeEventListener('pageshow', onPageShow);
     timeline?.kill();
     nav?.classList.remove('is-menu-active');
-    gsap.set(navContent, { clearProps: 'opacity' });
-    gsap.set(toggle, { clearProps: 'opacity' });
     unlock?.();
     video?.pause();
   };

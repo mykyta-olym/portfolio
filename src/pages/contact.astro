@@ -26,14 +26,14 @@ import { href } from '@/lib/paths';
       <p class="contact__text" data-reveal="lines" data-reveal-delay="0.15">
         Tell me about a project, a role or a question about my code. Email reaches me fastest.
       </p>
-      <div data-reveal="fade" data-reveal-delay="0.5">
+      <div data-reveal="fade" data-reveal-delay="0.25">
         <AvatarButton href={links.email.href} hoverText="Say hello">
           Send an Email
         </AvatarButton>
       </div>
     </div>
 
-    <div class="contact__card contact__card--mail" data-reveal="fade" data-reveal-delay="0.6">
+    <div class="contact__card contact__card--mail" data-reveal="fade" data-reveal-delay="0.3">
       <div class="contact__paper">
         <p class="contact__card-label">E-mail</p>
         <div class="contact__mail">
@@ -47,7 +47,7 @@ import { href } from '@/lib/paths';
       </div>
     </div>
 
-    <div class="contact__card contact__card--social" data-reveal="fade" data-reveal-delay="0.75">
+    <div class="contact__card contact__card--social" data-reveal="fade" data-reveal-delay="0.4">
       <div class="contact__paper">
         <p class="contact__card-label">Socials</p>
         <ul>
@@ -135,7 +135,7 @@ import { href } from '@/lib/paths';
     padding: 0 5px 5px;
     border-radius: 6px;
     background: rgb(255 255 255 / 71%);
-    color: #454545;
+    color: #242424;
     font-size: var(--fs-small);
     transition:
       translate 0.4s var(--ease-out),
@@ -157,7 +157,7 @@ import { href } from '@/lib/paths';
     z-index: 1;
     pointer-events: none;
     background: repeating-linear-gradient(to bottom, rgb(0 0 0 / 22%) 0 1px, rgb(255 255 255 / 4%) 2px, transparent 4px);
-    opacity: 0.7;
+    opacity: 0.3;
     mix-blend-mode: multiply;
   }
 
@@ -176,8 +176,7 @@ import { href } from '@/lib/paths';
     align-items: center;
     height: 36px;
     padding: 1px 10px 0;
-    border-bottom: 1px solid #454545;
-    border-radius: 4px;
+    border-bottom: 1px solid rgb(0 0 0 / 25%);
     font-family: var(--font-label);
     font-size: var(--fs-tag);
     font-weight: 700;
@@ -186,11 +185,19 @@ import { href } from '@/lib/paths';
     color: #000;
   }
   .contact__card--social .contact__card-label {
-    width: max-content;
-    margin-inline: auto;
+    justify-content: center;
   }
   .contact__card--social ul {
-    padding-bottom: 3px;
+    display: grid;
+    padding-block: 5px;
+  }
+  .contact__card--social li {
+    display: flex;
+    justify-content: center;
+  }
+  .contact__card--social :global(.hover-link) {
+    min-width: 7rem;
+    min-height: 28px;
   }
 
   .contact__mail {
@@ -235,7 +242,7 @@ import { href } from '@/lib/paths';
     }
   }
 
-  @media (max-width: 1279px) and (min-width: 768px) {
+  @media (max-width: 1439px) and (min-width: 768px) {
     .contact__title {
       font-size: 60px;
       line-height: 1.05;

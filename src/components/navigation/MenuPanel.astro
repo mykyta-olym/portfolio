@@ -14,7 +14,7 @@ const current = Astro.url.pathname;
   <div class="menu__panel" role="dialog" aria-modal="true" aria-label="Site menu">
     <div class="menu__head">
       <a class="menu__logo" href={href()} aria-label="Mykyta Olym, home">
-        <LogoMark size={32} />
+        <LogoMark size={22} />
       </a>
       <button class="menu__close" type="button" data-menu-close>
         <span class="visually-hidden">Close menu</span>
@@ -87,7 +87,7 @@ const current = Astro.url.pathname;
   .menu__backdrop {
     position: absolute;
     inset: 0;
-    background: rgb(0 0 0 / 28%);
+    background: rgb(0 0 0 / 48%);
     -webkit-backdrop-filter: blur(14px);
     backdrop-filter: blur(14px);
   }
@@ -113,7 +113,9 @@ const current = Astro.url.pathname;
     height: 52px;
     flex: none;
     padding: 0 5px;
-    background: var(--color-black);
+    background: #1b1d1b;
+    border: 1px solid rgb(255 255 255 / 30%);
+    border-radius: var(--radius-pill);
   }
 
   .menu__body {
@@ -121,8 +123,12 @@ const current = Astro.url.pathname;
     flex: 1;
     min-height: 0;
     flex-direction: column;
-    overflow: hidden;
+    overflow: hidden auto;
+    overscroll-behavior: contain;
     background: var(--color-black);
+    box-shadow:
+      inset 1px 0 #444,
+      inset -1px 0 #444;
   }
 
   .menu__logo,
@@ -224,7 +230,7 @@ const current = Astro.url.pathname;
   }
 
   .menu__link[aria-current='page'] {
-    opacity: 0.45;
+    opacity: 0.7;
   }
 
   .menu__link :global(.menu__arrow) {
@@ -277,6 +283,12 @@ const current = Astro.url.pathname;
     object-fit: cover;
   }
 
+  @media (max-height: 800px) {
+    .menu__foot {
+      padding-bottom: 24px;
+    }
+  }
+
   @media (max-height: 640px) {
     .menu__media {
       display: none;
@@ -293,9 +305,6 @@ const current = Astro.url.pathname;
   }
 
   @media (max-width: 767px) {
-    .menu__head {
-      padding-inline: 5px;
-    }
     .menu__nav {
       padding-inline: 36px;
     }
