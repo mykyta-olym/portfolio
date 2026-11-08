@@ -36,7 +36,7 @@ const current = Astro.url.pathname;
                   align="end"
                   href={href(item.path)}
                   label={item.label}
-                  hoverText={item.path === 'contact/' ? 'Hire me' : item.path === 'about/' ? 'Meet me' : 'Explore'}
+                  hoverText={item.path === 'contact/' ? 'Hire me' : item.path === 'about/' ? 'Meet' : 'View'}
                 />
                 <Icon name="arrow-up-right" size={18} class="menu__arrow" />
               </a>
@@ -94,7 +94,7 @@ const current = Astro.url.pathname;
 
   .menu__panel {
     position: absolute;
-    top: calc(var(--nav-top) - 0.0625rem);
+    top: var(--nav-top);
     bottom: 0;
     left: 50%;
     display: flex;

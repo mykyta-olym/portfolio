@@ -82,10 +82,6 @@ const fullTitle = title === site.title ? `${site.title} | Software developer` : 
         } catch {
           /* storage unavailable */
         }
-        // Capture this early event before the deferred application bundle runs.
-        window.addEventListener('pagereveal', (event) => {
-          window.pageReveal = event.viewTransition;
-        });
       })();
     </script>
   </head>

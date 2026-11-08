@@ -37,9 +37,10 @@ Final prompt:
 
 The public widget scripts on [Gian Media home](https://gianmediagroup.com/) and [Studio](https://gianmediagroup.com/studio/) are the behavioural reference. The application does not include WordPress, Elementor, jQuery or the widget bundles.
 
-- Circular gallery retains the flashing-circle style-1 stacked entry (0.5s, 0.1s stagger, scale 3), fan and radial spread. It explains six stages using actual work artifacts, rather than repeating project covers or using unrelated stock photos. Desktop hover turns a card; activation expands it at the centre for reading, including on phones. The 48s orbit pauses while reading and counter-rotates the cards so they stay upright. Resizing places the cards directly without replaying the entrance. Separate slots prevent coplanar intersections.
+- Circular gallery retains the flashing-circle style-1 stacked entry (0.5s, 0.1s stagger, scale 3), fan and radial spread. It explains six stages using process photographs. Cards become interactive only after the entrance completes, using native inert and a shared ready state. Desktop hover turns a card; activation expands it at the centre for reading, including on phones. The 48s orbit pauses while reading and counter-rotates the cards so they stay upright. Resizing places the cards directly without replaying the entrance. Separate slots prevent coplanar intersections; the ring paints above its heading.
 - About uses Three.js textured planes, a wrapped grid, scale 0.6, curved normals while dragging, camera z 500 to 450, inertia and a temporary text blur. Bounded placement keeps photographs apart. The renderer pauses when idle or hidden and disposes its GPU resources on page exit. Static photographs remain available without WebGL, JavaScript, or with reduced motion.
-- Scroll text uses GSAP SplitText for responsive line measurement, with the reference's 0.68 progress window, 115% rise and cubic easing. Each paragraph follows its own viewport position, with a 0.2 s scrub. Inline artwork stays with its line. Clip margins preserve accents and descenders. Short entrance text uses the source's 1.75 s duration, 60 ms stagger and 350 px early trigger.
+- Scroll text uses GSAP SplitText for responsive line measurement, with the reference's 0.68 progress window, 115% rise and cubic easing. Paragraphs share their section's viewport progress, as in the source, with a 0.2 s scrub and faster opacity completion. Inline artwork stays with its line. Clip margins preserve accents and descenders. Short entrance text uses the source's 1.75 s duration, 60 ms stagger and 350 px early trigger.
+- Page changes now use four white DOM bands with native CSS transform transitions, followed by normal navigation. This replaces the reference's cross-document snapshot effect at the user's request: the outgoing background video and GSAP motion keep running during departure. Internal home arrivals still skip the initial loader; reduced motion uses direct navigation.
 - Contact uses the original 0.53 black background overlay, 70px/62px desktop title, 15px/16px description, translucent card shell, white paper and the same scanline overlay. At phone width, the background is contained at the bottom and the social panel is hidden as in the reference; all social links remain in the menu. The email card is slightly wider to fit Mykyta's longer address and accessible copy button.
 - The reference's colour grading is applied to the hero, and coloured custom case-study glows have been removed. Project plates use a neutral charcoal/paper palette. Actual application and game screenshots retain their original colours.
 - Loader: the original 490/1210/2080 ms milestones, 340 ms counter roll, fixed percent sign, and 3 s hold followed by the 820 ms upward exit. Its grid cells extend from neighbouring cells using the reference algorithm; the final mark is Mykyta's monogram. Unlike the original, asset readiness can hold the final 99 beat until a 4 s deadline. Counter layers and animations are cleaned up even after a suspended tab skips milestones.
@@ -96,14 +97,13 @@ transitions, following [Chrome's top-layer animation pattern](https://developer.
 Image changes wait for native `Image.decode()` and discard superseded requests. Closing restores
 focus to the original opener, including after navigating to a different image.
 
-## Process artifacts
+## Process photographs
 
-The home orbit's `src/assets/process/*.webp` files are real browser captures made on 8 November 2026:
+The home orbit uses decorative process photographs; they are not presented as images of Mykyta or evidence of his projects. The reverse side explains the step. The tiny README, code and workflow screenshots were replaced at the user's request.
 
-- Understand: the [portfolio README](https://github.com/mykyta-olym/portfolio/blob/615d8ad/README.md), describing its scope.
-- Plan: the already documented stockroom order-state illustration, sourced from its domain code.
-- Build: [the actual menu implementation](https://github.com/mykyta-olym/portfolio/blob/615d8ad/src/scripts/modules/menu.ts).
-- Test and Ship: respectively the test annotations and deployment graph from [recorded run 42465717375](https://github.com/mykyta-olym/portfolio/actions/runs/42465717375), commit 615d8ad. These are historical workflow captures, not current test counters.
-- Refine: this portfolio's actual avatar button in its colour/hover-label state.
+- Understand, Plan and Refine reuse the previously documented reference's strategy, wireframe notebook and tablet images.
+- Build: cottonbro studio, [Close Up of a Hand on a Laptop Keyboard](https://www.pexels.com/photo/close-up-of-a-hand-on-a-laptop-keyboard-5474296/), Pexels License, downloaded 8 November 2026.
+- Test: Tima Miroshnichenko, [Person Using Computer](https://www.pexels.com/photo/person-using-computer-5380591/), Pexels License, downloaded 8 November 2026. This is terminal/workstation imagery, not a claim that the screen contains this project's tests.
+- Ship reuses Brett Sayles's server-rack photograph credited above.
 
-`node scripts/media/encode-process.mjs` encodes the original PNG captures from `.media-cache/project-captures/` without altering their contents. The discipline examples use the actual job-state diagram, student dashboard, model evaluation and game scene documented above.
+The two new originals were encoded at 1200 px wide as WebP. CSS crops them to the card and applies monochrome grading. The discipline examples still use the actual job-state diagram, student dashboard, model evaluation and game scene documented above.

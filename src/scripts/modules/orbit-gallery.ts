@@ -14,7 +14,9 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
   let visible = false;
   let built = false;
   let selected: HTMLButtonElement | null = null;
+  let interactive = false;
   const resting = new Map<HTMLElement, { x: number; y: number }>();
+  ring.inert = true;
 
   const expand = (card: HTMLButtonElement | null): void => {
     if (selected) {
@@ -46,6 +48,7 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
     timeline?.paused(!visible || document.hidden);
   };
   const onClick = (event: Event): void => {
+    if (!interactive) return;
     const card = (event.target as Element).closest<HTMLButtonElement>('[data-orbit-card]');
     if (!card) return;
     expand(selected === card ? null : card);
@@ -62,6 +65,9 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
     if (selected) selected.setAttribute('aria-expanded', 'false');
     selected = null;
     section.classList.remove('has-expanded');
+    section.classList.remove('is-interactive');
+    interactive = false;
+    ring.inert = true;
     gsap.killTweensOf(cards);
     gsap.set([ring, ...cards], { clearProps: 'all' });
     const count = cards.length;
@@ -86,6 +92,10 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
       if (heading) timeline.fromTo(heading, { opacity: 0, filter: 'blur(40px)' }, { opacity: 1, filter: 'blur(0px)', duration: 1 }, '<');
     } else gsap.set(cards, positions);
     timeline.add(() => {
+      interactive = true;
+      ring.inert = false;
+      section.classList.add('is-interactive');
+      if (reduce) return;
       spin = gsap.to(ring, {
         rotation: 360,
         duration: 48,
@@ -98,7 +108,10 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
     built = true;
   };
 
-  if (reduce) section.classList.add('is-static');
+  if (reduce) {
+    section.classList.add('is-static');
+    build(false);
+  }
   const enter = reduce ? null : ScrollTrigger.create({ trigger: section, start: 'top 60%', once: true, onEnter: () => build() });
   const visibility = ScrollTrigger.create({
     trigger: section,

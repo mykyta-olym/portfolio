@@ -39,7 +39,7 @@ for (const path of pages) {
   });
 }
 
-test('menu, project rows and the back button navigate between pages', async ({ page, isMobile }) => {
+test('menu, project rows and the back button navigate between pages', async ({ page }) => {
   await page.goto('./');
   await waitForStage(page);
   await page.getByRole('button', { name: 'Open menu' }).click();
@@ -59,7 +59,8 @@ test('menu, project rows and the back button navigate between pages', async ({ p
   // A page restored from the back-forward cache must not stay covered.
   await expect(page.locator('html')).not.toHaveClass(/is-departing/);
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
-  if (!isMobile) await expect(page.locator('[data-page-cover]')).not.toBeInViewport();
+  await expect(page.locator('[data-page-cover]')).toHaveCSS('visibility', 'hidden');
+  await expect(page.locator('[data-page-cover]')).toHaveCSS('pointer-events', 'none');
 });
 
 test('a nested page survives a reload', async ({ page }) => {
@@ -70,68 +71,42 @@ test('a nested page survives a reload', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('GitPulse');
 });
 
-test('page navigation uses all four source slices with a white backdrop @native', async ({ page }) => {
-  await page.addInitScript(() => {
-    window.addEventListener('pagereveal', (event) => {
-      const transition = (event as Event & { viewTransition?: ViewTransition }).viewTransition;
-      if (!transition) return;
-      void transition.ready
-        .then(() => {
-          const audit = {
-            names: document.getAnimations().flatMap((animation) => (animation instanceof CSSAnimation ? [animation.animationName] : [])),
-            background: getComputedStyle(document.documentElement, '::view-transition').backgroundColor,
-          };
-          (window as Window & { slicesAudit?: typeof audit }).slicesAudit = audit;
-        })
-        .catch(() => undefined);
-    });
-  });
+test('page navigation covers the live document with four white bands @transition', async ({ page }) => {
   await page.goto('about/');
-  test.skip(!(await page.evaluate(() => 'CSSViewTransitionRule' in window)), 'browser does not support cross-document transitions');
   await waitForStage(page);
   await expect(page.locator('.field')).toHaveClass(/has-webgl/);
   await page.bringToFront();
   await page.getByRole('button', { name: 'Open menu' }).click();
   await expect(page.locator('[data-menu-media]')).toHaveCSS('clip-path', /^inset\(0%(?: 0%){0,3}\)$/);
-  await page.getByRole('dialog').getByRole('link', { name: 'Contact' }).click();
+  await page.getByRole('dialog').getByRole('link', { name: 'Contact' }).click({ noWaitAfter: true });
+  await expect(page.locator('html')).toHaveClass(/is-departing/);
+  await expect(page.locator('.cover__slice')).toHaveCount(4);
+  for (const slice of await page.locator('.cover__slice').all()) await expect(slice).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   await expect(page).toHaveURL(/\/contact\/$/);
-  await expect
-    .poll(() => page.evaluate(() => (window as Window & { slicesAudit?: { names: string[] } }).slicesAudit?.names))
-    .toEqual(expect.arrayContaining(['gm-out-1', 'gm-out-2', 'gm-out-3', 'gm-out-4', 'gm-in-1', 'gm-in-2', 'gm-in-3', 'gm-in-4']));
-  expect(await page.evaluate(() => (window as Window & { slicesAudit?: { background: string } }).slicesAudit?.background)).toBe(
-    'rgb(255, 255, 255)',
-  );
   await waitForStage(page);
+  await expect(page.locator('[data-page-cover]')).toHaveCSS('visibility', 'hidden');
 });
 
-test('home CTA transitions and the logo returns home without another loader @native', async ({ page }) => {
-  await page.addInitScript(() => {
-    window.addEventListener('pagereveal', (event) => {
-      const transition = (event as Event & { viewTransition?: ViewTransition }).viewTransition;
-      if (!transition) return;
-      void transition.ready
-        .then(() => {
-          const animations = document
-            .getAnimations()
-            .filter((animation) => animation instanceof CSSAnimation && animation.animationName.startsWith('gm-'));
-          (window as Window & { homeTransitionAudit?: number }).homeTransitionAudit = animations.length;
-        })
-        .catch(() => undefined);
-    });
-  });
+test('the hero keeps playing during departure and home returns without another loader @transition', async ({ page }) => {
   await page.goto('./');
-  test.skip(!(await page.evaluate(() => 'CSSViewTransitionRule' in window)), 'browser does not support cross-document transitions');
   await waitForStage(page);
   await page.bringToFront();
-  await page.getByRole('link', { name: 'See the Work' }).click();
+  const video = page.locator('[data-hero-video]');
+  await expect.poll(() => video.evaluate((e: HTMLVideoElement) => !e.paused && e.currentTime > 0)).toBe(true);
+  const before = await video.evaluate((e: HTMLVideoElement) => e.currentTime);
+  await page.getByRole('link', { name: 'See the Work' }).click({ noWaitAfter: true });
+  await page.waitForTimeout(300);
+  const playing = await video.evaluate((e: HTMLVideoElement) => ({ time: e.currentTime, duration: e.duration, paused: e.paused }));
+  expect(playing.paused).toBe(false);
+  expect((playing.time - before + playing.duration) % playing.duration).toBeGreaterThan(0.15);
   await expect(page).toHaveURL(/\/work\/$/);
-  await expect.poll(() => page.evaluate(() => (window as Window & { homeTransitionAudit?: number }).homeTransitionAudit)).toBe(8);
   await waitForStage(page);
+  await expect(page.locator('[data-page-cover]')).toHaveCSS('visibility', 'hidden');
   await page.locator('.nav__logo').click();
   await expect(page).toHaveURL(/\/portfolio\/$/);
-  await expect.poll(() => page.evaluate(() => (window as Window & { homeTransitionAudit?: number }).homeTransitionAudit)).toBe(8);
   await expect(page.locator('[data-preloader]')).toHaveCount(0);
   await waitForStage(page);
+  await expect(page.locator('[data-page-cover]')).toHaveCSS('visibility', 'hidden');
   await expect(page.locator('html')).not.toHaveClass(/is-locked/);
 });
 

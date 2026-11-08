@@ -26,7 +26,7 @@ Sources and the laptop edit prompt are in [ASSETS.md](ASSETS.md).
 ## What is on the site
 
 - Home: the reference's synchronized four-beat loader, the monochrome hero loop, a scroll-linked line reveal,
-  a two-sided orbit of real work artifacts, a pinned list of disciplines with matching examples, a picture that shrinks into a frame, selected
+  a two-sided orbit of process photographs and short explanations, a pinned list of disciplines with matching examples, a picture that shrinks into a frame, selected
   projects with Swiper image strips, contact and FAQ, and a footer that reveals itself
   under the page with a pixel wordmark that reacts to the pointer.
 - Work: all six projects.
@@ -36,8 +36,8 @@ Sources and the laptop edit prompt are in [ASSETS.md](ASSETS.md).
 - About: a draggable field of faceless process photographs and design imagery, a short prologue and working principles.
 - Contact: the reference's animated cubic background and paper cards, with Mykyta's links and email copy control; a 404 page.
 
-Page changes use the reference's four rising horizontal slices and white pause through
-native cross-document View Transitions. Browsers without support use the page cover. With
+Page changes use four rising white bands over the live document. The outgoing video's
+playback and page animations continue during the cover, before normal navigation. With
 `prefers-reduced-motion` all of this becomes static, and the content is complete without
 JavaScript. Internal returns to home use the page transition without replaying the first-load
 sequence. Navigation, social links and calls to action have contextual hover labels; portrait
@@ -57,7 +57,7 @@ only moves keyboard focus after arrival.
 | FAQ                                       | Native details/summary, CSS details-content and interpolate-size; no JavaScript controller |
 | Tab panel height                          | CSS Grid keeps all panels in one cell; no measuring or ResizeObserver                      |
 | Full-size images                          | Native dialog, CSS entry/exit, decoded image swaps, captions and keyboard controls         |
-| Navigation                                | Native cross-document View Transitions and the reference's slice keyframes                 |
+| Navigation                                | CSS transforms on four DOM bands, then normal document navigation                          |
 
 The remaining application code supplies content, accessible controls, cleanup, reference timing
 and composition. The personalised pixel mark, canvas wordmark and Three.js scene still need
@@ -86,11 +86,10 @@ npm run test:e2e      # Playwright, desktop and mobile projects, against the bui
 npm run verify        # all of the above in order
 ```
 
-Locally the end-to-end tests run in the installed Google Chrome; CI uses Playwright's
-Chromium channel with the [new headless mode](https://playwright.dev/docs/browsers#chromium-new-headless-mode),
-so the native page transitions are exercised by the same browser engine.
-Native transition checks run with one worker because the browser skips these animations
-in background windows. The remaining end-to-end checks run in parallel.
+Both local and CI end-to-end tests use Google Chrome, including its
+[media codec support](https://playwright.dev/docs/browsers#media-codecs),
+for the H.264 playback and transition checks. Those checks run with one worker to measure active
+video playback consistently. The remaining end-to-end checks run in parallel.
 
 ## Media
 

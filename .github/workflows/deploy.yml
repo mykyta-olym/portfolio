@@ -36,7 +36,7 @@ jobs:
       - name: Build and check links, assets and copy
         run: npm run build
 
-      - run: npx playwright install --with-deps chromium
+      - run: npx playwright install --with-deps chrome
       - name: End-to-end and accessibility tests
         run: npm run test:e2e
 

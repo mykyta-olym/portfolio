@@ -3,9 +3,9 @@ import type { ExternalLink, Profile } from '@/types/content';
 const email = 'mykyta.olym.work@gmail.com';
 
 export const links = {
-  github: { label: 'GitHub', hoverText: 'Read the code', href: 'https://github.com/mykyta-olym', display: 'mykyta-olym' },
-  linkedin: { label: 'LinkedIn', hoverText: 'Stalk me', href: 'https://www.linkedin.com/in/mykyta-olym', display: 'mykyta-olym' },
-  telegram: { label: 'Telegram', hoverText: 'Say hello', href: 'https://t.me/PhD_Mykyta', display: '@PhD_Mykyta' },
+  github: { label: 'GitHub', hoverText: 'Code', href: 'https://github.com/mykyta-olym', display: 'mykyta-olym' },
+  linkedin: { label: 'LinkedIn', hoverText: 'Connect', href: 'https://www.linkedin.com/in/mykyta-olym', display: 'mykyta-olym' },
+  telegram: { label: 'Telegram', hoverText: 'Message', href: 'https://t.me/PhD_Mykyta', display: '@PhD_Mykyta' },
   email: { label: 'Email', hoverText: 'Hire me', href: `mailto:${email}`, display: email },
 } as const satisfies Record<string, ExternalLink>;
 

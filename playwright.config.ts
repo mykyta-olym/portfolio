@@ -3,9 +3,8 @@ import { defineConfig, devices } from '@playwright/test';
 const port = 4330;
 const base = process.env['SITE_BASE'] ?? '/portfolio/';
 const ci = Boolean(process.env['CI']);
-// Use real Chrome's headless mode in both environments. The older headless shell does
-// not exercise cross-document View Transitions, even when it exposes the CSS API.
-const browser = { channel: ci ? 'chromium' : 'chrome' };
+// Match the live media checks, including the site's H.264 video decoder, in both environments.
+const browser = { channel: 'chrome' };
 
 export default defineConfig({
   testDir: 'tests/e2e',

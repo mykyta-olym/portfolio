@@ -31,7 +31,7 @@ const year = new Date().getFullYear();
             <HoverLink
               href={href(item.path)}
               label={item.label}
-              hoverText={item.path === 'contact/' ? 'Hire me' : item.path === 'about/' ? 'Meet me' : 'Explore'}
+              hoverText={item.path === 'contact/' ? 'Hire me' : item.path === 'about/' ? 'Meet' : 'View'}
             />
           </li>
         ))}
@@ -40,8 +40,9 @@ const year = new Date().getFullYear();
     <div class="footer__column">
       <SectionLabel text="Write to me" />
       <ul>
-        <li>
+        <li class="footer__external">
           <HoverLink href={links.email.href} label={profile.email} hoverText="Write to me" />
+          <Icon name="arrow-up-right" size={13} />
         </li>
         <li>{profile.location}</li>
       </ul>
@@ -50,6 +51,7 @@ const year = new Date().getFullYear();
       {[links.github, links.linkedin, links.telegram].map((link) => (
         <li>
           <HoverLink href={link.href} label={link.label} hoverText={link.hoverText} external />
+          <Icon name="arrow-up-right" size={13} />
         </li>
       ))}
     </ul>
@@ -151,6 +153,17 @@ const year = new Date().getFullYear();
     font-size: var(--fs-small);
   }
 
+  .footer__external,
+  .footer__social li {
+    display: flex;
+    align-items: center;
+    gap: 0.4rem;
+  }
+  .footer__external :global(svg),
+  .footer__social :global(svg) {
+    flex: none;
+  }
+
   .footer__social a {
     text-decoration: underline;
     text-underline-offset: 4px;
@@ -248,7 +261,7 @@ const year = new Date().getFullYear();
     }
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 1023px) {
     .footer__grid {
       grid-template-columns: 1fr 1fr;
       gap: 2.5rem 1.5rem;
@@ -267,6 +280,13 @@ const year = new Date().getFullYear();
 
     .footer__note {
       justify-self: center;
+    }
+  }
+
+  @media (max-width: 600px) {
+    .footer__grid {
+      grid-template-columns: 1fr;
+      gap: 2rem;
     }
   }
 </style>

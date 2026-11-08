@@ -1,190 +1,66 @@
-/* Gian Media: Smooth Staggered Slices V4. Source and adaptations: ASSETS.md. */
+/* Four staggered bands cover the live DOM. No outgoing page snapshot is frozen. */
 @view-transition {
-  navigation: auto;
+  navigation: none;
 }
 
-/* Each value controls a separate horizontal reveal boundary.
-   Escaped syntax keeps this CSS safe for Elementor's CSS editor. */
-@property --gm-s1 {
-  syntax: '\3c percentage\3e';
-  inherits: false;
-  initial-value: 100%;
+.cover {
+  position: fixed;
+  inset: 0;
+  z-index: 90;
+  display: grid;
+  place-items: center;
+  visibility: hidden;
+  pointer-events: none;
+  color: #111;
 }
-@property --gm-s2 {
-  syntax: '\3c percentage\3e';
-  inherits: false;
-  initial-value: 100%;
+.cover__band {
+  position: absolute;
+  top: calc(var(--slice) * 25%);
+  left: 0;
+  width: 100%;
+  height: 25.2%;
+  overflow: hidden;
 }
-@property --gm-s3 {
-  syntax: '\3c percentage\3e';
-  inherits: false;
-  initial-value: 100%;
-}
-@property --gm-s4 {
-  syntax: '\3c percentage\3e';
-  inherits: false;
-  initial-value: 100%;
-}
-
-/* Real white backdrop between the old and new page. */
-::view-transition {
+.cover__slice {
+  display: block;
+  width: 100%;
+  height: 100%;
   background: #fff;
+  transform: translateY(101%);
+  transition: transform 0.56s cubic-bezier(0.48, 0, 0.23, 1);
+  transition-delay: calc(var(--slice) * 0.07s);
 }
-
-::view-transition-group(root) {
-  animation: none;
+.cover__mark {
+  position: relative;
+  opacity: 0;
+  transition: opacity 0.25s;
 }
-
-::view-transition-old(root),
-::view-transition-new(root) {
-  animation-duration: 2.25s;
-  animation-timing-function: cubic-bezier(0.48, 0, 0.23, 1);
-  animation-fill-mode: both;
-  mix-blend-mode: normal;
-  -webkit-mask-size:
-    100% 25.4%,
-    100% 25.4%,
-    100% 25.4%,
-    100% 25.4%;
-  mask-size:
-    100% 25.4%,
-    100% 25.4%,
-    100% 25.4%,
-    100% 25.4%;
-  -webkit-mask-position:
-    0 0%,
-    0 33.5121%,
-    0 67.0241%,
-    0 100.5362%;
-  mask-position:
-    0 0%,
-    0 33.5121%,
-    0 67.0241%,
-    0 100.5362%;
-  -webkit-mask-repeat: no-repeat;
-  mask-repeat: no-repeat;
+.is-departing .cover,
+.is-arriving .cover,
+.is-uncovering .cover {
+  visibility: visible;
+  pointer-events: auto;
 }
-
-/* Old page: each boundary travels UP inside its own fixed band. */
-::view-transition-old(root) {
-  z-index: 1;
-  -webkit-mask-image:
-    linear-gradient(to bottom, #000 var(--gm-s1), transparent var(--gm-s1)),
-    linear-gradient(to bottom, #000 var(--gm-s2), transparent var(--gm-s2)),
-    linear-gradient(to bottom, #000 var(--gm-s3), transparent var(--gm-s3)),
-    linear-gradient(to bottom, #000 var(--gm-s4), transparent var(--gm-s4));
-  mask-image:
-    linear-gradient(to bottom, #000 var(--gm-s1), transparent var(--gm-s1)),
-    linear-gradient(to bottom, #000 var(--gm-s2), transparent var(--gm-s2)),
-    linear-gradient(to bottom, #000 var(--gm-s3), transparent var(--gm-s3)),
-    linear-gradient(to bottom, #000 var(--gm-s4), transparent var(--gm-s4));
-  animation-name: gm-out-1, gm-out-2, gm-out-3, gm-out-4;
+.is-departing .cover__slice,
+.is-arriving .cover__slice {
+  transform: translateY(0);
 }
-
-/* New page: each band reveals UPWARD, matching the first half's motion.
-   Top band begins first, then the others follow. */
-::view-transition-new(root) {
-  z-index: 2;
-  -webkit-mask-image:
-    linear-gradient(to top, #000 var(--gm-s1), transparent var(--gm-s1)),
-    linear-gradient(to top, #000 var(--gm-s2), transparent var(--gm-s2)),
-    linear-gradient(to top, #000 var(--gm-s3), transparent var(--gm-s3)),
-    linear-gradient(to top, #000 var(--gm-s4), transparent var(--gm-s4));
-  mask-image:
-    linear-gradient(to top, #000 var(--gm-s1), transparent var(--gm-s1)),
-    linear-gradient(to top, #000 var(--gm-s2), transparent var(--gm-s2)),
-    linear-gradient(to top, #000 var(--gm-s3), transparent var(--gm-s3)),
-    linear-gradient(to top, #000 var(--gm-s4), transparent var(--gm-s4));
-  animation-name: gm-in-1, gm-in-2, gm-in-3, gm-in-4;
+.is-arriving .cover__slice {
+  transition: none;
 }
-
-/* Outgoing slices overlap in time, instead of snapping. */
-@keyframes gm-out-1 {
-  0%,
-  6% {
-    --gm-s1: 100%;
-  }
-  28%,
-  100% {
-    --gm-s1: 0%;
-  }
+.is-uncovering .cover__slice {
+  transform: translateY(-101%);
 }
-@keyframes gm-out-2 {
-  0%,
-  12% {
-    --gm-s2: 100%;
-  }
-  34%,
-  100% {
-    --gm-s2: 0%;
-  }
+.is-departing .cover__mark {
+  opacity: 1;
+  transition-delay: 0.5s;
 }
-@keyframes gm-out-3 {
-  0%,
-  18% {
-    --gm-s3: 100%;
-  }
-  40%,
-  100% {
-    --gm-s3: 0%;
-  }
+.is-arriving .cover__mark {
+  opacity: 1;
+  transition: none;
 }
-@keyframes gm-out-4 {
-  0%,
-  24% {
-    --gm-s4: 100%;
-  }
-  46%,
-  100% {
-    --gm-s4: 0%;
-  }
-}
-
-/* Incoming slices rise within each band, in staggered top-to-bottom order.
-   First half, duration and white pause are unchanged. */
-@keyframes gm-in-1 {
-  0%,
-  51% {
-    --gm-s1: 0%;
-  }
-  76%,
-  100% {
-    --gm-s1: 100%;
-  }
-}
-@keyframes gm-in-2 {
-  0%,
-  56% {
-    --gm-s2: 0%;
-  }
-  82%,
-  100% {
-    --gm-s2: 100%;
-  }
-}
-@keyframes gm-in-3 {
-  0%,
-  62% {
-    --gm-s3: 0%;
-  }
-  91%,
-  100% {
-    --gm-s3: 100%;
-  }
-}
-@keyframes gm-in-4 {
-  0%,
-  68% {
-    --gm-s4: 0%;
-  }
-  100% {
-    --gm-s4: 100%;
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root),
-  ::view-transition-new(root) {
-    animation-duration: 0.01ms !important;
+  .cover {
+    display: none;
   }
 }

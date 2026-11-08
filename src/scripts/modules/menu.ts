@@ -1,5 +1,5 @@
 // The navigation panel under the pill. Opening blurs the page, wipes the black panel up from
-// the bottom, lifts the links in, then reveals the media card. Closing wipes it away upwards.
+// the bottom, lifts the links in, then reveals the media card. Closing reverses the body wipe.
 // Focus is kept inside while open; Escape, the close button and the backdrop all close it.
 import { gsap } from '@/scripts/core/gsap';
 import { reducedMotion, type Cleanup } from '@/scripts/core/motion';
@@ -7,7 +7,6 @@ import { lockScroll } from '@/scripts/core/stage';
 
 const FOCUSABLE = 'a[href], button:not([disabled]), [tabindex]:not([tabindex="-1"])';
 const CLOSED_FROM_BOTTOM = 'inset(100% 0% 0% 0%)';
-const CLOSED_TO_TOP = 'inset(0% 0% 100% 0%)';
 const OPEN = 'inset(0% 0% 0% 0%)';
 
 export function initMenu(root: HTMLElement): Cleanup {
@@ -60,13 +59,14 @@ export function initMenu(root: HTMLElement): Cleanup {
     if (starting) {
       gsap.set(backdrop, { opacity: 0 });
       gsap.set(panel, { clipPath: CLOSED_FROM_BOTTOM });
-      gsap.set(head, { opacity: 1 });
+      gsap.set(head, { opacity: 1, borderRadius: '8px' });
+      gsap.set(head, { backgroundColor: '#1b1b1b' });
       gsap.set(items, { y: 30, opacity: 0 });
       if (media) gsap.set(media, { clipPath: CLOSED_FROM_BOTTOM });
     }
     if (reduce) {
       gsap.set(panel, { clipPath: OPEN });
-      gsap.set(head, { opacity: 1 });
+      gsap.set(head, { opacity: 1, backgroundColor: '#000' });
       gsap.set(navContent, { opacity: 0 });
       gsap.set(items, { opacity: 1, y: 0 });
       if (media) gsap.set(media, { clipPath: OPEN });
@@ -80,6 +80,7 @@ export function initMenu(root: HTMLElement): Cleanup {
         .to(links, { y: 0, opacity: 1, duration: 0.8, stagger: 0.08, ease: 'power3.out' }, 0.6)
         .to(socials, { y: 0, opacity: 1, duration: 0.6, stagger: 0.05, ease: 'power3.out' }, 0.6)
         .to(head, { opacity: 1, duration: 0.15 }, 0);
+      if (head) timeline.to(head, { backgroundColor: '#000', borderRadius: '8px 8px 0px 0px', duration: 0.5, ease: 'power2.inOut' }, 0.7);
       if (media) timeline.to(media, { clipPath: OPEN, duration: 1.5, ease: 'wipe' }, 0.4);
     }
     closeButton.focus({ preventScroll: true });
@@ -100,18 +101,19 @@ export function initMenu(root: HTMLElement): Cleanup {
       if (media) gsap.set(media, { clipPath: CLOSED_FROM_BOTTOM });
       unlock?.();
       unlock = null;
+      if (restoreFocus) toggle.focus({ preventScroll: true });
     };
     if (reduce) finish();
     else {
       timeline = gsap
         .timeline({ onComplete: finish })
+        .to(head, { backgroundColor: '#1b1b1b', borderRadius: '8px', duration: 0.45, ease: 'power2.inOut' }, 0)
         .to(head, { opacity: 0, duration: 0.25 }, 0.9)
         .to(navContent, { opacity: 1, duration: 0.25 }, 0.9)
         .to(toggle, { opacity: 1, duration: 0.25 }, 0.9)
-        .to(panel, { clipPath: CLOSED_TO_TOP, duration: 1.2, ease: 'wipe' }, 0)
+        .to(panel, { clipPath: CLOSED_FROM_BOTTOM, duration: 1.2, ease: 'wipe' }, 0)
         .to(backdrop, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 0.5);
     }
-    if (restoreFocus) toggle.focus({ preventScroll: true });
   };
 
   const onKey = (event: KeyboardEvent): void => {

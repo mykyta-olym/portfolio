@@ -76,6 +76,7 @@ test('contact hover labels slide inside their link without changing its destinat
   const destination = await link.getAttribute('href');
   // Hover after the delayed card entrance has finished, as an actual visitor can.
   await expect(page.locator('.contact__card--social')).toHaveCSS('opacity', '1');
+  const originalWidth = await link.evaluate((element) => element.clientWidth);
   await link.hover();
   await expect
     .poll(() =>
@@ -91,7 +92,8 @@ test('contact hover labels slide inside their link without changing its destinat
     .toBe(true);
   await expect(link).toHaveAttribute('href', destination ?? '');
   await expect(link).toHaveAttribute('aria-label', '[GitHub]');
-  await expect(link.locator('.hover-link__next')).toHaveText('Read the code');
+  await expect(link.locator('.hover-link__next')).toHaveText('Code');
+  expect(await link.evaluate((element) => element.clientWidth)).toBe(originalWidth);
   await link.focus();
   await expect(link).toBeFocused();
 });
@@ -126,7 +128,15 @@ test('a manual scroll interrupts the return to top without stealing focus', asyn
 test('process cards turn to explanations and stay still while being read', async ({ page }) => {
   await page.goto('./');
   await waitForStage(page);
+  const viewport = page.viewportSize();
+  await page.mouse.move((viewport?.width ?? 1440) / 2, (viewport?.height ?? 900) / 2);
   await page.locator('.orbit').evaluate((element) => window.scrollTo(0, (element as HTMLElement).offsetTop));
+  await page.waitForTimeout(250);
+  await page.mouse.click((viewport?.width ?? 1440) / 2, (viewport?.height ?? 900) / 2);
+  await expect(page.locator('[data-orbit-card][aria-expanded="true"]')).toHaveCount(0);
+  for (const flip of await page.locator('.orbit__flip').all()) {
+    expect(await flip.evaluate((element) => getComputedStyle(element).transform)).toBe('none');
+  }
   await page.waitForTimeout(4200);
   const card = page.locator('[data-orbit-card]').first();
   await card.click({ force: true });

@@ -9,11 +9,9 @@ import management from '@/assets/about/management.webp';
 import bottle from '@/assets/about/bottle.png';
 import selected from '@/assets/about/selected.webp';
 import terminal from '@/assets/about/terminal.webp';
-import understand from '@/assets/process/understand.webp';
 import build from '@/assets/process/build.webp';
 import test from '@/assets/process/test.webp';
-import refine from '@/assets/process/refine.webp';
-import ship from '@/assets/process/ship.webp';
+import servers from '@/assets/backgrounds/servers.webp';
 import { projectMedia } from './projects';
 
 export const disciplines: readonly Discipline[] = [
@@ -40,42 +38,44 @@ export const disciplines: readonly Discipline[] = [
 ];
 
 /** The home orbit explains the working process; project evidence lives in Selected work. */
-export const galleryCards = [
+export const galleryCards: readonly { image: MediaItem['src']; title: string; text: string; source: string; position?: string }[] = [
   {
-    image: understand,
+    image: design,
     title: 'Understand',
-    text: 'Start with the documented scope and constraints. This is the portfolio README.',
-    source: 'portfolio / README.md',
+    text: 'Clarify the goal, users and constraints before choosing a tool or writing code.',
+    source: 'Start with the problem',
   },
   {
-    image: projectMedia.stockroomOrders.src,
+    image: planning,
     title: 'Plan',
-    text: 'Map the state changes before implementation. This is the stockroom order lifecycle.',
-    source: 'stockroom / order states',
+    text: 'Sketch the flow and state changes, including what happens when something goes wrong.',
+    source: 'Make the decisions visible',
   },
   {
     image: build,
+    position: '50% 25%',
     title: 'Build',
-    text: 'Use established tools for the interactions. This is the actual GSAP menu implementation.',
-    source: 'portfolio / menu.ts',
+    text: 'Build one clear part at a time with established libraries and readable code.',
+    source: 'Keep the implementation clear',
   },
   {
     image: test,
+    position: '50% 15%',
     title: 'Test',
-    text: 'Verify the behavior in a real browser. This is a recorded Playwright run, including accessibility checks.',
-    source: 'GitHub Actions / 615d8ad',
+    text: 'Check the important paths with unit, browser and accessibility tests.',
+    source: 'Check behavior and failure cases',
   },
   {
-    image: refine,
+    image: management,
     title: 'Refine',
-    text: 'Review the small states too. This is the portrait button revealing its colour and hover label.',
-    source: 'portfolio / hover state',
+    text: 'Review layout, motion, keyboard use and responsive states in the browser.',
+    source: 'Make the small states work',
   },
   {
-    image: ship,
+    image: servers,
     title: 'Ship',
-    text: 'Deploy only after verification. This is the successful GitHub Pages workflow for this portfolio.',
-    source: 'GitHub Actions / 615d8ad',
+    text: 'Create a reproducible release, check the deployment and verify the live result.',
+    source: 'Follow through after deployment',
   },
 ];
 
