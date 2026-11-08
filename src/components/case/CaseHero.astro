@@ -9,8 +9,7 @@ interface Props {
 const { project } = Astro.props;
 ---
 
-<header class="case-hero" style={`--accent: ${project.accent}`}>
-  <div class="case-hero__glow" aria-hidden="true"></div>
+<header class="case-hero">
   <div class="case-hero__content">
     <LogoMark size={28} class="case-hero__mark" />
     <p class="case-hero__kind" data-reveal="fade">
@@ -35,15 +34,6 @@ const { project } = Astro.props;
     overflow: hidden;
     background: var(--color-black);
     text-align: center;
-  }
-
-  .case-hero__glow {
-    position: absolute;
-    inset: 0;
-    background:
-      radial-gradient(70% 60% at 50% 115%, color-mix(in srgb, var(--accent) 70%, transparent), transparent 70%),
-      linear-gradient(180deg, color-mix(in srgb, var(--accent) 34%, #000) 0%, #000 78%);
-    opacity: 0.9;
   }
 
   .case-hero__content {

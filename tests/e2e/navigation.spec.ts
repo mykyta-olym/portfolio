@@ -3,10 +3,27 @@ import { pages, waitForStage, watchErrors } from './helpers';
 
 test('home loads, the loader leaves and the hero is on stage', async ({ page }) => {
   const errors = watchErrors(page);
+  await page.addInitScript(() => {
+    const audit = { layers: 0, values: [] as string[] };
+    (window as Window & { loaderAudit?: typeof audit }).loaderAudit = audit;
+    const observer = new MutationObserver((records) => {
+      const digits = document.querySelector('[data-loader-digits]');
+      audit.layers = Math.max(audit.layers, digits?.childElementCount ?? 0);
+      for (const record of records)
+        for (const node of record.addedNodes) {
+          if (node instanceof HTMLElement && node.matches('[data-digit]')) audit.values.push(node.textContent?.trim() ?? '');
+        }
+      if (audit.values.includes('99') && !document.querySelector('[data-preloader]')) observer.disconnect();
+    });
+    observer.observe(document, { childList: true, subtree: true });
+  });
   await page.goto('./');
   await waitForStage(page);
   await expect(page.getByRole('heading', { level: 1 })).toHaveText(/Software That\s+Holds Up/);
   await expect(page.locator('html')).not.toHaveClass(/is-locked/);
+  const audit = await page.evaluate(() => (window as Window & { loaderAudit?: { layers: number; values: string[] } }).loaderAudit);
+  expect(audit?.layers).toBeLessThanOrEqual(2);
+  expect(audit?.values.filter((value) => value !== '00')).toEqual(['36', '78', '99']);
   expect(errors).toEqual([]);
 });
 

@@ -1,32 +1,15 @@
-// The home page loader. Its counter is driven by real loading events: web fonts, the hero
-// poster, enough of the hero video to play smoothly, and the window load event. The mark
-// morphs one stage per step of progress. Failed assets settle instead of blocking.
+// Source choreography: 00 → 36 → 78 → 99, with each counter change starting on the
+// same frame as its logo morph. Slow media can hold the final beat, never the page forever.
 import { loaderStages } from '@/lib/pixels';
 import { lockScroll, markStageReady } from '@/scripts/core/stage';
 import { reducedMotion } from '@/scripts/core/motion';
-import { displayPercent, LoadProgress, stageFor } from './progress';
+import { LoadProgress } from './progress';
 import { PixelMark } from './pixel-mark';
 
-const SEEN_KEY = 'loader-seen';
-const MORPH_MS = 360;
-const COUNTER_STEP_MS = 140;
+const MILESTONES = [0, 490, 1210, 2080];
+const PERCENTAGES = ['00', '36', '78', '99'];
+const GRID_MOVE = 340;
 const MAX_WAIT_MS = 4000;
-
-function readSeen(): boolean {
-  try {
-    return sessionStorage.getItem(SEEN_KEY) === '1';
-  } catch {
-    return false;
-  }
-}
-
-function writeSeen(): void {
-  try {
-    sessionStorage.setItem(SEEN_KEY, '1');
-  } catch {
-    // Storage can be blocked; the loader then simply plays its first-visit timing again.
-  }
-}
 
 /** True on connections where waiting for the hero video would hold the page back. */
 function slowConnection(): boolean {
@@ -80,8 +63,7 @@ export function startPreloader(root: HTMLElement): void {
   if (!canvas || !digits) return;
 
   const reduce = reducedMotion();
-  const seen = readSeen();
-  const minimum = reduce ? 250 : seen ? 650 : 1700;
+  const minimum = reduce ? 250 : 3000;
   const unlock = lockScroll();
   const progress = new LoadProgress().add('document', 1).add('fonts', 2).add('poster', 1).add('video', 4);
 
@@ -93,55 +75,63 @@ export function startPreloader(root: HTMLElement): void {
   trackVideo(progress, document.querySelector<HTMLVideoElement>('[data-hero-video]'));
 
   const mark = new PixelMark(canvas);
-  const last = loaderStages.length - 1;
-  let shownStage = 0;
-  let morphFrom = 0;
-  let morphStart = -1;
-  let shownPercent = -1;
-  let lastCounterUpdate = 0;
+  let milestone = 0;
+  let currentDigit = digits.querySelector<HTMLElement>('[data-digit]');
+  let counterAnimations: Animation[] = [];
   let leaving = false;
   const started = performance.now();
   mark.draw(loaderStages[0] ?? [], loaderStages[0] ?? [], 1);
 
-  const setPercent = (value: number): void => {
-    const previous = digits.querySelector<HTMLElement>('[data-digit]');
+  const setPercent = (value: string): void => {
+    // A suspended tab can cross several milestones in one frame. Keep only its current
+    // digit before starting another roll; animations must never accumulate old layers.
+    counterAnimations.forEach((animation) => animation.cancel());
+    for (const digit of digits.children) if (digit !== currentDigit) digit.remove();
+    const previous = currentDigit;
     const next = document.createElement('span');
     next.dataset['digit'] = '';
     next.className = 'loader__digit';
-    next.textContent = String(value).padStart(2, '0');
+    next.textContent = value;
     digits.append(next);
+    currentDigit = next;
     if (!previous || reduce) {
       previous?.remove();
       return;
     }
-    const timing = { duration: 280, easing: 'cubic-bezier(0.65, 0, 0.35, 1)', fill: 'both' as const };
-    previous.animate(
+    const timing = { duration: GRID_MOVE, easing: 'cubic-bezier(.45, 0, .55, 1)', fill: 'both' as const };
+    const leaving = previous.animate(
       [
         { transform: 'translateY(0)', opacity: 1 },
-        { transform: 'translateY(-45%)', opacity: 0 },
+        { transform: 'translate3d(0, -38%, 0)', opacity: 0 },
       ],
       timing,
     );
-    next.animate(
+    const arriving = next.animate(
       [
-        { transform: 'translateY(45%)', opacity: 0 },
+        { transform: 'translate3d(0, 38%, 0)', opacity: 0 },
         { transform: 'translateY(0)', opacity: 1 },
       ],
       timing,
-    ).onfinish = () => previous.remove();
+    );
+    counterAnimations = [leaving, arriving];
+    arriving.onfinish = () => {
+      previous.remove();
+      leaving.cancel();
+      arriving.cancel();
+      counterAnimations = [];
+    };
   };
 
   const leave = (): void => {
     if (leaving) return;
     leaving = true;
-    writeSeen();
-    root.classList.add('is-leaving');
     const finish = (): void => {
       root.remove();
       unlock();
     };
     // The page underneath starts its entrance while the cover is lifting.
-    window.setTimeout(markStageReady, reduce ? 0 : 280);
+    window.setTimeout(() => root.classList.add('is-leaving'), reduce ? 0 : 90);
+    window.setTimeout(markStageReady, reduce ? 0 : 370);
     root.addEventListener('transitionend', finish, { once: true });
     window.setTimeout(finish, 1400);
   };
@@ -149,27 +139,21 @@ export function startPreloader(root: HTMLElement): void {
   const tick = (now: number): void => {
     if (leaving) return;
     const elapsed = now - started;
-    const percent = displayPercent(progress);
-    if (percent !== shownPercent && now - lastCounterUpdate >= COUNTER_STEP_MS) {
-      shownPercent = percent;
-      lastCounterUpdate = now;
-      setPercent(percent);
+    while (milestone < MILESTONES.length - 1 && elapsed >= (MILESTONES[milestone + 1] ?? 0)) {
+      milestone += 1;
+      setPercent(PERCENTAGES[milestone] ?? '99');
     }
-
-    const target = reduce ? (progress.complete ? last : shownStage) : stageFor(progress.value, loaderStages.length, progress.complete);
-    if (morphStart < 0 && target > shownStage) {
-      morphFrom = shownStage;
-      shownStage += 1;
-      morphStart = now;
+    if (!reduce) {
+      const stage = milestone + 1;
+      const start = milestone === 0 ? 100 : (MILESTONES[milestone] ?? 0);
+      const duration = milestone === 0 ? 280 : milestone === 3 ? 550 : GRID_MOVE;
+      const t = Math.max(0, Math.min(1, (elapsed - start) / duration));
+      mark.draw(loaderStages[stage - 1] ?? [], loaderStages[stage] ?? [], t);
+    } else {
+      const final = loaderStages.at(-1) ?? [];
+      mark.draw(final, final, 1);
     }
-    if (morphStart >= 0) {
-      const t = reduce ? 1 : Math.min(1, (now - morphStart) / MORPH_MS);
-      mark.draw(loaderStages[morphFrom] ?? [], loaderStages[shownStage] ?? [], t);
-      if (t >= 1) morphStart = -1;
-    }
-
-    const settled = progress.complete && shownStage === last && morphStart < 0 && shownPercent === 100;
-    if ((settled && elapsed >= minimum) || elapsed >= MAX_WAIT_MS) {
+    if ((progress.complete && elapsed >= minimum) || elapsed >= MAX_WAIT_MS) {
       leave();
       return;
     }

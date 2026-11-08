@@ -2,12 +2,14 @@ import type { Discipline, MediaItem } from '@/types/content';
 import { projectMedia } from './projects';
 import code from '@/assets/about/code.webp';
 import design from '@/assets/about/design.webp';
-import glasses from '@/assets/about/glasses.webp';
 import planning from '@/assets/about/planning.webp';
 import workspace from '@/assets/about/workspace.webp';
 import modelling from '@/assets/about/modelling.webp';
-import laptop from '@/assets/renders/showcase.webp';
-import avatar from '@/assets/profile/avatar.jpg';
+import development from '@/assets/about/development.webp';
+import management from '@/assets/about/management.webp';
+import bottle from '@/assets/about/bottle.png';
+import selected from '@/assets/about/selected.webp';
+import terminal from '@/assets/about/terminal.webp';
 
 export const disciplines: readonly Discipline[] = [
   {
@@ -43,21 +45,23 @@ export const galleryCards: readonly { readonly image: MediaItem; readonly slug: 
 ];
 
 /** Tiles for the draggable field on the about page. */
-export const fieldTiles: readonly MediaItem[] = [
-  { src: design, alt: '', kind: 'photo' },
-  { src: laptop, alt: '', kind: 'render' },
-  { src: glasses, alt: '', kind: 'photo' },
-  { src: code, alt: '', kind: 'photo' },
-  { src: planning, alt: '', kind: 'photo' },
-  projectMedia.gardenFlight,
-  { src: workspace, alt: '', kind: 'photo' },
-  projectMedia.gitpulseStudent,
-  { src: modelling, alt: '', kind: 'photo' },
-  { src: avatar, alt: '', kind: 'photo' },
-  projectMedia.relayqDequeue,
-  projectMedia.phishlensScore,
-  projectMedia.stockroomOrders,
-  projectMedia.gardenBook,
-  projectMedia.gitpulsePipeline,
-  projectMedia.speechProtocol,
+const fieldPhotos = [
+  design,
+  planning,
+  development,
+  selected,
+  code,
+  terminal,
+  workspace,
+  modelling,
+  management,
+  development,
+  bottle,
+  selected,
+  planning,
+  code,
+  design,
+  modelling,
 ];
+
+export const fieldTiles: readonly MediaItem[] = fieldPhotos.map((src) => ({ src, alt: '', kind: 'photo' }));

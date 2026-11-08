@@ -1,6 +1,4 @@
 ---
-import Icon from './Icon.astro';
-
 interface Props {
   href: string;
   variant?: 'light' | 'dark';
@@ -20,22 +18,29 @@ const { href, variant = 'light', external = false, class: className } = Astro.pr
   <span class="button__label">
     <slot />
   </span>
-  <Icon name="chevron-right" size={11} class="button__icon" />
+  <svg class="button__icon" width="12" height="16" viewBox="0 0 19 24" fill="currentColor" aria-hidden="true">
+    <rect x="0.5" y="0.75" width="8" height="6" rx="0.45" />
+    <rect x="5" y="4.75" width="8" height="6" rx="0.45" />
+    <rect x="9.5" y="9" width="8" height="6" rx="0.45" />
+    <rect x="5" y="13.25" width="8" height="6" rx="0.45" />
+    <rect x="0.5" y="17.25" width="8" height="6" rx="0.45" />
+  </svg>
 </a>
 
 <style>
   .button {
     display: inline-flex;
     align-items: center;
-    gap: 0.625rem;
-    height: 2.5rem;
-    padding: 0 1.125rem 0 1.25rem;
+    gap: 0.75rem;
+    height: 2.75rem;
+    padding: 0 10px 0 30px;
     border: 1px solid transparent;
     border-radius: 2px;
     font-size: var(--fs-small);
     font-weight: 400;
     letter-spacing: -0.006em;
     white-space: nowrap;
+    overflow: hidden;
     transition:
       background-color 0.3s var(--ease-button),
       color 0.3s var(--ease-button),
@@ -44,21 +49,24 @@ const { href, variant = 'light', external = false, class: className } = Astro.pr
 
   .button__label {
     display: block;
+    transform: translate3d(-10px, 0, 0);
     transition: transform 0.3s var(--ease-button);
   }
 
   .button :global(.button__icon) {
+    flex: none;
+    transform: translate3d(-10px, 0, 0);
     transition: transform 0.3s var(--ease-button);
   }
 
   .button:hover .button__label,
   .button:focus-visible .button__label {
-    transform: translateX(-3px);
+    transform: translate3d(0, 0, 0);
   }
 
   .button:hover :global(.button__icon),
   .button:focus-visible :global(.button__icon) {
-    transform: translateX(4px);
+    transform: translate3d(0, 0, 0);
   }
 
   .button--light {
@@ -68,7 +76,7 @@ const { href, variant = 'light', external = false, class: className } = Astro.pr
 
   .button--light:hover,
   .button--light:focus-visible {
-    background: transparent;
+    background: var(--color-black);
     color: var(--color-white);
     border-color: var(--color-white);
   }
@@ -84,5 +92,13 @@ const { href, variant = 'light', external = false, class: className } = Astro.pr
     background: var(--color-white);
     color: var(--color-black);
     border-color: var(--color-white);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .button,
+    .button__label,
+    .button :global(.button__icon) {
+      transition: none;
+    }
   }
 </style>

@@ -25,7 +25,7 @@
     display: grid;
     place-items: center;
     background: var(--color-black);
-    transition: transform 0.82s var(--ease-wipe);
+    transition: transform 0.82s cubic-bezier(0.76, 0, 0.24, 1);
     will-change: transform;
     animation: loader-failsafe 0.01s linear 9s forwards;
   }
@@ -62,22 +62,29 @@
     font-size: 0.6875rem;
     letter-spacing: 0.03em;
     font-variant-numeric: tabular-nums;
+    gap: 0.05em;
+    min-width: 65px;
+    line-height: 1.25;
   }
 
   .loader__digits {
     position: relative;
     display: block;
-    width: 3.1ch;
+    width: 3.4ch;
     height: 1.4em;
     overflow: hidden;
+    contain: layout paint;
+    flex: none;
   }
 
   .loader__digits :global(.loader__digit) {
     position: absolute;
     inset: 0;
-    display: flex;
-    align-items: center;
-    justify-content: flex-end;
+    display: block;
+    text-align: right;
+    white-space: nowrap;
+    backface-visibility: hidden;
+    transform: translate3d(0, 0, 0);
   }
 
   .loader__digits :global(.loader__digit:only-child) {

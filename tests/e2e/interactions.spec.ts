@@ -52,16 +52,43 @@ test('case study tabs switch with the mouse and the arrow keys', async ({ page }
   await expect(tabs.nth(0)).toHaveAttribute('aria-selected', 'true');
 });
 
-test('the email address can be copied on the contact page', async ({ page, context, browserName }) => {
+test('the email address fits one line and can be copied on the contact page', async ({ page, context, browserName }) => {
   test.skip(browserName !== 'chromium', 'clipboard permissions are Chromium only');
   await context.grantPermissions(['clipboard-read', 'clipboard-write']);
   await page.goto('contact/');
   await waitForStage(page);
+  const address = page.locator('.contact__mail a');
+  expect(
+    await address.evaluate((element) => element.getBoundingClientRect().height / parseFloat(getComputedStyle(element).lineHeight)),
+  ).toBeLessThan(1.1);
   const button = page.getByRole('button', { name: 'Copy the email address' });
   await button.click();
   await expect(button).toHaveClass(/is-copied/);
   await expect(page.locator('[data-copy-status]')).toHaveText('Email address copied');
   expect(await page.evaluate(() => navigator.clipboard.readText())).toBe('mykyta.olym.work@gmail.com');
+});
+
+test('contact hover labels slide inside their link without changing its destination', async ({ page, isMobile }) => {
+  test.skip(isMobile, 'hover is a mouse interaction');
+  await page.goto('contact/');
+  await waitForStage(page);
+  const link = page.locator('.contact__card--social a').first();
+  const destination = await link.getAttribute('href');
+  // Hover after the delayed card entrance has finished, as an actual visitor can.
+  await expect(page.locator('.contact__card--social')).toHaveCSS('opacity', '1');
+  await link.hover();
+  await expect
+    .poll(() =>
+      link.evaluate((element) => {
+        const inner = element.querySelector('span');
+        return inner ? inner.getBoundingClientRect().top >= element.getBoundingClientRect().bottom - 1 : false;
+      }),
+    )
+    .toBe(true);
+  await expect(link).toHaveAttribute('href', destination ?? '');
+  await expect(link).toHaveAttribute('aria-label', '[GitHub]');
+  await link.focus();
+  await expect(link).toBeFocused();
 });
 
 test('back to top returns to the top of the page', async ({ page }) => {
@@ -95,13 +122,14 @@ test('the about field moves when dragged', async ({ page, isMobile }) => {
   test.skip(isMobile, 'mouse dragging is a desktop interaction');
   await page.goto('about/');
   await waitForStage(page);
-  const tile = page.locator('[data-field-tile]').first();
-  const before = await tile.evaluate((element) => element.style.transform);
+  await expect(page.locator('.field')).toHaveClass(/has-webgl/);
+  const canvas = page.locator('[data-field-canvas]');
+  const before = await canvas.screenshot();
   await page.mouse.move(700, 450);
   await page.mouse.down();
   await page.mouse.move(400, 300, { steps: 10 });
   await page.mouse.up();
-  await expect.poll(() => tile.evaluate((element) => element.style.transform)).not.toBe(before);
+  await expect.poll(async () => (await canvas.screenshot()).equals(before)).toBe(false);
 });
 
 test('the typed phrase in the navigation types the home words', async ({ page }) => {

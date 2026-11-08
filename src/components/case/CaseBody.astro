@@ -11,7 +11,7 @@ interface Props {
 const { project } = Astro.props;
 ---
 
-<section class="case" aria-label={`${project.name} case study`} style={`--accent: ${project.accent}`}>
+<section class="case" aria-label={`${project.name} case study`}>
   <aside class="case__panel">
     <div class="case__sticky">
       <div class="case__top">
@@ -274,6 +274,7 @@ const { project } = Astro.props;
   .case__figure :global(img) {
     width: 100%;
     height: auto;
+    filter: grayscale(1);
   }
 
   @media (max-width: 1023px) {

@@ -13,23 +13,25 @@ Live: https://mykyta-olym.github.io/portfolio/
 - TypeScript in strict mode for all page scripts and data.
 - [GSAP 3](https://gsap.com) with ScrollTrigger and CustomEase for the motion system.
 - [Swiper](https://swiperjs.com) for the project carousels and continuous tool-logo strip.
+- [Three.js](https://threejs.org) for the photographic About field, adapting the reference's camera and curved-plane motion.
 - Plain CSS with design tokens in `src/styles/tokens.css`; component styles are scoped.
 - Self-hosted Inter, Inter Tight, Figtree and IBM Plex Mono from Fontsource (SIL OFL).
 - Vitest for unit tests, Playwright and axe-core for end-to-end and accessibility tests.
 
-There is no live WebGL on the pages. Reference animations ship as video and animated WebP;
-the laptop banner is a still image. Sources and the laptop edit prompt are in [ASSETS.md](ASSETS.md).
+About loads WebGL on demand and pauses its renderer when idle, offscreen or in a background tab.
+Other reference animations ship as video and animated WebP; the laptop banner is a still image.
+Sources and the laptop edit prompt are in [ASSETS.md](ASSETS.md).
 
 ## What is on the site
 
-- Home: a loader driven by real loading progress, the hero loop, a scroll-linked contrast reveal,
+- Home: the reference's synchronized four-beat loader, the monochrome hero loop, a scroll-linked line reveal,
   a ring gallery, a pinned list of disciplines, a picture that shrinks into a frame, selected
   projects with Swiper image strips, contact and FAQ, and a footer that reveals itself
   under the page with a pixel wordmark that reacts to the pointer.
 - Work: all six projects.
 - Case studies: a sticky panel with stack, key numbers and tabbed sections next to a column
   of real visuals: screenshots, verbatim code, diagrams and charts drawn from each repository.
-- About: a draggable field of project images, a short prologue and working principles.
+- About: a draggable field of faceless process photographs and design imagery, a short prologue and working principles.
 - Contact: the reference's animated cubic background and paper cards, with Mykyta's links and email copy control; a 404 page.
 
 Page changes use a cover that rises over the old page and lifts off the new one. With
@@ -93,9 +95,11 @@ Run `node scripts/qa/measure.mjs <url> --width 2560 --height 1440` against a pro
 The script records LCP, CLS, frame intervals while scrolling, and video frame drops on the
 machine's real GPU. `--throttle` adds 4x CPU slowdown and a 1.6 Mbps, 150 ms network.
 
-On a first visit the home page opens behind its loader for at least 1.7 s, longer while
-the hero video buffers and never more than 4 s. On slow or data-saving connections it does
-not wait for the video. These are lab numbers from one machine, not field data.
+The loader follows the reference's 3 s choreography: 00, 36, 78, then 99 percent, synchronized
+with the mark. It can hold the last beat while assets settle, up to 4 s. Slow or data-saving
+connections do not wait for video buffering. The About field measured 16.7 ms median and
+16.8 ms p95 frame intervals at 2560×1440 on an Intel UHD 630, with no idle draws before or
+after interaction. These are lab measurements on one machine, not field data.
 
 ## Project structure
 

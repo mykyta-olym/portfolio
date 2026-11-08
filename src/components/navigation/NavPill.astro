@@ -74,9 +74,19 @@ const phrase = pillPhrases[context];
     transition: background-color var(--duration-fast) ease;
   }
 
-  .nav__logo:hover,
-  .nav__toggle:hover {
-    background: rgb(255 255 255 / 8%);
+  .nav:global(.is-menu-active) .nav__pill {
+    background: transparent;
+    border-color: transparent;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .nav:global(.is-menu-active) .nav__toggle {
+    opacity: 0;
+  }
+
+  .nav__toggle:hover .nav__lines {
+    transform: scale(1.2);
   }
 
   .nav__phrase {
@@ -110,8 +120,9 @@ const phrase = pillPhrases[context];
 
   .nav__lines {
     display: grid;
-    gap: 0.1875rem;
-    width: 1.125rem;
+    gap: 2px;
+    width: 22px;
+    transition: transform 0.25s ease-out;
   }
 
   .nav__lines span {

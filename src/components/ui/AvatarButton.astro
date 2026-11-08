@@ -22,23 +22,20 @@ const { href, class: className } = Astro.props;
     display: inline-flex;
     align-items: center;
     gap: 0.625rem;
-    height: 2.875rem;
-    padding: 0.3125rem 1.25rem 0.3125rem 0.3125rem;
-    background: var(--color-chip);
+    height: 3.25rem;
+    padding: 0.5rem 1.25rem 0.5rem 0.5rem;
+    background: rgb(255 255 255 / 71%);
     color: var(--color-black);
     border-radius: 3px;
     font-size: var(--fs-small);
     font-weight: 400;
     white-space: nowrap;
-    transition:
-      background-color 0.3s var(--ease-button),
-      transform 0.3s var(--ease-button);
+    transition: transform 0.4s ease;
   }
 
   .avatar-button:hover,
   .avatar-button:focus-visible {
-    background: var(--color-white);
-    transform: translateY(-2px);
+    transform: translateY(-6px) scale(1.02);
   }
 
   .avatar-button :global(.avatar-button__image) {

@@ -13,11 +13,15 @@ const current = Astro.url.pathname;
   <div class="menu__panel" data-menu-panel role="dialog" aria-modal="true" aria-label="Site menu">
     <div class="menu__head">
       <a class="menu__logo" href={href()} aria-label="Mykyta Olym, home">
-        <LogoMark size={22} />
+        <LogoMark size={32} />
       </a>
       <button class="menu__close" type="button" data-menu-close>
         <span class="visually-hidden">Close menu</span>
-        <Icon name="close" size={16} />
+        <span class="menu__bars" aria-hidden="true">
+          <span></span>
+          <span></span>
+          <span></span>
+        </span>
       </button>
     </div>
     <div class="menu__body" data-menu-surface>
@@ -50,13 +54,13 @@ const current = Astro.url.pathname;
             loop
             playsinline
             preload="none"
-            poster={href('media/menu/programmer-poster.webp')}
+            poster={href('media/menu/code-process-poster.webp')}
             aria-hidden="true"
             tabindex="-1"
           >
-            <source src={href('media/menu/programmer.mp4')} type="video/mp4" />
+            <source src={href('media/menu/code-process.mp4')} type="video/mp4" />
           </video>
-          <figcaption class="visually-hidden">A programmer working at a computer</figcaption>
+          <figcaption class="visually-hidden">Source code being edited on a screen</figcaption>
         </figure>
       </div>
     </div>
@@ -96,9 +100,9 @@ const current = Astro.url.pathname;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    height: 3.25rem;
+    height: 88px;
     flex: none;
-    padding: 0.3125rem;
+    padding: 0 20px 0 30px;
     background: var(--color-black);
   }
 
@@ -121,31 +125,82 @@ const current = Astro.url.pathname;
     color: var(--color-white);
   }
 
-  .menu__close:hover,
-  .menu__logo:hover {
-    background: rgb(255 255 255 / 8%);
+  .menu__bars {
+    position: relative;
+    width: 22px;
+    height: 18px;
+    transition: scale 0.25s ease-out;
+  }
+
+  .menu__bars span {
+    position: absolute;
+    top: 8px;
+    left: 0;
+    width: 22px;
+    height: 2px;
+    background: currentColor;
+    transition:
+      transform 0.25s ease-out,
+      opacity 0.25s ease-out;
+  }
+
+  .menu__bars span:first-child {
+    transform: translateY(-4px);
+  }
+  .menu__bars span:last-child {
+    transform: translateY(4px);
+  }
+  .menu__close:global(.is-open) .menu__bars span:first-child {
+    transform: rotate(45deg) scaleX(1.05);
+  }
+  .menu__close:global(.is-open) .menu__bars span:nth-child(2) {
+    opacity: 0;
+  }
+  .menu__close:global(.is-open) .menu__bars span:last-child {
+    transform: rotate(-45deg) scaleX(1.05);
+  }
+  .menu__close:hover .menu__bars {
+    scale: 1.2;
   }
 
   .menu__nav {
-    padding: 1.75rem 1.5rem 0;
+    padding: 42px 44px 0;
   }
 
   .menu__nav ul {
     display: grid;
     justify-items: end;
-    gap: 0.125rem;
+    gap: 10px;
   }
 
   .menu__link {
+    position: relative;
     display: inline-flex;
     align-items: center;
     gap: 0.5rem;
     font-size: var(--fs-menu);
     font-weight: 400;
     letter-spacing: -0.01em;
-    line-height: 1.12;
+    line-height: 30px;
+    min-height: 38px;
     color: var(--color-white);
     transition: opacity var(--duration-fast) ease;
+  }
+
+  .menu__link::after {
+    content: '';
+    position: absolute;
+    inset: auto 0 -2px;
+    height: 1px;
+    background: currentColor;
+    transform: scaleX(0);
+    transform-origin: right;
+    transition: transform 0.3s cubic-bezier(0.25, 0, 0.4, 1);
+  }
+
+  .menu__link:is(:hover, :focus-visible)::after {
+    transform: scaleX(1);
+    transform-origin: left;
   }
 
   .menu__nav ul:hover .menu__link:not(:hover) {
@@ -157,6 +212,8 @@ const current = Astro.url.pathname;
   }
 
   .menu__link :global(.menu__arrow) {
+    width: 30px;
+    height: 30px;
     transition: transform var(--duration-base) var(--ease-button);
   }
 
@@ -166,7 +223,7 @@ const current = Astro.url.pathname;
 
   .menu__foot {
     margin-top: auto;
-    padding: 1.5rem;
+    padding: 24px 44px min(18vh, 195px);
   }
 
   .menu__social {
@@ -192,7 +249,7 @@ const current = Astro.url.pathname;
 
   .menu__media {
     position: relative;
-    aspect-ratio: 16 / 10;
+    aspect-ratio: 365 / 233;
     overflow: hidden;
     border-radius: var(--radius-small);
     background: linear-gradient(160deg, #2a2a2a, #121212);
@@ -207,6 +264,38 @@ const current = Astro.url.pathname;
   @media (max-height: 640px) {
     .menu__media {
       display: none;
+    }
+    .menu__foot {
+      padding-bottom: 24px;
+    }
+    .menu__head {
+      height: 52px;
+    }
+    .menu__nav {
+      padding-top: 20px;
+    }
+  }
+
+  @media (max-width: 767px) {
+    .menu__head {
+      padding-left: 15px;
+      padding-right: 10px;
+    }
+    .menu__nav {
+      padding-inline: 36px;
+    }
+    .menu__nav ul {
+      gap: 6px;
+    }
+    .menu__link {
+      line-height: 40px;
+      letter-spacing: -0.5px;
+    }
+    .menu__foot {
+      padding-inline: 36px;
+    }
+    .menu__media {
+      aspect-ratio: 275 / 150;
     }
   }
 </style>

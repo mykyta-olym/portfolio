@@ -14,25 +14,31 @@ export function initMenu(root: HTMLElement): Cleanup {
   const toggle = document.querySelector<HTMLButtonElement>('[data-menu-toggle]');
   const panel = root.querySelector<HTMLElement>('[data-menu-panel]');
   const surface = root.querySelector<HTMLElement>('[data-menu-surface]');
+  const head = root.querySelector<HTMLElement>('.menu__head');
+  const nav = document.querySelector<HTMLElement>('[data-nav]');
+  const navContent = document.querySelectorAll<HTMLElement>('.nav__logo, .nav__phrase');
   const backdrop = root.querySelector<HTMLElement>('[data-menu-backdrop]');
   const closeButton = root.querySelector<HTMLButtonElement>('[data-menu-close]');
   const media = root.querySelector<HTMLElement>('[data-menu-media]');
   const video = root.querySelector<HTMLVideoElement>('[data-menu-video]');
   if (!toggle || !panel || !surface || !backdrop || !closeButton) return () => undefined;
-  const items = [...root.querySelectorAll<HTMLElement>('[data-menu-item]')];
+  const links = [...root.querySelectorAll<HTMLElement>('.menu__nav [data-menu-item]')];
+  const socials = [...root.querySelectorAll<HTMLElement>('.menu__social [data-menu-item]')];
+  const items = [...links, ...socials];
 
   let open = false;
   let timeline: gsap.core.Timeline | null = null;
   let unlock: (() => void) | null = null;
   const reduce = reducedMotion();
 
-  gsap.set(surface, { clipPath: CLOSED_FROM_BOTTOM });
+  gsap.set(panel, { clipPath: CLOSED_FROM_BOTTOM });
   if (media) gsap.set(media, { clipPath: CLOSED_FROM_BOTTOM });
 
   const setOpen = (value: boolean): void => {
     open = value;
     toggle.setAttribute('aria-expanded', String(value));
     root.toggleAttribute('data-open', value);
+    closeButton.classList.toggle('is-open', value);
   };
 
   const show = (): void => {
@@ -41,6 +47,8 @@ export function initMenu(root: HTMLElement): Cleanup {
     timeline?.kill();
     setOpen(true);
     root.hidden = false;
+    gsap.set(toggle, { opacity: 0 });
+    nav?.classList.add('is-menu-active');
     surface.inert = false;
     unlock ??= lockScroll();
     if (video && video.preload === 'none') {
@@ -50,12 +58,15 @@ export function initMenu(root: HTMLElement): Cleanup {
     if (!reduce) void video?.play().catch(() => undefined);
     if (starting) {
       gsap.set(backdrop, { opacity: 0 });
-      gsap.set(surface, { clipPath: CLOSED_FROM_BOTTOM });
+      gsap.set(panel, { clipPath: CLOSED_FROM_BOTTOM });
+      gsap.set(head, { opacity: 0 });
       gsap.set(items, { y: 30, opacity: 0 });
       if (media) gsap.set(media, { clipPath: CLOSED_FROM_BOTTOM });
     }
     if (reduce) {
-      gsap.set(surface, { clipPath: OPEN });
+      gsap.set(panel, { clipPath: OPEN });
+      gsap.set(head, { opacity: 1 });
+      gsap.set(navContent, { opacity: 0 });
       gsap.set(items, { opacity: 1, y: 0 });
       if (media) gsap.set(media, { clipPath: OPEN });
       gsap.set(backdrop, { opacity: 1 });
@@ -63,9 +74,12 @@ export function initMenu(root: HTMLElement): Cleanup {
       timeline = gsap
         .timeline()
         .to(backdrop, { opacity: 1, duration: 0.5, ease: 'power2.out' }, 0)
-        .to(surface, { clipPath: OPEN, duration: starting ? 1.2 : 0.6, ease: 'wipe' }, 0)
-        .to(items, { y: 0, opacity: 1, duration: 0.8, stagger: 0.08, ease: 'power3.out' }, starting ? 0.6 : 0);
-      if (media) timeline.to(media, { clipPath: OPEN, duration: starting ? 1.5 : 0.6, ease: 'wipe' }, starting ? 0.4 : 0);
+        .to(navContent, { opacity: 0, duration: 0.6 }, 0)
+        .to(panel, { clipPath: OPEN, duration: 1.2, ease: 'wipe' }, 0)
+        .to(links, { y: 0, opacity: 1, duration: 0.8, stagger: 0.08, ease: 'power3.out' }, 0.6)
+        .to(socials, { y: 0, opacity: 1, duration: 0.6, stagger: 0.05, ease: 'power3.out' }, 0.6)
+        .to(head, { opacity: 1, duration: 0.6 }, 0.8);
+      if (media) timeline.to(media, { clipPath: OPEN, duration: 1.5, ease: 'wipe' }, 0.4);
     }
     closeButton.focus({ preventScroll: true });
   };
@@ -77,8 +91,11 @@ export function initMenu(root: HTMLElement): Cleanup {
     timeline?.kill();
     const finish = (): void => {
       root.hidden = true;
+      nav?.classList.remove('is-menu-active');
+      gsap.set(navContent, { clearProps: 'opacity' });
+      gsap.set(toggle, { clearProps: 'opacity' });
       video?.pause();
-      gsap.set(surface, { clipPath: CLOSED_FROM_BOTTOM });
+      gsap.set(panel, { clipPath: CLOSED_FROM_BOTTOM });
       if (media) gsap.set(media, { clipPath: CLOSED_FROM_BOTTOM });
       unlock?.();
       unlock = null;
@@ -87,9 +104,11 @@ export function initMenu(root: HTMLElement): Cleanup {
     else {
       timeline = gsap
         .timeline({ onComplete: finish })
-        .to(items, { opacity: 0, duration: 0.25, ease: 'power1.out' }, 0)
-        .to(surface, { clipPath: CLOSED_TO_TOP, duration: 1.2, ease: 'wipe' }, 0)
-        .to(backdrop, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 0.25);
+        .to(head, { opacity: 0, duration: 0.3 }, 0)
+        .to(navContent, { opacity: 1, duration: 0.6 }, 0.5)
+        .to(toggle, { opacity: 1, duration: 0.6 }, 0.5)
+        .to(panel, { clipPath: CLOSED_TO_TOP, duration: 1.2, ease: 'wipe' }, 0)
+        .to(backdrop, { opacity: 0, duration: 0.6, ease: 'power2.inOut' }, 0.5);
     }
     if (restoreFocus) toggle.focus({ preventScroll: true });
   };
@@ -135,6 +154,9 @@ export function initMenu(root: HTMLElement): Cleanup {
     document.removeEventListener('keydown', onKey);
     window.removeEventListener('pageshow', onPageShow);
     timeline?.kill();
+    nav?.classList.remove('is-menu-active');
+    gsap.set(navContent, { clearProps: 'opacity' });
+    gsap.set(toggle, { clearProps: 'opacity' });
     unlock?.();
     video?.pause();
   };

@@ -9,11 +9,11 @@ const portrait = '(max-aspect-ratio: 3/4)';
 <section class="hero" aria-labelledby="hero-title">
   <div class="hero__media" aria-hidden="true">
     <picture>
-      <source media={portrait} srcset={href('media/hero/grid-portrait-poster.webp')} width="720" height="1280" />
+      <source media={portrait} srcset={href('media/hero/mono-grid-portrait-poster.webp')} width="720" height="1280" />
       <img
         class="hero__poster"
         data-hero-poster
-        src={href('media/hero/grid-1080-poster.webp')}
+        src={href('media/hero/mono-grid-1080-poster.webp')}
         alt=""
         width="1920"
         height="1080"
@@ -22,8 +22,8 @@ const portrait = '(max-aspect-ratio: 3/4)';
       />
     </picture>
     <video class="hero__video" data-hero-video data-module="background-video" autoplay muted loop playsinline preload="auto" tabindex="-1">
-      <source src={href('media/hero/grid-portrait.mp4')} type="video/mp4" media={portrait} />
-      <source src={href('media/hero/grid-1080.mp4')} type="video/mp4" />
+      <source src={href('media/hero/mono-grid-portrait.mp4')} type="video/mp4" media={portrait} />
+      <source src={href('media/hero/mono-grid-1080.mp4')} type="video/mp4" />
     </video>
     <div class="hero__shade"></div>
   </div>
@@ -71,6 +71,7 @@ const portrait = '(max-aspect-ratio: 3/4)';
   .hero__poster,
   .hero__video {
     object-fit: cover;
+    filter: grayscale(1) brightness(0.75) contrast(1.1);
   }
 
   .hero__video {

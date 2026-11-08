@@ -28,7 +28,7 @@ const tiles = fieldTiles.map((image, index) => {
 });
 ---
 
-<section class="field" data-module="drag-field" data-cursor="Drag" aria-labelledby="about-title">
+<section class="field" data-module="drag-field" data-cursor="Drag Me" aria-labelledby="about-title">
   <ul class="field__tiles" aria-hidden="true">
     {tiles.map((tile) => (
       <li
@@ -56,8 +56,7 @@ const tiles = fieldTiles.map((image, index) => {
 </section>
 
 <style>
-  /* Tiles are placed around the centre on a grid of cells. The script uses the same
-     formula, so taking over from these first-paint positions moves nothing. */
+  /* Static fallback grid. Enhanced mode reveals its canvas after the textures are ready. */
   .field {
     --cell: max(220px, 100cqw / 3.6);
     --cell-h: 56cqh;
@@ -72,7 +71,6 @@ const tiles = fieldTiles.map((image, index) => {
     touch-action: pan-y;
     -webkit-user-select: none;
     user-select: none;
-    perspective: 1400px;
   }
 
   .field:global(.is-dragging) {
@@ -82,6 +80,23 @@ const tiles = fieldTiles.map((image, index) => {
   .field__tiles {
     position: absolute;
     inset: 0;
+  }
+
+  .field:global(.has-webgl) .field__tiles {
+    visibility: hidden;
+  }
+
+  :global(.js) .field:not(:global(.is-static)) .field__tiles {
+    visibility: hidden;
+  }
+
+  .field :global(canvas[data-field-canvas]) {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    filter: grayscale(1);
+    pointer-events: none;
   }
 
   .field__tile {
@@ -105,12 +120,7 @@ const tiles = fieldTiles.map((image, index) => {
     height: 100%;
     object-fit: cover;
     pointer-events: none;
-    filter: grayscale(0.65) brightness(0.8);
-    transition: filter 0.5s ease;
-  }
-
-  .field:hover .field__tile :global(img) {
-    filter: grayscale(0.3) brightness(0.92);
+    filter: grayscale(1);
   }
 
   .field__title {
@@ -119,22 +129,24 @@ const tiles = fieldTiles.map((image, index) => {
     display: grid;
     place-content: center;
     justify-items: center;
-    gap: 0.6rem;
+    gap: 0;
     pointer-events: none;
     filter: blur(var(--field-blur, 0px));
-    text-shadow: 0 0 40px rgb(0 0 0 / 80%);
   }
 
   .field__title h1 {
-    font-size: var(--fs-gallery);
+    font-size: 45px;
     font-weight: 400;
-    letter-spacing: -0.01em;
+    line-height: 80px;
+    letter-spacing: -0.5px;
+    color: #ececec;
   }
 
   .field__meta {
-    font-family: var(--font-mono);
-    font-size: 0.6875rem;
-    letter-spacing: 0.14em;
+    font-family: var(--font-label);
+    font-size: 13px;
+    line-height: 18.2px;
+    letter-spacing: 1.5px;
     text-transform: uppercase;
     color: var(--color-text-muted);
   }
@@ -151,15 +163,38 @@ const tiles = fieldTiles.map((image, index) => {
     color: var(--color-text-dim);
   }
 
+  @media (max-width: 1024px) {
+    .field__title h1 {
+      font-size: 35px;
+    }
+    .field__meta {
+      font-size: 10px;
+      letter-spacing: 2.5px;
+    }
+  }
+
   @media (max-width: 767px) {
     .field {
       --cell: max(220px, 100cqw / 2.1);
+    }
+    .field__title h1 {
+      font-size: 24px;
+      line-height: 26px;
+    }
+    .field__meta {
+      font-size: 12px;
     }
   }
 
   @media (pointer: fine) {
     .field__hint {
       display: none;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    :global(.js) .field .field__tiles {
+      visibility: visible;
     }
   }
 </style>

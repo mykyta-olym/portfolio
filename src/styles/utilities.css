@@ -66,15 +66,19 @@
   transform: none;
 }
 
-/* Scroll contrast keeps the complete sentence visible, including between wheel events. */
+/* Source line-rise clipping leaves room for accents and descenders. */
 .is-rising .rise-word {
   display: inline-block;
+  vertical-align: baseline;
+  line-height: inherit;
+  white-space: nowrap;
+  clip-path: inset(-0.12em -0.08em -0.18em -0.08em);
 }
 
-.is-rising .rise-inner,
-.is-rising [data-inline-pic] {
+.is-rising .rise-inner {
   display: inline-block;
-  opacity: var(--rise-a, 1);
+  transform: translate3d(0, var(--rise-y, 1.15em), 0);
+  opacity: var(--rise-a, 0);
 }
 
 @media (prefers-reduced-motion: reduce) {
