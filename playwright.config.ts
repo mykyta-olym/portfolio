@@ -3,8 +3,9 @@ import { defineConfig, devices } from '@playwright/test';
 const port = 4330;
 const base = process.env['SITE_BASE'] ?? '/portfolio/';
 const ci = Boolean(process.env['CI']);
-// Locally the installed Chrome is used; CI installs Playwright's own Chromium.
-const browser = ci ? {} : { channel: 'chrome' as const };
+// Use real Chrome's headless mode in both environments. The older headless shell does
+// not exercise cross-document View Transitions, even when it exposes the CSS API.
+const browser = { channel: ci ? 'chromium' : 'chrome' };
 
 export default defineConfig({
   testDir: 'tests/e2e',

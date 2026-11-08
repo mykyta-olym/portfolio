@@ -61,8 +61,11 @@ npm run test:e2e      # Playwright, desktop and mobile projects, against the bui
 npm run verify        # all of the above in order
 ```
 
-Locally the end-to-end tests run in the installed Google Chrome; CI installs Playwright's
-own Chromium.
+Locally the end-to-end tests run in the installed Google Chrome; CI uses Playwright's
+Chromium channel with the [new headless mode](https://playwright.dev/docs/browsers#chromium-new-headless-mode),
+so the native page transitions are exercised by the same browser engine.
+Native transition checks run with one worker because the browser skips these animations
+in background windows. The remaining end-to-end checks run in parallel.
 
 ## Media
 

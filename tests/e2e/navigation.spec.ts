@@ -70,7 +70,7 @@ test('a nested page survives a reload', async ({ page }) => {
   await expect(page.getByRole('heading', { level: 1 })).toHaveText('GitPulse');
 });
 
-test('page navigation uses all four source slices with a white backdrop', async ({ page }) => {
+test('page navigation uses all four source slices with a white backdrop @native', async ({ page }) => {
   await page.addInitScript(() => {
     window.addEventListener('pagereveal', (event) => {
       const transition = (event as Event & { viewTransition?: ViewTransition }).viewTransition;
@@ -89,7 +89,10 @@ test('page navigation uses all four source slices with a white backdrop', async 
   await page.goto('about/');
   test.skip(!(await page.evaluate(() => 'CSSViewTransitionRule' in window)), 'browser does not support cross-document transitions');
   await waitForStage(page);
+  await expect(page.locator('.field')).toHaveClass(/has-webgl/);
+  await page.bringToFront();
   await page.getByRole('button', { name: 'Open menu' }).click();
+  await expect(page.locator('[data-menu-media]')).toHaveCSS('clip-path', /^inset\(0%(?: 0%){0,3}\)$/);
   await page.getByRole('dialog').getByRole('link', { name: 'Contact' }).click();
   await expect(page).toHaveURL(/\/contact\/$/);
   await expect
