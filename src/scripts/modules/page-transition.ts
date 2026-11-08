@@ -27,6 +27,7 @@ export function initPageTransitions(panel: HTMLElement): Cleanup {
   const uncover = (): void => {
     if (disposed) return;
     root.classList.remove('is-uncovering');
+    markStageReady();
     unlock?.();
     unlock = undefined;
   };
@@ -39,7 +40,7 @@ export function initPageTransitions(panel: HTMLElement): Cleanup {
       requestAnimationFrame(() => {
         if (disposed) return;
         root.classList.replace('is-arriving', 'is-uncovering');
-        timers.push(window.setTimeout(markStageReady, 150), window.setTimeout(uncover, 850));
+        timers.push(window.setTimeout(uncover, 850));
       });
     });
   } else {

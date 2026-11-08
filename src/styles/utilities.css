@@ -32,13 +32,21 @@
   padding-inline: var(--gutter);
 }
 
+[data-scramble] {
+  display: inline-block;
+  overflow: hidden;
+  white-space: nowrap;
+}
+
 /* Text revealed line by line. Without script, or with reduced motion, it is simply shown. */
-.js [data-reveal='lines'] {
+.js [data-reveal='lines'],
+.js [data-scroll-rise] {
   visibility: hidden;
 }
 
 .js [data-reveal='lines'].is-split,
-.js [data-reveal='lines'].is-done {
+.js [data-reveal='lines'].is-done,
+.js [data-scroll-rise].is-split {
   visibility: visible;
 }
 
@@ -55,9 +63,6 @@
 .js [data-reveal='fade'] {
   opacity: 0;
   transform: translate3d(0, 1.25rem, 0);
-  transition:
-    opacity 0.9s var(--ease-out),
-    transform 0.9s var(--ease-out);
 }
 
 .js [data-reveal='fade'].is-done {
@@ -66,7 +71,8 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .js [data-reveal='lines'] {
+  .js [data-reveal='lines'],
+  .js [data-scroll-rise] {
     visibility: visible;
   }
 

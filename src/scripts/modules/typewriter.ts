@@ -12,6 +12,7 @@ export function initTypewriter(element: HTMLElement): Cleanup {
   void whenStageReady().then(() => {
     if (disposed) return;
     output.textContent = '';
+    element.classList.add('is-typing');
     typed = new Typed(output, {
       strings: words,
       typeSpeed: 70,

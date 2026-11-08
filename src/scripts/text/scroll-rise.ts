@@ -1,6 +1,7 @@
 import { SplitText } from 'gsap/SplitText';
 import { gsap } from '@/scripts/core/gsap';
 import { fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
+import { whenStageReady } from '@/scripts/core/stage';
 
 gsap.registerPlugin(SplitText);
 
@@ -8,7 +9,7 @@ gsap.registerPlugin(SplitText);
 export async function initScrollRise(scope: ParentNode = document): Promise<Cleanup> {
   if (reducedMotion()) return () => undefined;
   const groups = [...scope.querySelectorAll<HTMLElement>('[data-scroll-rise]')];
-  await fontsReady();
+  await Promise.all([fontsReady(), whenStageReady()]);
   const splits = groups.map((group) => {
     const paragraphs = [...group.querySelectorAll<HTMLElement>('p')];
     return SplitText.create(paragraphs.length ? paragraphs : group, {
@@ -19,6 +20,9 @@ export async function initScrollRise(scope: ParentNode = document): Promise<Clea
       autoSplit: true,
       ignore: '[data-inline-pic]',
       onSplit(self) {
+        // Initialize every row together; staggered tweens otherwise leave future rows visible.
+        gsap.set(self.lines, { yPercent: 115, opacity: 0 });
+        group.classList.add('is-split');
         const stagger = self.lines.length > 1 ? 0.32 / (self.lines.length - 1) : 0;
         return gsap
           .timeline({
@@ -30,17 +34,13 @@ export async function initScrollRise(scope: ParentNode = document): Promise<Clea
               invalidateOnRefresh: true,
             },
           })
-          .fromTo(
-            self.lines,
-            { yPercent: 115 },
-            {
-              yPercent: 0,
-              duration: 0.68,
-              stagger,
-              ease: 'power3.out',
-            },
-          )
-          .fromTo(self.lines, { opacity: 0 }, { opacity: 1, duration: 0.45, stagger, ease: 'power3.out' }, 0);
+          .to(self.lines, {
+            yPercent: 0,
+            duration: 0.68,
+            stagger,
+            ease: 'power2.out',
+          })
+          .to(self.lines, { opacity: 1, duration: 0.45, stagger, ease: 'power2.out' }, 0);
       },
     });
   });

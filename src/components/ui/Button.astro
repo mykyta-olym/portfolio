@@ -52,21 +52,21 @@ const { href, variant = 'light', external = false, class: className, hoverText }
     white-space: nowrap;
     overflow: hidden;
     transition:
-      background-color 0.3s var(--ease-button),
-      color 0.3s var(--ease-button),
-      border-color 0.3s var(--ease-button);
+      background-color 0.45s var(--ease-out),
+      color 0.45s var(--ease-out),
+      border-color 0.45s var(--ease-out);
   }
 
   .button__label {
     display: block;
     transform: translate3d(-10px, 0, 0);
-    transition: transform 0.3s var(--ease-button);
+    transition: transform 0.45s var(--ease-out);
   }
 
   .button :global(.button__icon) {
     flex: none;
     transform: translate3d(-10px, 0, 0);
-    transition: transform 0.3s var(--ease-button);
+    transition: transform 0.45s var(--ease-out);
   }
   .button__text {
     position: relative;

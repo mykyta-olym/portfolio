@@ -9,6 +9,7 @@ interface Props {
 
 const { context } = Astro.props;
 const phrase = pillPhrases[context];
+const wordWidth = Math.max(...phrase.words.map((word) => word.length));
 ---
 
 <header class="nav" data-nav>
@@ -18,7 +19,9 @@ const phrase = pillPhrases[context];
     </a>
     <p class="nav__phrase" data-module="typewriter" data-words={JSON.stringify(phrase.words.map((w) => w.toUpperCase()))}>
       {phrase.prefix && <span class="nav__prefix">{phrase.prefix.toUpperCase()}&nbsp;</span>}
-      <span data-typewriter-text>{phrase.words[0]?.toUpperCase()}</span>
+      <span class="nav__typing" style={`--type-width:${wordWidth}`}>
+        <span data-typewriter-text>{phrase.words[0]?.toUpperCase()}</span>
+      </span>
     </p>
     <button class="nav__toggle" type="button" data-menu-toggle aria-expanded="false" aria-controls="site-menu">
       <span class="visually-hidden">Open menu</span>
@@ -110,6 +113,18 @@ const phrase = pillPhrases[context];
     flex: none;
   }
 
+  .nav__typing {
+    display: inline-block;
+    flex: none;
+    width: calc(var(--type-width) * (1ch + 0.15em) + 0.5rem);
+    text-align: left;
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    :global(.js) .nav__phrase:not(:global(.is-typing)) [data-typewriter-text] {
+      visibility: hidden;
+    }
+  }
+
   .nav__lines {
     display: grid;
     gap: 2px;
@@ -141,6 +156,12 @@ const phrase = pillPhrases[context];
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .nav__typing {
+      width: auto;
+    }
+    :global(.js) .nav__phrase [data-typewriter-text] {
+      visibility: visible;
+    }
     .nav__phrase :global(.typed-cursor) {
       animation: none;
     }

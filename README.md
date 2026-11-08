@@ -44,6 +44,10 @@ sequence. Navigation, social links and calls to action have contextual hover lab
 buttons reveal the actual photo in colour. Back to top uses an interruptible eased scroll and
 only moves keyboard focus after arrival.
 
+Text waits for fonts and the loading or navigation cover to leave before starting.
+GSAP owns both line and fade reveals at the same viewport threshold; completed headings
+stay visible after reflow, and navigation typing reserves its width while the cursor moves.
+
 ## Existing solutions and application code
 
 | Interaction                               | Implementation                                                                             |

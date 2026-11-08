@@ -61,14 +61,15 @@ function start(): void {
   if (loader) startPreloader(loader);
   const cover = document.querySelector<HTMLElement>('[data-page-cover]');
   if (cover) cleanups.push(initPageTransitions(cover));
-  cleanups.push(initAwayTitle(), initFadeReveals(), initScramble());
-  void initLineReveals().then((cleanup) => cleanups.push(cleanup));
-  void initScrollRise().then((cleanup) => cleanups.push(cleanup));
-  void mountModules().then(() => {
-    // Pinned sections change the page height; recalculate once everything is mounted.
-    ScrollTrigger.refresh();
-    document.documentElement.dataset['modules'] = 'ready';
-  });
+  cleanups.push(initAwayTitle());
+  void Promise.all([Promise.all([initLineReveals(), initFadeReveals(), initScrollRise(), initScramble()]), mountModules()]).then(
+    ([textCleanups]) => {
+      cleanups.push(...textCleanups);
+      // Pinned sections change the page height; recalculate once everything is mounted.
+      ScrollTrigger.refresh();
+      document.documentElement.dataset['modules'] = 'ready';
+    },
+  );
 }
 
 window.addEventListener('pagehide', (event) => {

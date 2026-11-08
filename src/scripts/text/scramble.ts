@@ -1,6 +1,7 @@
 // Small uppercase labels decode from random characters when they come into view. A group
 // replays only after it has fully left the screen, and not more often than every 1.5 s.
-import { reducedMotion, type Cleanup } from '@/scripts/core/motion';
+import { fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
+import { whenStageReady } from '@/scripts/core/stage';
 import { gsap } from '@/scripts/core/gsap';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
 
@@ -17,15 +18,18 @@ export function scrambleText(element: HTMLElement, delay = 0): void {
   gsap.to(element, {
     duration: DURATION / 1000,
     delay: delay / 1000,
-    scrambleText: { text: finalText, chars: CHARACTERS, speed: 0.6 },
+    scrambleText: { text: finalText, chars: CHARACTERS, speed: 0.6, tweenLength: false },
     ease: 'none',
     overwrite: true,
   });
 }
 
-export function initScramble(scope: ParentNode = document): Cleanup {
+export async function initScramble(scope: ParentNode = document): Promise<Cleanup> {
   const groups = [...scope.querySelectorAll<HTMLElement>('[data-scramble-group]')];
   if (groups.length === 0 || reducedMotion()) return () => undefined;
+  await Promise.all([fontsReady(), whenStageReady()]);
+  const labels = [...scope.querySelectorAll<HTMLElement>('[data-scramble]')];
+  gsap.set(labels, { width: (_i, element: HTMLElement) => element.getBoundingClientRect().width });
   const state = new Map(groups.map((group) => [group, { armed: true, last: -Infinity }]));
 
   const trigger = new IntersectionObserver(
@@ -57,5 +61,6 @@ export function initScramble(scope: ParentNode = document): Cleanup {
     trigger.disconnect();
     rearm.disconnect();
     groups.forEach((group) => gsap.killTweensOf(group.querySelectorAll('[data-scramble]')));
+    gsap.set(labels, { clearProps: 'width' });
   };
 }

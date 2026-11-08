@@ -132,11 +132,11 @@ export function startPreloader(root: HTMLElement): void {
     leaving = true;
     const finish = (): void => {
       root.remove();
+      markStageReady();
       unlock();
     };
-    // The page underneath starts its entrance while the cover is lifting.
+    // Text and navigation typing share the moment the cover has actually left.
     window.setTimeout(() => root.classList.add('is-leaving'), reduce ? 0 : 90);
-    window.setTimeout(markStageReady, reduce ? 0 : 370);
     root.addEventListener('transitionend', finish, { once: true });
     window.setTimeout(finish, 1400);
   };
