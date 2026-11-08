@@ -87,10 +87,16 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
         .set(cards, { transformOrigin: `center ${lift}px` })
         .to(cards, { y: -lift, duration: 0.5, ease: 'power1.out' })
         .to(cards, { rotation: (i) => (i * 360) / count, rotateY: 15, duration: 1, ease: 'power1.out' }, '<')
-        .set(cards, { transformOrigin: 'center center' })
-        .to(cards, { ...positions, rotation: 0, rotateY: 0, duration: 1.2, ease: 'power3.inOut' });
-      if (heading) timeline.fromTo(heading, { opacity: 0, filter: 'blur(40px)' }, { opacity: 1, filter: 'blur(0px)', duration: 1 }, '<');
-    } else gsap.set(cards, positions);
+        .addLabel('spread')
+        .to(cards, { ...positions, rotation: 0, rotateY: 0, duration: 1.2, ease: 'power3.inOut' })
+        // Reset the pivot only in the flat pose, where it cannot move a card.
+        .set(cards, { transformOrigin: 'center center' });
+      if (heading)
+        timeline.fromTo(heading, { opacity: 0, filter: 'blur(40px)' }, { opacity: 1, filter: 'blur(0px)', duration: 1 }, 'spread');
+    } else {
+      gsap.set(cards, positions);
+      if (heading) gsap.set(heading, { opacity: 1, filter: 'blur(0px)' });
+    }
     timeline.add(() => {
       interactive = true;
       ring.inert = false;
