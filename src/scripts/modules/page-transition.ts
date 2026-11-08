@@ -78,6 +78,8 @@ export function initPageTransitions(panel: HTMLElement): Cleanup {
   };
   const onPageShow = (event: PageTransitionEvent): void => {
     if (!event.persisted) return;
+    timers.forEach(clearTimeout);
+    timers.length = 0;
     leaving = false;
     root.classList.remove('is-departing', 'is-arriving', 'is-uncovering');
     uncover();
