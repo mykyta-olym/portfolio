@@ -32,7 +32,7 @@ const link = projectHref(project.slug);
   </div>
   <div class="row__gallery" data-reveal="fade" data-reveal-delay="0.12">
     <div class="row__strip swiper" data-module="drag-scroll" tabindex="0" role="region" aria-label={`${project.name} images`}>
-      <ul class="row__images swiper-wrapper">
+      <ul class="row__images swiper-wrapper" tabindex="0" aria-label={`${project.name} slides`}>
         {project.strip.map((item) => (
           <li class="row__image swiper-slide" style={`--image-ratio: ${item.src.width} / ${item.src.height}`}>
             <Image
