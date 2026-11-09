@@ -88,8 +88,13 @@ const tiles = fieldTiles.map((image, index) => {
     visibility: hidden;
   }
 
-  :global(.js) .field:not(:global(.is-static)) .field__tiles {
-    visibility: hidden;
+  .field:global(.is-static) {
+    cursor: auto;
+  }
+
+  .field:global(.is-static) .field__hint,
+  :global(.no-js) .field__hint {
+    display: none;
   }
 
   .field :global(canvas[data-field-canvas]) {

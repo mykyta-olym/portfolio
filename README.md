@@ -50,6 +50,12 @@ stay visible after reflow, and navigation typing reserves its width while the cu
 Entrance easing has a short finish; scroll-linked text and the picture frame use only a
 120 ms catch-up. Hover labels share a 240 ms CSS transition that reverses from its current
 position, and process cards finish their return flip before the orbit resumes.
+
+Touch layouts use short paragraph entrances instead of scrubbed line masks; text stays readable
+after scrolling back. The six process cards appear within 0.8 s without the desktop's large
+stacked flips. Phone project strips show the next image's edge, with a larger case-study link.
+The phone showcase reveals its heading on entry and uses a shorter sticky section. About keeps
+its HTML photographs visible while textures load and falls back to them after a GPU context loss.
 Astro's built-in hover prefetch warms internal pages. The navigation pill expands into one
 opaque black menu panel; its contents keep their layout throughout opening and closing.
 The background stays in place and becomes inert until closing finishes. Overlay scroll locks

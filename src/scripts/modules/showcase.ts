@@ -14,14 +14,29 @@ export function initShowcase(section: HTMLElement): Cleanup {
   }
   const media = gsap.matchMedia();
   media.add(
-    { desktop: '(min-width: 1024px)', tablet: '(min-width: 768px) and (max-width: 1023.98px)', phone: '(max-width: 767.98px)' },
+    {
+      desktop: '(min-width: 1024px) and (min-height: 641px)',
+      tablet: '(min-width: 768px) and (max-width: 1023.98px) and (min-height: 641px)',
+      phone: '(max-width: 767.98px), (max-height: 640px)',
+    },
     (context) => {
-      const { desktop, tablet } = context.conditions ?? {};
-      const scale = desktop ? 0.6 : tablet ? 0.7 : 0.62;
-      const timeline = gsap
-        .timeline()
-        .fromTo(frame, { scale: 1 }, { scale, ease: 'none' })
-        .fromTo(content, { y: 90, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.3, ease: 'none' });
+      const { desktop, tablet, phone } = context.conditions ?? {};
+      const scale = desktop ? 0.6 : tablet ? 0.7 : 0.92;
+      const timeline = gsap.timeline().fromTo(frame, { scale: 1 }, { scale, ease: 'none' });
+      if (phone) {
+        gsap.fromTo(
+          content,
+          { y: 18, opacity: 0 },
+          {
+            y: 0,
+            opacity: 1,
+            duration: 0.5,
+            stagger: 0.06,
+            ease: 'power1.out',
+            scrollTrigger: { trigger: section, start: 'top 80%', once: true },
+          },
+        );
+      } else timeline.fromTo(content, { y: 90, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.3, ease: 'none' });
       const trigger = ScrollTrigger.create({
         trigger: section,
         animation: timeline,

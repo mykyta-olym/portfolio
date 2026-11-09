@@ -181,6 +181,31 @@ test('image strips scroll sideways by dragging without opening the project', asy
   await expect(page).toHaveURL(/\/work\/$/);
 });
 
+test('about photographs remain visible during texture loading and after a GPU context loss', async ({ page }) => {
+  let release = (): void => undefined;
+  const pending = new Promise<void>((resolve) => (release = resolve));
+  await page.route('**/assets/workstation*.webp', async (route) => {
+    await pending;
+    await route.continue();
+  });
+  try {
+    await page.goto('about/', { waitUntil: 'domcontentloaded' });
+    await waitForStage(page);
+    const photograph = page.locator('[data-field-tile] img').first();
+    await expect.poll(() => photograph.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
+    await expect(photograph).toBeVisible();
+  } finally {
+    release();
+  }
+  await expect(page.locator('.field')).toHaveClass(/has-webgl/);
+  await page.locator('[data-field-canvas]').evaluate((canvas: HTMLCanvasElement) => {
+    canvas.getContext('webgl2')?.getExtension('WEBGL_lose_context')?.loseContext();
+  });
+  await expect(page.locator('.field')).toHaveClass(/is-static/);
+  await expect(page.locator('[data-field-canvas]')).toBeHidden();
+  await expect(page.locator('[data-field-tile] img').first()).toBeVisible();
+});
+
 test('the about field moves when dragged', async ({ page, isMobile }) => {
   test.skip(isMobile, 'mouse dragging is a desktop interaction');
   await page.goto('about/');
@@ -247,7 +272,7 @@ test('project images enlarge, cycle with arrow keys and restore focus on close',
   await expect(page.locator('html')).not.toHaveClass(/is-locked/);
 });
 
-test('scroll text reflows during a reveal and returns intact after reverse scrolling', async ({ page }) => {
+test('scroll text reflows during a reveal and returns intact after reverse scrolling', async ({ page, isMobile }) => {
   await page.goto('./');
   await waitForStage(page);
   const text = page.locator('.statement__text');
@@ -268,16 +293,12 @@ test('scroll text reflows during a reveal and returns intact after reverse scrol
   );
   await expect(text.locator('[data-inline-pic]')).toHaveCount(2);
   expect(await text.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
-  expect(
-    await text.locator('.rise-line').evaluateAll((lines) => lines.every((line) => Number(getComputedStyle(line).opacity) > 0.99)),
-  ).toBe(true);
+  const visibleText = isMobile ? paragraphs : text.locator('.rise-line');
+  expect(await visibleText.evaluateAll((lines) => lines.every((line) => Number(getComputedStyle(line).opacity) > 0.99))).toBe(true);
   const freshTop = await text.evaluate((element) => element.getBoundingClientRect().top + window.scrollY);
   await page.evaluate((y) => window.scrollTo(0, y - innerHeight * 0.83), freshTop);
   await page.waitForTimeout(450);
-  expect(
-    await text
-      .locator('.rise-line')
-      .first()
-      .evaluate((line) => Number(getComputedStyle(line).opacity)),
-  ).toBeLessThan(0.5);
+  const firstOpacity = await visibleText.first().evaluate((line) => Number(getComputedStyle(line).opacity));
+  if (isMobile) expect(firstOpacity).toBeGreaterThan(0.99);
+  else expect(firstOpacity).toBeLessThan(0.5);
 });

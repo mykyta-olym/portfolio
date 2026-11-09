@@ -53,6 +53,7 @@ export function initDragField(field: HTMLElement): Cleanup {
     gridH = 1,
     radius = 1;
   let disposed = false,
+    failed = false,
     visible = true,
     frame = 0,
     previous = 0;
@@ -132,7 +133,7 @@ export function initDragField(field: HTMLElement): Cleanup {
     frame = moving && visible && !document.hidden ? requestAnimationFrame(render) : 0;
   };
   const kick = (): void => {
-    if (!frame && visible && !document.hidden && !disposed && planes.length) {
+    if (!frame && visible && !document.hidden && !disposed && !failed && planes.length) {
       previous = 0;
       frame = requestAnimationFrame(render);
     }
@@ -141,6 +142,17 @@ export function initDragField(field: HTMLElement): Cleanup {
     cancelAnimationFrame(frame);
     frame = 0;
   };
+  // A mobile GPU may reclaim the context while the tab is backgrounded.
+  // Keep the decoded HTML photographs instead of leaving a blank canvas.
+  const onContextLost = (): void => {
+    failed = true;
+    stop();
+    canvas.hidden = true;
+    field.classList.remove('has-webgl');
+    field.classList.add('is-static');
+    field.removeAttribute('data-cursor');
+  };
+  canvas.addEventListener('webglcontextlost', onContextLost);
   // A detached proxy lets Draggable own pointer capture and inertia without moving the canvas.
   const proxy = document.createElement('div');
   const syncDrag = function (this: Draggable): void {
@@ -195,7 +207,7 @@ export function initDragField(field: HTMLElement): Cleanup {
   const loader = new TextureLoader();
   void Promise.all(images.map((image) => loader.loadAsync(image.currentSrc || image.src)))
     .then((textures) => {
-      if (disposed) {
+      if (disposed || failed) {
         textures.forEach((texture) => texture.dispose());
         return;
       }
@@ -210,6 +222,7 @@ export function initDragField(field: HTMLElement): Cleanup {
       field.classList.add('has-webgl');
     })
     .catch(() => {
+      failed = true;
       canvas.remove();
       field.classList.add('is-static');
     });
@@ -222,6 +235,7 @@ export function initDragField(field: HTMLElement): Cleanup {
     drag?.tween?.kill();
     drag?.kill();
     document.removeEventListener('visibilitychange', onVisibility);
+    canvas.removeEventListener('webglcontextlost', onContextLost);
     planes.forEach((plane) => {
       plane.geometry.dispose();
       plane.material.map?.dispose();

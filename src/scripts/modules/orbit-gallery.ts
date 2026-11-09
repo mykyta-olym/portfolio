@@ -1,7 +1,7 @@
 // Keep the source's stacked entrance and fan-out. The two-sided cards explain a
 // working process, stay upright while orbiting and pause for reading.
 import { gsap, ScrollTrigger } from '@/scripts/core/gsap';
-import { reducedMotion, type Cleanup } from '@/scripts/core/motion';
+import { coarsePointer, reducedMotion, type Cleanup } from '@/scripts/core/motion';
 
 export function initOrbitGallery(section: HTMLElement): Cleanup {
   const ring = section.querySelector<HTMLElement>('[data-orbit-ring]');
@@ -9,6 +9,7 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
   const heading = section.querySelector<HTMLElement>('[data-orbit-heading]');
   if (!ring || !cards.length) return () => undefined;
   const reduce = reducedMotion();
+  const hover = window.matchMedia('(hover: hover) and (pointer: fine)');
   let timeline: gsap.core.Timeline | null = null;
   let spin: gsap.core.Tween | null = null;
   let visible = false;
@@ -43,14 +44,12 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
   };
 
   const updatePlayback = (): void => {
-    const reading = cards.some((card) => card.matches(':hover, :focus-visible') || card.getAttribute('aria-expanded') === 'true');
-    // Keep a card still until its return flip ends, including interrupted hover reversals.
-    const turning = cards.some((card) =>
-      card
-        .querySelector('.orbit__flip')
-        ?.getAnimations()
-        .some((animation) => animation.playState === 'running'),
+    const reading = cards.some(
+      (card) =>
+        card.matches(':focus-visible') || (hover.matches && card.matches(':hover')) || card.getAttribute('aria-expanded') === 'true',
     );
+    // Include touch face fades and size changes, as well as desktop return flips.
+    const turning = cards.some((card) => card.getAnimations({ subtree: true }).some((animation) => animation.playState === 'running'));
     spin?.paused(!visible || reading || turning || document.hidden);
     timeline?.paused(!visible || document.hidden);
   };
@@ -79,7 +78,8 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
     gsap.set([ring, ...cards], { clearProps: 'all' });
     const count = cards.length;
     const height = section.querySelector<HTMLElement>('.orbit__stage')?.clientHeight ?? window.innerHeight;
-    const radius = Math.min(window.innerWidth * 0.32, height * 0.32, 390);
+    const compact = coarsePointer() || window.innerWidth < 768;
+    const radius = Math.min(window.innerWidth * (compact ? 0.36 : 0.32), height * 0.32, 390);
     const positions = {
       x: (i: number) => radius * Math.cos((i * Math.PI * 2) / count - Math.PI / 3),
       y: (i: number) => radius * Math.sin((i * Math.PI * 2) / count - Math.PI / 3),
@@ -87,7 +87,15 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
     cards.forEach((card, i) => resting.set(card, { x: positions.x(i), y: positions.y(i) }));
     gsap.set(cards, { opacity: 1, x: 0, y: 0, rotateX: 0, rotation: 0, scale: 1, transformOrigin: 'center center' });
     timeline = gsap.timeline();
-    if (animate) {
+    if (animate && compact) {
+      // Touch scrolling needs the six stages ready within one gesture, without giant flips.
+      timeline.fromTo(
+        cards,
+        { x: positions.x, y: (i) => positions.y(i) + 24, scale: 0.9, opacity: 0 },
+        { ...positions, scale: 1, opacity: 1, duration: 0.5, stagger: 0.06, ease: 'power1.out' },
+      );
+      if (heading) timeline.fromTo(heading, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power1.out' }, 0.08);
+    } else if (animate) {
       const lift = 50 + (cards[0]?.offsetHeight ?? 120) / 2;
       timeline
         .from(cards, { y: window.innerHeight / 2 + 200, rotateX: -180, scale: 3, duration: 0.5, stagger: 0.1, ease: 'power1.out' })

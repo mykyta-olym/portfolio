@@ -35,7 +35,7 @@ test('keeps keyboard focus inside while open', async ({ page, isMobile }) => {
   }
 });
 
-test('closes with the close button and the backdrop, and survives fast toggling', async ({ page }) => {
+test('closes with the close button and the backdrop, and survives fast toggling', async ({ page, isMobile }) => {
   const toggle = page.locator('[data-menu-toggle]');
   const dialog = page.getByRole('dialog', { name: 'Site menu' });
   await toggle.click();
@@ -44,9 +44,14 @@ test('closes with the close button and the backdrop, and survives fast toggling'
   await toggle.click();
   await page.mouse.click(10, 400);
   await expect(dialog).toBeHidden();
-  const visibleControl = page.locator('.nav:not(.is-menu-active) [data-menu-toggle], .menu:not([hidden]) [data-menu-close]');
+  // Both controls occupy this point. Keep tapping it while one replaces the other.
+  const box = await toggle.boundingBox();
+  if (!box) throw new Error('The menu toggle must have a visible box');
+  const x = box.x + box.width / 2;
+  const y = box.y + box.height / 2;
   for (let i = 0; i < 6; i += 1) {
-    await visibleControl.click({ force: true });
+    if (isMobile) await page.touchscreen.tap(x, y);
+    else await page.mouse.click(x, y);
     await page.waitForTimeout(60);
   }
   await expect(dialog).toBeHidden();

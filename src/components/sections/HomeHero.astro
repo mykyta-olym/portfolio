@@ -168,4 +168,14 @@ const portrait = '(max-aspect-ratio: 3/4)';
       max-width: 22rem;
     }
   }
+
+  @media (max-height: 640px) and (min-width: 640px) {
+    .hero {
+      height: 100svh;
+      min-height: 0;
+    }
+    .hero__main {
+      bottom: 6svh;
+    }
+  }
 </style>

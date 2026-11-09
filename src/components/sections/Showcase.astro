@@ -27,7 +27,7 @@ import showcase from '@/assets/renders/showcase.webp';
 </section>
 
 <style>
-  /* Twice the viewport tall: the frame sticks for one viewport of scrolling while it shrinks.
+  /* Desktop: the frame sticks for one viewport of scrolling while it shrinks.
      Sticky positioning keeps the layout still, so the pin causes no layout shift. */
   .showcase {
     position: relative;
@@ -98,6 +98,20 @@ import showcase from '@/assets/renders/showcase.webp';
     border-radius: 4px;
   }
 
+  @media (max-width: 767px), (max-height: 640px) {
+    .showcase {
+      height: 145svh;
+    }
+    .showcase__wrapper {
+      height: 100svh;
+    }
+    .showcase__content {
+      padding-top: 5.5rem;
+    }
+    .showcase:global(.is-static) {
+      height: auto;
+    }
+  }
   @media (max-width: 767px) {
     .showcase__frame :global(.showcase__image) {
       /* Keep the complete laptop screen inside the portrait frame. Only the empty

@@ -126,7 +126,11 @@ import { disciplines } from '@/data/disciplines';
   }
 
   @media (max-width: 1023px) {
+    .disciplines {
+      height: calc(100svh + var(--count) * 30svh);
+    }
     .disciplines__sticky {
+      height: 100svh;
       grid-template-columns: 1fr;
       grid-template-rows: auto auto auto;
       align-content: center;

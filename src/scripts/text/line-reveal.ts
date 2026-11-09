@@ -1,6 +1,6 @@
 import { SplitText } from 'gsap/SplitText';
 import { gsap, ScrollTrigger } from '@/scripts/core/gsap';
-import { fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
+import { coarsePointer, fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
 import { whenStageReady } from '@/scripts/core/stage';
 
 gsap.registerPlugin(SplitText);
@@ -30,15 +30,16 @@ export async function initLineReveals(scope: ParentNode = document): Promise<Cle
         currentTween = null;
       },
       onSplit(self) {
+        const compact = coarsePointer() || window.innerWidth < 768;
         element.classList.add('is-split');
         if (element.classList.contains('is-done')) return gsap.set(self.lines, { yPercent: 0 });
         gsap.set(self.lines, { yPercent: 110 });
         const tween = gsap.to(self.lines, {
           yPercent: 0,
-          duration: 0.78,
+          duration: compact ? 0.5 : 0.78,
           ease: 'power1.out',
-          stagger: 0.06,
-          delay: Number(element.dataset['revealDelay'] ?? 0),
+          stagger: compact ? 0.035 : 0.06,
+          delay: Math.min(Number(element.dataset['revealDelay'] ?? 0), compact ? 0.15 : Infinity),
           paused: !played,
           onComplete: () => element.classList.add('is-done'),
         });
