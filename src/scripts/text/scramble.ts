@@ -27,7 +27,8 @@ export function scrambleText(element: HTMLElement, delay = 0): void {
 export async function initScramble(scope: ParentNode = document): Promise<Cleanup> {
   const groups = [...scope.querySelectorAll<HTMLElement>('[data-scramble-group]')];
   if (groups.length === 0 || reducedMotion()) return () => undefined;
-  await Promise.all([fontsReady(), whenStageReady()]);
+  await fontsReady();
+  let disposed = false;
   const labels = [...scope.querySelectorAll<HTMLElement>('[data-scramble]')];
   gsap.set(labels, { width: (_i, element: HTMLElement) => element.getBoundingClientRect().width });
   const state = new Map(groups.map((group) => [group, { armed: true, last: -Infinity }]));
@@ -42,7 +43,10 @@ export async function initScramble(scope: ParentNode = document): Promise<Cleanu
         if (now - current.last < COOLDOWN) continue;
         current.armed = false;
         current.last = now;
-        group.querySelectorAll<HTMLElement>('[data-scramble]').forEach((label, index) => scrambleText(label, index * STAGGER));
+        void whenStageReady().then(() => {
+          if (!disposed)
+            group.querySelectorAll<HTMLElement>('[data-scramble]').forEach((label, index) => scrambleText(label, index * STAGGER));
+        });
       }
     },
     { rootMargin: '0px 0px -10% 0px' },
@@ -59,6 +63,7 @@ export async function initScramble(scope: ParentNode = document): Promise<Cleanu
     rearm.observe(group);
   });
   return () => {
+    disposed = true;
     trigger.disconnect();
     rearm.disconnect();
     groups.forEach((group) => gsap.killTweensOf(group.querySelectorAll('[data-scramble]')));

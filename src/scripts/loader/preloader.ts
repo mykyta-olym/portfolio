@@ -57,7 +57,7 @@ function trackImage(progress: LoadProgress, name: string, image: HTMLImageElemen
   }
 }
 
-export function startPreloader(root: HTMLElement): void {
+export function startPreloader(root: HTMLElement, prepared: Promise<unknown> = Promise.resolve()): void {
   // Internal navigation has its own transition. Do not replay the initial-load sequence.
   if (document.documentElement.classList.contains('is-internal-navigation')) {
     root.remove();
@@ -84,6 +84,10 @@ export function startPreloader(root: HTMLElement): void {
   let currentDigit = digits.querySelector<HTMLElement>('[data-digit]');
   let counterAnimations: Animation[] = [];
   let leaving = false;
+  let layoutReady = false;
+  void prepared.then(() => {
+    layoutReady = true;
+  });
   const started = performance.now();
   mark.draw(loaderStages[0] ?? [], loaderStages[0] ?? [], 1);
 
@@ -135,8 +139,9 @@ export function startPreloader(root: HTMLElement): void {
       markStageReady();
       unlock();
     };
-    // Text and navigation typing share the moment the cover has actually left.
     window.setTimeout(() => root.classList.add('is-leaving'), reduce ? 0 : 90);
+    // Entrances begin while the loader slides away, so the hero rises as it is uncovered.
+    window.setTimeout(markStageReady, reduce ? 0 : 330);
     root.addEventListener('transitionend', finish, { once: true });
     window.setTimeout(finish, 1400);
   };
@@ -158,7 +163,7 @@ export function startPreloader(root: HTMLElement): void {
       const final = loaderStages.at(-1) ?? [];
       mark.draw(final, final, 1);
     }
-    if ((progress.complete && elapsed >= minimum) || elapsed >= MAX_WAIT_MS) {
+    if ((progress.complete && layoutReady && elapsed >= minimum) || elapsed >= MAX_WAIT_MS) {
       leave();
       return;
     }

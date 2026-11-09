@@ -1,6 +1,7 @@
 // Coordinates when the page is "on stage": after the home loader or the page transition has
 // uncovered it. Entrance animations wait for this so they never play behind a cover.
-import { gsap } from '@/scripts/core/gsap';
+import { gsap, ScrollTrigger } from '@/scripts/core/gsap';
+import type { Cleanup } from '@/scripts/core/motion';
 
 const READY_EVENT = 'stage:ready';
 let ready = false;
@@ -19,6 +20,35 @@ export function whenStageReady(): Promise<void> {
 
 export function isStageReady(): boolean {
   return ready;
+}
+
+/**
+ * Everything on the first screen enters with the page, including content near its bottom edge.
+ * Further down, an entrance waits until its element has scrolled a little into view.
+ */
+export function entranceStart(element: Element, start = 'top 92%'): () => string {
+  return () => (element.getBoundingClientRect().top + window.scrollY < window.innerHeight ? 'top bottom' : start);
+}
+
+/** Prepare an entrance now; play it only when both its section and the page are visible. */
+export function playOnStage(element: Element, animation: gsap.core.Animation, start = 'top 92%'): Cleanup {
+  let disposed = false;
+  animation.pause();
+  const trigger = ScrollTrigger.create({
+    trigger: element,
+    start: entranceStart(element, start),
+    once: true,
+    onEnter: () => {
+      void whenStageReady().then(() => {
+        if (!disposed) animation.play();
+      });
+    },
+  });
+  return () => {
+    disposed = true;
+    trigger.kill();
+    animation.kill();
+  };
 }
 
 /** Locks scrolling while something covers the page. Counted, so overlaps unlock correctly. */

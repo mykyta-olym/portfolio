@@ -9,6 +9,7 @@ import { initFadeReveals, initLineReveals } from '@/scripts/text/line-reveal';
 import { initScramble } from '@/scripts/text/scramble';
 import { initScrollRise } from '@/scripts/text/scroll-rise';
 import { initMenu } from '@/scripts/modules/menu';
+import { whenStageReady } from '@/scripts/core/stage';
 
 type Init = (element: HTMLElement) => Cleanup;
 
@@ -57,19 +58,26 @@ async function mountModules(): Promise<void> {
 }
 
 function start(): void {
-  const loader = document.querySelector<HTMLElement>('[data-preloader]');
-  if (loader) startPreloader(loader);
-  const cover = document.querySelector<HTMLElement>('[data-page-cover]');
-  if (cover) cleanups.push(initPageTransitions(cover));
   cleanups.push(initAwayTitle());
-  void Promise.all([Promise.all([initLineReveals(), initFadeReveals(), initScrollRise(), initScramble()]), mountModules()]).then(
-    ([textCleanups]) => {
+  // Fonts, line measurements and section layout settle under the transition cover.
+  const prepared = Promise.all([Promise.all([initLineReveals(), initFadeReveals(), initScrollRise(), initScramble()]), mountModules()])
+    .then(([textCleanups]) => {
       cleanups.push(...textCleanups);
       // Pinned sections change the page height; recalculate once everything is mounted.
       ScrollTrigger.refresh();
+      document.documentElement.dataset['prepared'] = 'ready';
+    })
+    // A failed text enhancement must never keep the loader or the page cover in place.
+    .catch((error: unknown) => console.error('Page preparation failed', error));
+  const loader = document.querySelector<HTMLElement>('[data-preloader]');
+  if (loader) startPreloader(loader, prepared);
+  const cover = document.querySelector<HTMLElement>('[data-page-cover]');
+  if (cover) cleanups.push(initPageTransitions(cover, prepared));
+  void prepared
+    .then(() => whenStageReady())
+    .then(() => {
       document.documentElement.dataset['modules'] = 'ready';
-    },
-  );
+    });
 }
 
 window.addEventListener('pagehide', (event) => {

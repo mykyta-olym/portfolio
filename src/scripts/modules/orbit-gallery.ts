@@ -2,6 +2,7 @@
 // working process, stay upright while orbiting and pause for reading.
 import { gsap, ScrollTrigger } from '@/scripts/core/gsap';
 import { coarsePointer, reducedMotion, type Cleanup } from '@/scripts/core/motion';
+import { whenStageReady } from '@/scripts/core/stage';
 
 export function initOrbitGallery(section: HTMLElement): Cleanup {
   const ring = section.querySelector<HTMLElement>('[data-orbit-ring]');
@@ -138,7 +139,16 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
     section.classList.add('is-static');
     build(false);
   }
-  const enter = reduce ? null : ScrollTrigger.create({ trigger: section, start: 'top 60%', once: true, onEnter: () => build() });
+  let disposed = false;
+  // A restored scroll position can place the section in view under the page cover.
+  const enter = reduce
+    ? null
+    : ScrollTrigger.create({
+        trigger: section,
+        start: 'top 60%',
+        once: true,
+        onEnter: () => void whenStageReady().then(() => !disposed && !built && build()),
+      });
   const visibility = ScrollTrigger.create({
     trigger: section,
     start: 'top bottom',
@@ -166,6 +176,7 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
   window.addEventListener('resize', onResize);
   document.addEventListener('visibilitychange', updatePlayback);
   return () => {
+    disposed = true;
     enter?.kill();
     visibility.kill();
     timeline?.kill();

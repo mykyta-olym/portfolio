@@ -22,7 +22,7 @@ const background = backgrounds[Astro.props.slug as keyof typeof backgrounds];
 ---
 
 {background && (
-  <div class="case-backdrop" aria-hidden="true">
+  <div class="case-backdrop" aria-hidden="true" data-reveal="fade" data-reveal-motion="opacity">
     <Image
       src={background.src}
       alt=""

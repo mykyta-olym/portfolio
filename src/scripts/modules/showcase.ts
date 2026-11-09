@@ -3,6 +3,7 @@
 // it follows the scroll in both directions without moving the layout.
 import { gsap, ScrollTrigger } from '@/scripts/core/gsap';
 import { reducedMotion, type Cleanup } from '@/scripts/core/motion';
+import { playOnStage } from '@/scripts/core/stage';
 
 export function initShowcase(section: HTMLElement): Cleanup {
   const frame = section.querySelector<HTMLElement>('[data-showcase-frame]');
@@ -23,18 +24,12 @@ export function initShowcase(section: HTMLElement): Cleanup {
       const { desktop, tablet, phone } = context.conditions ?? {};
       const scale = desktop ? 0.6 : tablet ? 0.7 : 0.92;
       const timeline = gsap.timeline().fromTo(frame, { scale: 1 }, { scale, ease: 'none' });
+      let entrance: (() => void) | undefined;
       if (phone) {
-        gsap.fromTo(
-          content,
-          { y: 18, opacity: 0 },
-          {
-            y: 0,
-            opacity: 1,
-            duration: 0.5,
-            stagger: 0.06,
-            ease: 'power1.out',
-            scrollTrigger: { trigger: section, start: 'top 80%', once: true },
-          },
+        entrance = playOnStage(
+          section,
+          gsap.fromTo(content, { y: 18, opacity: 0 }, { y: 0, opacity: 1, duration: 0.5, stagger: 0.06, ease: 'power1.out', paused: true }),
+          'top 80%',
         );
       } else timeline.fromTo(content, { y: 90, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.3, ease: 'none' });
       const trigger = ScrollTrigger.create({
@@ -45,6 +40,7 @@ export function initShowcase(section: HTMLElement): Cleanup {
         scrub: 0.12,
       });
       return () => {
+        entrance?.();
         trigger.kill();
         timeline.kill();
       };

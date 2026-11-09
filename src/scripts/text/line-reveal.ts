@@ -1,7 +1,7 @@
 import { SplitText } from 'gsap/SplitText';
 import { gsap, ScrollTrigger } from '@/scripts/core/gsap';
 import { coarsePointer, fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
-import { whenStageReady } from '@/scripts/core/stage';
+import { entranceStart, playOnStage, whenStageReady } from '@/scripts/core/stage';
 
 gsap.registerPlugin(SplitText);
 
@@ -15,29 +15,8 @@ export async function initLineReveals(scope: ParentNode = document): Promise<Cle
   // Measure under the cover; only playback waits for its actual exit.
   await fontsReady();
   if (coarsePointer() || window.innerWidth < 768) {
-    // Do not split/rebuild mobile text when browser chrome or orientation changes.
-    await whenStageReady();
-    const tweens = elements.map((element) => {
-      gsap.set(element, { opacity: 0, y: 16 });
-      element.classList.add('is-split');
-      return gsap.to(element, {
-        opacity: 1,
-        y: 0,
-        duration: 0.55,
-        delay: Math.min(Number(element.dataset['revealDelay'] ?? 0), 0.12),
-        ease: 'power1.out',
-        scrollTrigger: { trigger: element, start: 'top 92%', once: true },
-        onComplete: () => {
-          element.classList.add('is-done');
-          gsap.set(element, { clearProps: 'opacity,transform' });
-        },
-      });
-    });
-    return () =>
-      tweens.forEach((tween) => {
-        tween.scrollTrigger?.kill();
-        tween.kill();
-      });
+    // Whole-block touch headings use the shared entrance below, without line masks.
+    return () => undefined;
   }
   let disposed = false;
   const splits = elements.map((element) => {
@@ -72,7 +51,7 @@ export async function initLineReveals(scope: ParentNode = document): Promise<Cle
         if (!played)
           trigger = ScrollTrigger.create({
             trigger: element,
-            start: 'top 92%',
+            start: entranceStart(element),
             once: true,
             onEnter: () => {
               void whenStageReady().then(() => {
@@ -93,30 +72,33 @@ export async function initLineReveals(scope: ParentNode = document): Promise<Cle
 }
 
 export async function initFadeReveals(scope: ParentNode = document): Promise<Cleanup> {
-  const elements = [...scope.querySelectorAll<HTMLElement>('[data-reveal="fade"]')];
+  const compact = coarsePointer() || window.innerWidth < 768;
+  const elements = [
+    ...scope.querySelectorAll<HTMLElement>(compact ? '[data-reveal="fade"], [data-reveal="lines"]' : '[data-reveal="fade"]'),
+  ];
   if (reducedMotion()) {
     elements.forEach((element) => element.classList.add('is-done'));
     return () => undefined;
   }
-  await Promise.all([fontsReady(), whenStageReady()]);
-  const tweens = elements.map((element) =>
-    gsap.to(element, {
+  await fontsReady();
+  const cleanups = elements.map((element) => {
+    gsap.set(element, { opacity: 0, y: element.dataset['revealMotion'] === 'opacity' ? 0 : 14 });
+    if (element.dataset['reveal'] === 'lines') element.classList.add('is-split');
+    const tween = gsap.to(element, {
       opacity: 1,
       y: 0,
-      duration: 0.56,
-      delay: Math.min(Number(element.dataset['revealDelay'] ?? 0), coarsePointer() || window.innerWidth < 768 ? 0.12 : Infinity),
+      duration: 0.68,
+      paused: true,
+      delay: Math.min(Number(element.dataset['revealDelay'] ?? 0), compact ? 0.15 : Infinity),
       ease: 'power1.out',
-      scrollTrigger: { trigger: element, start: 'top 92%', once: true },
       onComplete: () => {
         element.classList.add('is-done');
         gsap.set(element, { clearProps: 'opacity,transform' });
       },
-    }),
-  );
-  return () => {
-    tweens.forEach((tween) => {
-      tween.scrollTrigger?.kill();
-      tween.kill();
     });
+    return playOnStage(element, tween);
+  });
+  return () => {
+    cleanups.forEach((cleanup) => cleanup());
   };
 }

@@ -1,7 +1,7 @@
 import { SplitText } from 'gsap/SplitText';
 import { gsap } from '@/scripts/core/gsap';
 import { fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
-import { whenStageReady } from '@/scripts/core/stage';
+import { playOnStage, whenStageReady } from '@/scripts/core/stage';
 
 gsap.registerPlugin(SplitText);
 
@@ -9,7 +9,8 @@ gsap.registerPlugin(SplitText);
 export async function initScrollRise(scope: ParentNode = document): Promise<Cleanup> {
   if (reducedMotion()) return () => undefined;
   const groups = [...scope.querySelectorAll<HTMLElement>('[data-scroll-rise]')];
-  await Promise.all([fontsReady(), whenStageReady()]);
+  await fontsReady();
+  let disposed = false;
   const media = gsap.matchMedia();
   media.add(
     { compact: '(max-width: 767px), (pointer: coarse), (pointer: none)', desktop: '(min-width: 768px) and (pointer: fine)' },
@@ -21,14 +22,17 @@ export async function initScrollRise(scope: ParentNode = document): Promise<Clea
           const children = [...group.querySelectorAll<HTMLElement>('p')];
           return children.length ? children : [group];
         });
-        paragraphs.forEach((paragraph) =>
-          gsap.fromTo(
+        const cleanups = paragraphs.map((paragraph) =>
+          playOnStage(
             paragraph,
-            { opacity: 0, y: 18 },
-            { opacity: 1, y: 0, duration: 0.5, ease: 'power1.out', scrollTrigger: { trigger: paragraph, start: 'top 90%', once: true } },
+            gsap.fromTo(paragraph, { opacity: 0, y: 18 }, { opacity: 1, y: 0, duration: 0.6, paused: true, ease: 'power1.out' }),
+            'top 90%',
           ),
         );
-        return () => groups.forEach((group) => group.classList.remove('is-split'));
+        return () => {
+          cleanups.forEach((cleanup) => cleanup());
+          groups.forEach((group) => group.classList.remove('is-split'));
+        };
       }
       const splits = groups.map((group) => {
         const paragraphs = [...group.querySelectorAll<HTMLElement>('p')];
@@ -44,7 +48,7 @@ export async function initScrollRise(scope: ParentNode = document): Promise<Clea
             gsap.set(self.lines, { yPercent: 115, opacity: 0 });
             group.classList.add('is-split');
             const stagger = self.lines.length > 1 ? 0.32 / (self.lines.length - 1) : 0;
-            return gsap
+            const timeline = gsap
               .timeline({
                 scrollTrigger: {
                   trigger: group,
@@ -61,6 +65,11 @@ export async function initScrollRise(scope: ParentNode = document): Promise<Clea
                 ease: 'none',
               })
               .to(self.lines, { opacity: 1, duration: 0.45, stagger, ease: 'none' }, 0);
+            timeline.scrollTrigger?.disable(false);
+            void whenStageReady().then(() => {
+              if (!disposed && timeline.parent) timeline.scrollTrigger?.enable();
+            });
+            return timeline;
           },
         });
       });
@@ -70,5 +79,8 @@ export async function initScrollRise(scope: ParentNode = document): Promise<Clea
       };
     },
   );
-  return () => media.revert();
+  return () => {
+    disposed = true;
+    media.revert();
+  };
 }

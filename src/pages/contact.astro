@@ -14,7 +14,7 @@ import { href } from '@/lib/paths';
   description="Contact Mykyta Olym by email, Telegram or LinkedIn. Based in Košice, Slovakia."
 >
   <section class="contact" aria-labelledby="contact-title">
-    <picture class="contact__backdrop" aria-hidden="true">
+    <picture class="contact__backdrop" aria-hidden="true" data-reveal="fade" data-reveal-motion="opacity">
       <source media="(prefers-reduced-motion: reduce)" srcset={href('media/contact/cubic-still.webp')} />
       <img src={href('media/contact/cubic-loop.webp')} alt="" width="800" height="500" fetchpriority="high" />
     </picture>

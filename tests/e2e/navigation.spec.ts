@@ -61,6 +61,7 @@ test('menu, project rows and the back button navigate between pages', async ({ p
   await expect(page.getByRole('heading', { level: 1 })).toBeVisible();
   await expect(page.locator('[data-page-cover]')).toHaveCSS('visibility', 'hidden');
   await expect(page.locator('[data-page-cover]')).toHaveCSS('pointer-events', 'none');
+  await expect(page.locator('.row__name').filter({ hasText: 'phishlens' })).toHaveCSS('opacity', '1');
 });
 
 test('a nested page survives a reload', async ({ page }) => {
@@ -80,11 +81,59 @@ test('page navigation covers the live document with four white bands @transition
   await expect(page.locator('[data-menu-media]')).toHaveCSS('clip-path', /^inset\(0%(?: 0%){0,3}\)$/);
   await page.getByRole('dialog').getByRole('link', { name: 'Contact' }).click({ noWaitAfter: true });
   await expect(page.locator('html')).toHaveClass(/is-departing/);
+  expect(
+    await page
+      .locator('.menu__nav')
+      .evaluate((element) =>
+        element
+          .getAnimations()
+          .some((animation) => (animation.effect as KeyframeEffect).getKeyframes().some((frame) => frame.opacity === '0')),
+      ),
+  ).toBe(true);
   await expect(page.locator('.cover__slice')).toHaveCount(4);
   for (const slice of await page.locator('.cover__slice').all()) await expect(slice).toHaveCSS('background-color', 'rgb(255, 255, 255)');
   await expect(page).toHaveURL(/\/contact\/$/);
   await waitForStage(page);
   await expect(page.locator('[data-page-cover]')).toHaveCSS('visibility', 'hidden');
+});
+
+test('entrances start while the bands are still leaving @transition', async ({ page }) => {
+  await page.goto('work/');
+  await waitForStage(page);
+  await page.bringToFront();
+  await page.locator('.row__link').first().click({ noWaitAfter: true });
+  await expect(page).toHaveURL(/\/work\/[a-z-]+\/$/);
+  // The page must not open empty: its content is already moving under the leaving bands.
+  await page.waitForFunction(
+    () => {
+      const root = document.documentElement.classList;
+      return root.contains('is-uncovering') && root.contains('is-stage-ready');
+    },
+    null,
+    { polling: 'raf', timeout: 15_000 },
+  );
+  await expect(page.locator('[data-page-cover]')).toHaveCSS('visibility', 'hidden');
+  await expect(page.locator('.case-hero__kind')).toHaveCSS('opacity', '1');
+});
+
+test('first-screen content finishes its entrance on every page', async ({ page }) => {
+  for (const path of [...pages, 'no-such-page/']) {
+    await page.goto(path);
+    await waitForStage(page);
+    await page.waitForTimeout(1600);
+    const hidden = await page.evaluate(() =>
+      [...document.querySelectorAll<HTMLElement>('[data-reveal], [data-scroll-rise] p, .line-slide, .field__hint')]
+        .filter((element) => !element.closest('[data-module="menu"], .case__tabpanel, .footer'))
+        .filter((element) => {
+          const style = getComputedStyle(element);
+          const box = element.getBoundingClientRect();
+          if (style.display === 'none' || box.width * box.height === 0 || box.bottom <= 0 || box.top >= innerHeight) return false;
+          return style.visibility === 'hidden' || Number(style.opacity) < 0.89 || Math.abs(new DOMMatrix(style.transform).m42) > 1;
+        })
+        .map((element) => `${element.className} ${(element.textContent ?? '').trim().slice(0, 24)}`),
+    );
+    expect(hidden, path).toEqual([]);
+  }
 });
 
 test('the hero keeps playing during departure and home returns without another loader @transition', async ({ page }) => {
@@ -99,6 +148,7 @@ test('the hero keeps playing during departure and home returns without another l
   const playing = await video.evaluate((e: HTMLVideoElement) => ({ time: e.currentTime, duration: e.duration, paused: e.paused }));
   expect(playing.paused).toBe(false);
   expect((playing.time - before + playing.duration) % playing.duration).toBeGreaterThan(0.15);
+  expect(await page.locator('.hero__title').evaluate((element) => Number(getComputedStyle(element).opacity))).toBeLessThan(0.35);
   await expect(page).toHaveURL(/\/work\/$/);
   await waitForStage(page);
   await expect(page.locator('[data-page-cover]')).toHaveCSS('visibility', 'hidden');
