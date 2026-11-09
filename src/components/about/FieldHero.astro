@@ -2,7 +2,7 @@
 import { Image } from 'astro:assets';
 import { fieldTiles } from '@/data/disciplines';
 
-// Tiles sit on a 4 by 4 pattern of cells, each nudged off-centre so the field looks loose.
+// Four columns, with bounded offsets to keep the photographs apart.
 const columns = 4;
 const rows = Math.ceil(fieldTiles.length / columns);
 const nudges = [
@@ -28,7 +28,7 @@ const tiles = fieldTiles.map((image, index) => {
 });
 ---
 
-<section class="field" data-module="drag-field" data-cursor="Drag Me" aria-labelledby="about-title">
+<section class="field" style={`--rows: ${rows}`} data-module="drag-field" data-cursor="Drag Me" aria-labelledby="about-title">
   <ul class="field__tiles" aria-hidden="true">
     {tiles.map((tile) => (
       <li
@@ -42,13 +42,15 @@ const tiles = fieldTiles.map((image, index) => {
       </li>
     ))}
   </ul>
-  <div class="field__title" data-field-title>
-    <h1 id="about-title" data-reveal="lines">
-      Across the stack
-    </h1>
-    <p class="field__meta" data-reveal="fade" data-reveal-delay="0.2">
-      Kyiv / Košice
-    </p>
+  <div class="field__title">
+    <div class="field__heading" data-field-title>
+      <h1 id="about-title" data-reveal="lines">
+        Across the stack
+      </h1>
+      <p class="field__meta" data-reveal="fade" data-reveal-delay="0.2">
+        Kyiv / Košice
+      </p>
+    </div>
   </div>
   <p class="field__hint" data-reveal="fade" data-reveal-delay="0.35">
     Drag to explore
@@ -104,7 +106,7 @@ const tiles = fieldTiles.map((image, index) => {
     top: 50%;
     left: 50%;
     translate: -50% -50%;
-    transform: translate3d(calc((var(--x) - 1.5) * var(--cell)), calc((var(--y) - 1.5) * var(--cell-h)), 0);
+    transform: translate3d(calc((var(--x) - 1.5) * var(--cell)), calc((var(--y) - (var(--rows) - 1) / 2) * var(--cell-h)), 0);
     width: clamp(7rem, 16vw, 26rem);
     aspect-ratio: var(--ratio);
     margin-left: calc(var(--dx) * 10vw);
@@ -125,13 +127,19 @@ const tiles = fieldTiles.map((image, index) => {
 
   .field__title {
     position: absolute;
+    z-index: 1;
     inset: 0;
     display: grid;
     place-content: center;
-    justify-items: center;
-    gap: 0;
     pointer-events: none;
-    filter: blur(var(--field-blur, 0px));
+  }
+
+  .field__heading {
+    display: grid;
+    justify-items: center;
+    text-shadow:
+      0 1px 3px #000,
+      0 2px 18px rgb(0 0 0 / 65%);
   }
 
   .field__title h1 {

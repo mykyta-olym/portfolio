@@ -33,7 +33,7 @@ Sources and the laptop edit prompt are in [ASSETS.md](ASSETS.md).
 - Case studies: ready-made photographic backgrounds with restrained scroll motion, a sticky panel with stack, key numbers and tabbed sections next to a column
   of real visuals: screenshots, verbatim code, diagrams and charts drawn from each repository.
   One next-project link follows each case, without repeating three complete project galleries.
-- About: a draggable field of faceless process photographs and design imagery, a short prologue and working principles.
+- About: a draggable field of eight licensed photographs of code, planning and computing equipment, a short prologue and working principles.
 - Contact: the reference's animated cubic background and paper cards, with Mykyta's links and email copy control; a 404 page.
 
 Page changes use four rising white bands over the live document. The outgoing video's

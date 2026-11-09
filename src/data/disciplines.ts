@@ -1,14 +1,15 @@
 import type { Discipline, MediaItem } from '@/types/content';
-import code from '@/assets/about/code.webp';
 import design from '@/assets/about/design.webp';
 import planning from '@/assets/about/planning.webp';
-import workspace from '@/assets/about/workspace.webp';
-import modelling from '@/assets/about/modelling.webp';
-import development from '@/assets/about/development.webp';
 import management from '@/assets/about/management.webp';
-import bottle from '@/assets/about/bottle.png';
-import selected from '@/assets/about/selected.webp';
-import terminal from '@/assets/about/terminal.webp';
+import code from '@/assets/about/photography/source-code.webp';
+import keyboard from '@/assets/about/photography/keyboard.webp';
+import circuits from '@/assets/about/photography/circuits.webp';
+import workstation from '@/assets/about/photography/workstation.webp';
+import flowchart from '@/assets/about/photography/flowchart.webp';
+import network from '@/assets/about/photography/network.webp';
+import storage from '@/assets/about/photography/storage.webp';
+import desk from '@/assets/about/photography/desk.webp';
 import build from '@/assets/process/build.webp';
 import test from '@/assets/process/test.webp';
 import servers from '@/assets/backgrounds/servers.webp';
@@ -79,24 +80,7 @@ export const galleryCards: readonly { image: MediaItem['src']; title: string; te
   },
 ];
 
-/** Tiles for the draggable field on the about page. */
-const fieldPhotos = [
-  design,
-  planning,
-  development,
-  selected,
-  code,
-  terminal,
-  workspace,
-  modelling,
-  management,
-  development,
-  bottle,
-  selected,
-  planning,
-  code,
-  design,
-  modelling,
-];
+/** Licensed process photography, not project evidence. Credits: ASSETS.md. */
+const fieldPhotos = [network, workstation, keyboard, circuits, code, flowchart, storage, desk];
 
 export const fieldTiles: readonly MediaItem[] = fieldPhotos.map((src) => ({ src, alt: '', kind: 'photo' }));

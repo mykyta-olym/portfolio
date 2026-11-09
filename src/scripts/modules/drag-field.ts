@@ -41,7 +41,7 @@ export function initDragField(field: HTMLElement): Cleanup {
   const scene = new Scene();
   const camera = new PerspectiveCamera(50, 1, 0.1, 1500);
   camera.position.z = 500;
-  // The source paints its image layer after the heading: dragged planes can pass in front.
+  // CSS keeps the heading above the image layer so a dragged photograph cannot erase it.
   field.append(canvas);
   const planes: Mesh<PlaneGeometry, MeshBasicMaterial>[] = [];
   const base: { x: number; y: number }[] = [];
