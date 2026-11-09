@@ -18,8 +18,36 @@ import { coarsePointer, reducedMotion, type Cleanup } from '@/scripts/core/motio
 import { gsap } from '@/scripts/core/gsap';
 import { Draggable } from 'gsap/Draggable';
 import { InertiaPlugin } from 'gsap/InertiaPlugin';
+import { playOnStage } from '@/scripts/core/stage';
 
 gsap.registerPlugin(Draggable, InertiaPlugin);
+
+function revealFallback(field: HTMLElement): Cleanup {
+  field.classList.add('is-static');
+  field.dataset['fieldState'] = 'static';
+  field.removeAttribute('data-cursor');
+  let disposed = false;
+  const cleanups: Cleanup[] = [];
+  field.querySelectorAll<HTMLImageElement>('[data-field-tile] img').forEach((image, index) => {
+    void image
+      .decode()
+      .then(() => {
+        if (disposed) return;
+        const tile = image.closest<HTMLElement>('[data-field-tile]');
+        if (!tile) return;
+        const entrance = gsap
+          .timeline({ paused: true, delay: index * 0.035 })
+          .to(tile, { opacity: 1, duration: 0.8, ease: 'power1.out' }, 0)
+          .fromTo(image, { y: 14, scale: 0.96 }, { y: 0, scale: 1, duration: 0.8, ease: 'power1.out' }, 0);
+        cleanups.push(playOnStage(field, entrance));
+      })
+      .catch(() => undefined);
+  });
+  return () => {
+    disposed = true;
+    cleanups.forEach((cleanup) => cleanup());
+  };
+}
 
 export function initDragField(field: HTMLElement): Cleanup {
   if (reducedMotion()) {
@@ -31,12 +59,18 @@ export function initDragField(field: HTMLElement): Cleanup {
   const canvas = document.createElement('canvas');
   const context = canvas.getContext('webgl2', { alpha: true, antialias: true });
   if (!context || images.length === 0) {
-    field.classList.add('is-static');
-    return () => undefined;
+    return revealFallback(field);
   }
+  field.dataset['fieldState'] = 'preparing';
+  field.removeAttribute('data-cursor');
   canvas.dataset['fieldCanvas'] = '';
   canvas.setAttribute('aria-hidden', 'true');
-  const renderer = new WebGLRenderer({ canvas, context, alpha: true, antialias: true });
+  let renderer: WebGLRenderer;
+  try {
+    renderer = new WebGLRenderer({ canvas, context, alpha: true, antialias: true });
+  } catch {
+    return revealFallback(field);
+  }
   renderer.setPixelRatio(Math.min(devicePixelRatio || 1, 1.5));
   const scene = new Scene();
   const camera = new PerspectiveCamera(50, 1, 0.1, 1500);
@@ -63,6 +97,9 @@ export function initDragField(field: HTMLElement): Cleanup {
     offsetX = 0,
     offsetY = 0;
   let curve = 0;
+  const intro = { progress: 0 };
+  let entranceCleanup: Cleanup | undefined;
+  let fallbackCleanup: Cleanup | undefined;
   let titleX = 0,
     titleY = 0,
     titleTargetX = 0,
@@ -107,14 +144,14 @@ export function initDragField(field: HTMLElement): Cleanup {
         ny = y / (gridH / 2);
       const distance = Math.hypot(nx, ny);
       const z = radius * 0.2 * curve * 0.45 * Math.max(0, 1 - distance * 0.9);
-      plane.position.set(x, y, plane.position.z + (z - plane.position.z) * damp(6, dt));
+      plane.position.set(x, y + (1 - intro.progress) * 14, plane.position.z + (z - plane.position.z) * damp(6, dt));
       normal
         .set(nx, ny, 1)
         .normalize()
         .lerp(front, 1 - Math.max(0, 1 - distance * 0.8) * curve);
       rotation.setFromUnitVectors(front, normal.normalize());
       plane.quaternion.slerp(rotation, damp(3 + curve * 6, dt));
-      plane.scale.setScalar(0.6);
+      plane.scale.setScalar(0.6 * (0.96 + intro.progress * 0.04));
     });
     titleX += (titleTargetX - titleX) * damp(10, dt);
     titleY += (titleTargetY - titleY) * damp(10, dt);
@@ -145,12 +182,15 @@ export function initDragField(field: HTMLElement): Cleanup {
   // A mobile GPU may reclaim the context while the tab is backgrounded.
   // Keep the decoded HTML photographs instead of leaving a blank canvas.
   const onContextLost = (): void => {
+    if (failed || disposed) return;
     failed = true;
+    entranceCleanup?.();
     stop();
     canvas.hidden = true;
     field.classList.remove('has-webgl');
-    field.classList.add('is-static');
-    field.removeAttribute('data-cursor');
+    drag?.disable();
+    if (title) gsap.set(title, { clearProps: 'transform,filter' });
+    fallbackCleanup = revealFallback(field);
   };
   canvas.addEventListener('webglcontextlost', onContextLost);
   // A detached proxy lets Draggable own pointer capture and inertia without moving the canvas.
@@ -189,6 +229,7 @@ export function initDragField(field: HTMLElement): Cleanup {
       kick();
     },
   });
+  drag?.disable();
   const onVisibility = (): void => {
     if (document.hidden) stop();
     else kick();
@@ -205,12 +246,15 @@ export function initDragField(field: HTMLElement): Cleanup {
   });
   resize.observe(field);
   const loader = new TextureLoader();
+  // A missing texture must not leave the whole field empty or cause a late layout swap.
+  const textureDeadline = window.setTimeout(onContextLost, 2500);
   void Promise.all(images.map((image) => loader.loadAsync(image.currentSrc || image.src)))
     .then((textures) => {
       if (disposed || failed) {
         textures.forEach((texture) => texture.dispose());
         return;
       }
+      window.clearTimeout(textureDeadline);
       textures.forEach((texture) => {
         texture.colorSpace = SRGBColorSpace;
         const plane = new Mesh(new PlaneGeometry(), new MeshBasicMaterial({ map: texture, side: DoubleSide }));
@@ -220,15 +264,32 @@ export function initDragField(field: HTMLElement): Cleanup {
       measure();
       render(performance.now());
       field.classList.add('has-webgl');
+      const entrance = gsap
+        .timeline({
+          paused: true,
+          onStart: () => {
+            field.dataset['fieldState'] = 'entering';
+          },
+          onComplete: () => {
+            field.dataset['fieldState'] = 'ready';
+            field.dataset['cursor'] = 'Drag Me';
+            drag?.enable();
+          },
+        })
+        .to(canvas, { opacity: 1, duration: 0.8, ease: 'power1.out' }, 0)
+        .to(intro, { progress: 1, duration: 0.8, ease: 'power1.out', onUpdate: kick }, 0);
+      entranceCleanup = playOnStage(field, entrance);
     })
     .catch(() => {
-      failed = true;
-      canvas.remove();
-      field.classList.add('is-static');
+      window.clearTimeout(textureDeadline);
+      onContextLost();
     });
   document.addEventListener('visibilitychange', onVisibility);
   return () => {
     disposed = true;
+    window.clearTimeout(textureDeadline);
+    entranceCleanup?.();
+    fallbackCleanup?.();
     stop();
     observer.disconnect();
     resize.disconnect();
@@ -244,5 +305,6 @@ export function initDragField(field: HTMLElement): Cleanup {
     renderer.dispose();
     canvas.remove();
     field.classList.remove('has-webgl');
+    if (title) gsap.set(title, { clearProps: 'transform,filter' });
   };
 }
