@@ -24,7 +24,7 @@ import { href } from '@/lib/paths';
     <SectionLabel text="FAQ" />
     <div class="faq">
       {questions.map((item) => (
-        <details class="faq__item">
+        <details class="faq__item" data-reveal="fade">
           <summary class="faq__question">
             <span>{item.question}</span>
             <Icon name="chevron-down" size={14} class="faq__icon" />

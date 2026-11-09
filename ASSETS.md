@@ -140,14 +140,18 @@ remain credited above.
 The desktop reference motion remains the baseline. On coarse pointers and phone widths,
 GSAP ScrollTrigger reveals each long paragraph once over 0.5 s with an 18 px rise; it does
 not repeatedly mask and scrub lines during momentum scrolling. Short heading entrances use
-0.5 s and a 35 ms line stagger. The process gallery brings its six cards directly into their
+a single 0.55 s whole-block rise without rebuilding line masks. Labels decode once on touch.
+The process gallery brings its six cards directly into their
 ring positions over 0.8 s, keeping interaction locked until entry finishes.
 Touch activation expands the card and crossfades its two faces without a 3D backface;
 this avoids reversed text in WebKit. Orbit playback waits for both face and size transitions.
 
 The phone showcase heading appears when the section enters; its frame settles at 92% scale
 over a 145svh section instead of shrinking the typography to 62%. Sticky phone stages use
-stable viewport units. Swiper shows 1.1 slides with 12 px gaps on phones, retaining the
-reference's two slides and 20 px gaps on wider layouts. Project links include an arrow and
-a 44 px phone target. The static About field stays visible during texture loading and after
-a WebGL context loss, with its inactive drag hint hidden.
+stable viewport units. Swiper CSS mode uses native scroll snapping for one centered image
+in project rows on touch devices, with a swipe hint, fraction count and 44 px navigation buttons.
+The ready-made Navigation, Pagination and A11y modules handle the controls. Both
+horizontal image swipes and vertical page gestures remain native. Desktop retains two
+project slides and 20 px gaps. The curved About field keeps its original layout and interaction.
+Project links include an arrow and a 44 px phone target. About fallback photographs remain visible during texture loading and after a
+WebGL context loss. Content groups use the shared one-time GSAP fade/rise entrance.

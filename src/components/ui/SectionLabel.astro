@@ -8,7 +8,7 @@ interface Props {
 const { text, class: className, as: Tag = 'p' } = Astro.props;
 ---
 
-<Tag class:list={['label', className]} data-scramble-group>
+<Tag class:list={['label', className]} data-scramble-group data-reveal="fade">
   <svg class="label__glyph" width="15" height="6" viewBox="0 0 15 6" aria-hidden="true" shape-rendering="crispEdges">
     <rect x="0" y="0" width="3" height="3" fill="currentColor"></rect>
     <rect x="3" y="3" width="3" height="3" fill="currentColor"></rect>

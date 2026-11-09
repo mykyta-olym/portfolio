@@ -1,6 +1,6 @@
 // Small uppercase labels decode from random characters when they come into view. A group
 // replays only after it has fully left the screen, and not more often than every 1.5 s.
-import { fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
+import { coarsePointer, fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
 import { whenStageReady } from '@/scripts/core/stage';
 import { gsap } from '@/scripts/core/gsap';
 import { ScrambleTextPlugin } from 'gsap/ScrambleTextPlugin';
@@ -48,6 +48,7 @@ export async function initScramble(scope: ParentNode = document): Promise<Cleanu
     { rootMargin: '0px 0px -10% 0px' },
   );
   const rearm = new IntersectionObserver((entries) => {
+    if (coarsePointer() || window.innerWidth < 768) return;
     for (const entry of entries) {
       const current = state.get(entry.target as HTMLElement);
       if (current && !entry.isIntersecting) current.armed = true;

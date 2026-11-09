@@ -14,6 +14,31 @@ export async function initLineReveals(scope: ParentNode = document): Promise<Cle
   }
   // Measure under the cover; only playback waits for its actual exit.
   await fontsReady();
+  if (coarsePointer() || window.innerWidth < 768) {
+    // Do not split/rebuild mobile text when browser chrome or orientation changes.
+    await whenStageReady();
+    const tweens = elements.map((element) => {
+      gsap.set(element, { opacity: 0, y: 16 });
+      element.classList.add('is-split');
+      return gsap.to(element, {
+        opacity: 1,
+        y: 0,
+        duration: 0.55,
+        delay: Math.min(Number(element.dataset['revealDelay'] ?? 0), 0.12),
+        ease: 'power1.out',
+        scrollTrigger: { trigger: element, start: 'top 92%', once: true },
+        onComplete: () => {
+          element.classList.add('is-done');
+          gsap.set(element, { clearProps: 'opacity,transform' });
+        },
+      });
+    });
+    return () =>
+      tweens.forEach((tween) => {
+        tween.scrollTrigger?.kill();
+        tween.kill();
+      });
+  }
   let disposed = false;
   const splits = elements.map((element) => {
     let played = false;
@@ -79,7 +104,7 @@ export async function initFadeReveals(scope: ParentNode = document): Promise<Cle
       opacity: 1,
       y: 0,
       duration: 0.56,
-      delay: Number(element.dataset['revealDelay'] ?? 0),
+      delay: Math.min(Number(element.dataset['revealDelay'] ?? 0), coarsePointer() || window.innerWidth < 768 ? 0.12 : Infinity),
       ease: 'power1.out',
       scrollTrigger: { trigger: element, start: 'top 92%', once: true },
       onComplete: () => {

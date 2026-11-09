@@ -162,12 +162,21 @@ test('process cards turn to explanations and stay still while being read', async
   await expect(page.locator('[data-orbit-card]').last()).toBeFocused();
 });
 
-test('image strips scroll sideways by dragging without opening the project', async ({ page, isMobile }) => {
-  test.skip(isMobile, 'mouse dragging is a desktop interaction');
+test('image strips move without opening the project', async ({ page, isMobile }) => {
   await page.goto('work/');
   await waitForStage(page);
   const strip = page.getByRole('region', { name: 'relayq images' });
   await strip.scrollIntoViewIfNeeded();
+  if (isMobile) {
+    const gallery = page.locator('.row__gallery').first();
+    await expect(gallery).toHaveClass(/is-done/);
+    await gallery.getByRole('button', { name: 'Next image' }).click();
+    await expect(gallery.locator('[data-slide-count]')).toHaveText('2 / 3');
+    await expect(page).toHaveURL(/\/work\/$/);
+    await gallery.getByRole('button', { name: 'Previous image' }).click();
+    await expect(gallery.locator('[data-slide-count]')).toHaveText('1 / 3');
+    return;
+  }
   const box = await strip.boundingBox();
   if (!box) throw new Error('strip has no box');
   const image = strip.locator('li').first();

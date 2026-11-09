@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import Tag from '@/components/ui/Tag.astro';
 import Icon from '@/components/ui/Icon.astro';
+import GalleryControls from '@/components/ui/GalleryControls.astro';
 import type { Project } from '@/types/content';
 import { projectHref } from '@/lib/paths';
 
@@ -15,13 +16,13 @@ const link = projectHref(project.slug);
 ---
 
 <article class="row" aria-labelledby={`row-${project.slug}`}>
-  <Heading class="row__name" id={`row-${project.slug}`}>
+  <Heading class="row__name" id={`row-${project.slug}`} data-reveal="fade">
     <a href={link} class="row__link">
       {project.name}
       <Icon name="arrow-up-right" size={16} />
     </a>
   </Heading>
-  <div class="row__info" data-scramble-group>
+  <div class="row__info" data-scramble-group data-reveal="fade" data-reveal-delay="0.06">
     <ul class="row__tags" aria-label="Stack">
       {project.tags.map((tag) => (
         <Tag text={tag} />
@@ -29,14 +30,24 @@ const link = projectHref(project.slug);
     </ul>
     <p class="row__summary">{project.summary}</p>
   </div>
-  <div class="row__strip swiper" data-module="drag-scroll" tabindex="0" role="region" aria-label={`${project.name} images`}>
-    <ul class="row__images swiper-wrapper">
-      {project.strip.map((item) => (
-        <li class="row__image swiper-slide" style={`--image-ratio: ${item.src.width} / ${item.src.height}`}>
-          <Image src={item.src} alt={item.alt} widths={[360, 720]} sizes="(min-width: 768px) 22vw, 60vw" loading="lazy" draggable="false" />
-        </li>
-      ))}
-    </ul>
+  <div class="row__gallery" data-reveal="fade" data-reveal-delay="0.12">
+    <div class="row__strip swiper" data-module="drag-scroll" tabindex="0" role="region" aria-label={`${project.name} images`}>
+      <ul class="row__images swiper-wrapper">
+        {project.strip.map((item) => (
+          <li class="row__image swiper-slide" style={`--image-ratio: ${item.src.width} / ${item.src.height}`}>
+            <Image
+              src={item.src}
+              alt={item.alt}
+              widths={[400, 800, 1200]}
+              sizes="(min-width: 1024px) 22vw, 90vw"
+              loading="lazy"
+              draggable="false"
+            />
+          </li>
+        ))}
+      </ul>
+    </div>
+    <GalleryControls count={project.strip.length} />
   </div>
 </article>
 
@@ -52,9 +63,14 @@ const link = projectHref(project.slug);
     transition: background-color 0.3s ease;
   }
 
-  .row:hover,
   .row:focus-within {
     background: rgb(255 255 255 / 3%);
+  }
+
+  .row__gallery {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
   }
 
   .row__name {
@@ -153,6 +169,9 @@ const link = projectHref(project.slug);
   }
 
   @media (hover: hover) {
+    .row:hover {
+      background: rgb(255 255 255 / 3%);
+    }
     .row:hover .row__image :global(img) {
       transform: scale(1.035);
     }
@@ -176,7 +195,14 @@ const link = projectHref(project.slug);
     }
   }
 
-  @media (max-width: 767px) {
+  @media (max-width: 767px), (max-width: 1023px) and (pointer: coarse) {
+    .row {
+      padding-inline: var(--gutter);
+    }
+    .row__name,
+    .row__info {
+      padding-right: 0;
+    }
     .row__name {
       font-size: 1.25rem;
     }
@@ -188,7 +214,10 @@ const link = projectHref(project.slug);
       line-height: 1.4;
     }
     .row__image {
-      width: 90%;
+      width: 100%;
+    }
+    .row__image :global(img) {
+      object-fit: contain;
     }
   }
 </style>

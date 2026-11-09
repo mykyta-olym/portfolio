@@ -4,15 +4,13 @@ import { principles } from '@/data/principles';
 
 <ol class="principles" aria-label="How I work">
   {principles.map((principle, index) => (
-    <li class="principles__item">
+    <li class="principles__item" data-reveal="fade">
       <span class="principles__number" aria-hidden="true">
         {index + 1}
       </span>
       <div class="principles__copy">
         <h3 class="visually-hidden">{principle.title}</h3>
-        <p class="principles__text" data-reveal="fade">
-          {principle.text}
-        </p>
+        <p class="principles__text">{principle.text}</p>
       </div>
     </li>
   ))}

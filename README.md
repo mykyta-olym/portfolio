@@ -53,7 +53,10 @@ position, and process cards finish their return flip before the orbit resumes.
 
 Touch layouts use short paragraph entrances instead of scrubbed line masks; text stays readable
 after scrolling back. The six process cards appear within 0.8 s without the desktop's large
-stacked flips. Phone project strips show the next image's edge, with a larger case-study link.
+stacked flips. Phone project strips show one centered image, native horizontal scrolling,
+44 px previous/next buttons, a slide count and a swipe hint. Short touch headings rise as complete text
+blocks, without SplitText reflow; labels decode once. Project names, descriptions and galleries,
+section labels, principles, FAQ and case information have consistent one-time entrances.
 The phone showcase reveals its heading on entry and uses a shorter sticky section. About keeps
 its HTML photographs visible while textures load and falls back to them after a GPU context loss.
 Astro's built-in hover prefetch warms internal pages. The navigation pill expands into one

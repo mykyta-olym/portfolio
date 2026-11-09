@@ -10,14 +10,14 @@ import { disciplines } from '@/data/disciplines';
     <h2 class="visually-hidden" id="disciplines-label">
       What I do
     </h2>
-    <ol class="disciplines__list">
+    <ol class="disciplines__list" data-reveal="fade">
       {disciplines.map((item, index) => (
         <li class:list={['disciplines__item', { 'is-active': index === 0 }]} data-discipline-item>
           <h3 class="disciplines__title">{item.title}</h3>
         </li>
       ))}
     </ol>
-    <div class="disciplines__media">
+    <div class="disciplines__media" data-reveal="fade" data-reveal-delay="0.1">
       {disciplines.map((item, index) => (
         <figure class:list={['disciplines__figure', { 'is-active': index === 0 }]} data-discipline-image>
           <div class="disciplines__picture">
@@ -91,12 +91,15 @@ import { disciplines } from '@/data/disciplines';
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.32s var(--ease-hover);
+    transition:
+      opacity 0.32s ease,
+      visibility 0.32s;
   }
 
   .disciplines__figure:global(.is-active) {
     opacity: 1;
     visibility: visible;
+    transition-delay: 0s;
   }
 
   .disciplines__picture {

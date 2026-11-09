@@ -21,10 +21,14 @@ const { project } = Astro.props;
           View code <Icon name="arrow-up-right" size={12} />
         </a>
       </div>
-      <h2 class="case__name">{project.name}</h2>
-      <p class="case__summary">{project.summary}</p>
+      <h2 class="case__name" data-reveal="fade">
+        {project.name}
+      </h2>
+      <p class="case__summary" data-reveal="fade">
+        {project.summary}
+      </p>
 
-      <dl class="case__facts">
+      <dl class="case__facts" data-reveal="fade">
         <div>
           <dt>Stack</dt>
           <dd>{project.stack.join(', ')}</dd>
@@ -39,7 +43,7 @@ const { project } = Astro.props;
         </div>
       </dl>
 
-      <ul class="case__metrics">
+      <ul class="case__metrics" data-reveal="fade">
         {project.metrics.map((metric) => (
           <li>
             <span class="case__metric-value">{metric.value}</span>
@@ -48,7 +52,7 @@ const { project } = Astro.props;
         ))}
       </ul>
 
-      <div class="case__tabs" data-module="tabs">
+      <div class="case__tabs" data-module="tabs" data-reveal="fade">
         <div class="case__tablist" role="tablist" aria-label="Case study sections">
           {project.sections.map((section, index) => (
             <button

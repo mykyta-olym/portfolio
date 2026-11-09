@@ -32,6 +32,16 @@
   padding-inline: var(--gutter);
 }
 
+/* Native Swiper scrolling must accept both horizontal swipes and vertical page gestures. */
+.swiper-css-mode {
+  touch-action: pan-x pan-y;
+}
+
+.swiper-css-mode > .swiper-wrapper {
+  overscroll-behavior-x: contain;
+  transform: none;
+}
+
 [data-scramble] {
   display: inline-block;
   overflow: hidden;
