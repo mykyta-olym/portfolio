@@ -34,14 +34,16 @@ const next = projects[(index + 1) % projects.length];
           <h2 class="more__title" data-reveal="lines">
             {next.name}
           </h2>
-          <p class="more__kind">{next.kind}</p>
+          <p class="more__kind" data-reveal="fade" data-reveal-delay="0.1">
+            {next.kind}
+          </p>
         </div>
-        <span class="more__arrow">
+        <span class="more__arrow" data-reveal="fade" data-reveal-delay="0.15">
           <Icon name="arrow-up-right" size={64} />
         </span>
       </a>
     )}
-    <div class="more__cta">
+    <div class="more__cta" data-reveal="fade">
       <Button href={href('work/')} variant="dark" hoverText="Explore">
         All Projects
       </Button>

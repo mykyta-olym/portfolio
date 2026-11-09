@@ -7,13 +7,17 @@ import { href } from '@/lib/paths';
 
 <BaseLayout title="Page not found" pill="missing" description="This page does not exist.">
   <section class="missing" aria-labelledby="missing-title">
-    <LogoMark size={44} class="missing__mark" />
-    <p class="missing__code">404</p>
-    <h1 class="missing__title" id="missing-title" data-reveal="lines">
+    <LogoMark size={44} class="missing__mark" data-reveal="fade" />
+    <p class="missing__code" data-reveal="fade" data-reveal-delay="0.05">
+      404
+    </p>
+    <h1 class="missing__title" id="missing-title" data-reveal="lines" data-reveal-delay="0.1">
       This page does not exist
     </h1>
-    <p class="missing__text">The link may be old, or the address may have a typo.</p>
-    <div class="missing__actions">
+    <p class="missing__text" data-reveal="fade" data-reveal-delay="0.25">
+      The link may be old, or the address may have a typo.
+    </p>
+    <div class="missing__actions" data-reveal="fade" data-reveal-delay="0.35">
       <Button href={href()}>Back Home</Button>
       <Button href={href('work/')} variant="dark">
         See the Work

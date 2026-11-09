@@ -190,7 +190,7 @@ test('image strips move without opening the project', async ({ page, isMobile })
   await expect(page).toHaveURL(/\/work\/$/);
 });
 
-test('about photographs remain visible during texture loading and after a GPU context loss', async ({ page }) => {
+test('about photographs enter smoothly and keep a stable fallback after a slow texture or GPU loss', async ({ page }) => {
   let release = (): void => undefined;
   const pending = new Promise<void>((resolve) => (release = resolve));
   await page.route('**/assets/workstation*.webp', async (route) => {
@@ -202,17 +202,49 @@ test('about photographs remain visible during texture loading and after a GPU co
     await waitForStage(page);
     const photograph = page.locator('[data-field-tile] img').first();
     await expect.poll(() => photograph.evaluate((image: HTMLImageElement) => image.complete && image.naturalWidth > 0)).toBe(true);
-    await expect(photograph).toBeVisible();
+    await expect(page.locator('.field')).toHaveClass(/is-static/);
+    await expect(page.locator('[data-field-tile]').first()).toHaveCSS('opacity', '1');
   } finally {
     release();
   }
+  await page.waitForTimeout(300);
+  await expect(page.locator('.field')).not.toHaveClass(/has-webgl/);
+  await page.unroute('**/assets/workstation*.webp');
+  await page.reload();
+  await waitForStage(page);
   await expect(page.locator('.field')).toHaveClass(/has-webgl/);
+  await expect(page.locator('.field')).toHaveAttribute('data-field-state', 'ready');
   await page.locator('[data-field-canvas]').evaluate((canvas: HTMLCanvasElement) => {
     canvas.getContext('webgl2')?.getExtension('WEBGL_lose_context')?.loseContext();
   });
   await expect(page.locator('.field')).toHaveClass(/is-static/);
   await expect(page.locator('[data-field-canvas]')).toBeHidden();
   await expect(page.locator('[data-field-tile] img').first()).toBeVisible();
+  await expect(page.locator('[data-field-tile]').first()).toHaveCSS('opacity', '1');
+});
+
+test('the footer rows rise into place while the page slides off them', async ({ page }) => {
+  await page.goto('about/');
+  await waitForStage(page);
+  const rows = page.locator('.footer__mark, .footer__grid > *, .footer__bottom');
+  expect(await rows.first().evaluate((element) => Number(getComputedStyle(element).opacity))).toBeLessThan(0.5);
+  await page.evaluate(() => window.scrollTo(0, document.documentElement.scrollHeight - innerHeight * 1.5));
+  await page.mouse.move(200, 200);
+  for (let i = 0; i < 12; i += 1) {
+    await page.mouse.wheel(0, 200);
+    await page.waitForTimeout(40);
+  }
+  await expect
+    .poll(() =>
+      rows.evaluateAll((elements) =>
+        elements.every((element) => {
+          const style = getComputedStyle(element);
+          return Number(style.opacity) > 0.99 && Math.abs(new DOMMatrix(style.transform).m42) < 0.5;
+        }),
+      ),
+    )
+    .toBe(true);
+  expect(await page.evaluate(() => document.documentElement.scrollWidth - document.documentElement.clientWidth)).toBeLessThanOrEqual(0);
 });
 
 test('the about field moves when dragged', async ({ page, isMobile }) => {
@@ -220,6 +252,7 @@ test('the about field moves when dragged', async ({ page, isMobile }) => {
   await page.goto('about/');
   await waitForStage(page);
   await expect(page.locator('.field')).toHaveClass(/has-webgl/);
+  await expect(page.locator('.field')).toHaveAttribute('data-field-state', 'ready');
   const canvas = page.locator('[data-field-canvas]');
   const before = await canvas.screenshot();
   await page.mouse.move(700, 450);

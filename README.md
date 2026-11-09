@@ -36,17 +36,23 @@ Sources and the laptop edit prompt are in [ASSETS.md](ASSETS.md).
 - About: a draggable field of eight licensed photographs of code, planning and computing equipment, a short prologue and working principles.
 - Contact: the reference's animated cubic background and paper cards, with Mykyta's links and email copy control; a 404 page.
 
-Page changes use four rising white bands over the live document. The outgoing video's
-playback and page animations continue during the cover, before normal navigation. With
+Page changes use four rising white bands over the live document. Visible foreground content
+fades and rises briefly from its current state using native Web Animations; additive movement
+preserves an entrance or drag already in progress. The outgoing video's playback and background
+motion continue during the cover, before normal navigation. History restoration cancels the exit effects. With
 `prefers-reduced-motion` all of this becomes static, and the content is complete without
 JavaScript. Internal returns to home use the page transition without replaying the first-load
 sequence. Navigation, social links and calls to action have contextual hover labels; portrait
 buttons reveal the actual photo in colour. Back to top uses an interruptible eased scroll and
 only moves keyboard focus after arrival.
 
-Text lines are measured while the cover is still present and start moving when it actually
-finishes. GSAP owns line and fade reveals at the same viewport threshold; completed headings
-stay visible after reflow, and navigation typing reserves its width while the cursor moves.
+Text lines and section layouts are prepared while the cover is still present. Entrances start
+140 ms after the bands begin to leave (330 ms into the loader's exit on the first visit), so the
+page rises as it is uncovered instead of opening empty. Everything on the first screen enters
+with the page, including content near its bottom edge; further down, GSAP line and fade reveals
+share one viewport threshold. Completed headings stay visible after reflow, and navigation typing
+reserves its width while the cursor moves. The footer rows rise into place, tied to the scroll,
+while the page slides off them; the 404 page and the next-project link have the same entrances.
 Entrance easing has a short finish; scroll-linked text and the picture frame use only a
 120 ms catch-up. Hover labels share a 240 ms CSS transition that reverses from its current
 position, and process cards finish their return flip before the orbit resumes.
@@ -58,7 +64,10 @@ stacked flips. Phone project strips show one centered image, native horizontal s
 blocks, without SplitText reflow; labels decode once. Project names, descriptions and galleries,
 section labels, principles, FAQ and case information have consistent one-time entrances.
 The phone showcase reveals its heading on entry and uses a shorter sticky section. About keeps
-its HTML photographs visible while textures load and falls back to them after a GPU context loss.
+its original free-moving photographic field. Its photographs fade and settle into place after
+the page opens; dragging becomes available when that entrance finishes. Slow textures (2.5 s)
+or GPU context loss switch to decoded HTML photographs with the same gentle entrance, without
+a late swap back to another layout.
 Astro's built-in hover prefetch warms internal pages. The navigation pill expands into one
 opaque black menu panel; its contents keep their layout throughout opening and closing.
 The background stays in place and becomes inert until closing finishes. Overlay scroll locks

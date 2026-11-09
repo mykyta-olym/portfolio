@@ -13,7 +13,7 @@ const { project } = Astro.props;
 <header class="case-hero" data-module="case-hero">
   <CaseBackdrop slug={project.slug} />
   <div class="case-hero__content">
-    <LogoMark size={28} class="case-hero__mark" />
+    <LogoMark size={28} class="case-hero__mark" data-reveal="fade" />
     <p class="case-hero__kind" data-reveal="fade">
       {project.kind}
     </p>

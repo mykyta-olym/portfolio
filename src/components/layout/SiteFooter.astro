@@ -9,7 +9,7 @@ import { href } from '@/lib/paths';
 const year = new Date().getFullYear();
 ---
 
-<footer class="footer" aria-labelledby="footer-title">
+<footer class="footer" aria-labelledby="footer-title" data-module="footer-reveal">
   <h2 class="visually-hidden" id="footer-title">
     Site footer
   </h2>
@@ -77,6 +77,8 @@ const year = new Date().getFullYear();
     position: sticky;
     bottom: 0;
     z-index: var(--layer-footer);
+    /* Rising rows must not extend the document while the footer is still covered. */
+    overflow: clip;
     background: var(--color-black);
     padding-top: clamp(4rem, 9vw, 8.5rem);
   }

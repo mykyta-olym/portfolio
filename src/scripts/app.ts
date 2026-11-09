@@ -30,6 +30,7 @@ const modules: Record<string, () => Promise<Init>> = {
   tabs: () => import('@/scripts/modules/tabs').then((m) => m.initTabs),
   'case-hero': () => import('@/scripts/modules/case-hero').then((m) => m.initCaseHero),
   'media-gallery': () => import('@/scripts/modules/media-gallery').then((m) => m.initMediaGallery),
+  'footer-reveal': () => import('@/scripts/modules/footer-reveal').then((m) => m.initFooterReveal),
 };
 
 const cleanups: Cleanup[] = [];
