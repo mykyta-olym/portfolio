@@ -142,9 +142,17 @@ test('the hero keeps playing during departure and home returns without another l
   await page.bringToFront();
   const video = page.locator('[data-hero-video]');
   await expect.poll(() => video.evaluate((e: HTMLVideoElement) => !e.paused && e.currentTime > 0)).toBe(true);
+  // Click the settled, visible button as a reader would; an automatic scroll would move the
+  // heading out of view, and only visible content takes part in the exit.
+  await expect(page.locator('.hero__title')).toHaveClass(/is-done/);
+  await expect(page.locator('.hero__action')).toHaveCSS('opacity', '1');
+  const box = await page.getByRole('link', { name: 'See the Work' }).boundingBox();
+  if (!box) throw new Error('The hero action has no box');
+  expect(box.y + box.height).toBeLessThanOrEqual(page.viewportSize()?.height ?? 0);
   const before = await video.evaluate((e: HTMLVideoElement) => e.currentTime);
-  await page.getByRole('link', { name: 'See the Work' }).click({ noWaitAfter: true });
+  await page.mouse.click(box.x + box.width / 2, box.y + box.height / 2);
   await page.waitForTimeout(300);
+  expect(await page.evaluate(() => window.scrollY)).toBe(0);
   const playing = await video.evaluate((e: HTMLVideoElement) => ({ time: e.currentTime, duration: e.duration, paused: e.paused }));
   expect(playing.paused).toBe(false);
   expect((playing.time - before + playing.duration) % playing.duration).toBeGreaterThan(0.15);
