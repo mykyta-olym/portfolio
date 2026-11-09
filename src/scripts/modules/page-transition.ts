@@ -3,7 +3,9 @@ import { fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
 import { lockScroll, markStageReady } from '@/scripts/core/stage';
 
 export const TRANSITION_KEY = 'page-transition';
-const LEAVE_MS = 800;
+// Content fades for 260 ms; band edges come on screen from 215 ms and the last one closes at 670 ms.
+const COVERED_MS = 690;
+const LEAVE_MS = 730;
 // Entrances start while the bands sweep away, so the page never opens empty and then fills in.
 const ENTRANCE_LEAD_MS = 140;
 
@@ -59,7 +61,7 @@ export function initPageTransitions(panel: HTMLElement, prepared: Promise<unknow
       );
     });
     for (const element of targets) {
-      const timing: KeyframeAnimationOptions = { duration: 320, easing: 'cubic-bezier(.4, 0, 1, 1)', fill: 'both' };
+      const timing: KeyframeAnimationOptions = { duration: 260, easing: 'cubic-bezier(.4, 0, 1, 1)', fill: 'both' };
       // Snapshot opacity; compose movement with any entrance or drag still in progress.
       // Underlying animations and background videos keep running throughout departure.
       exits.push(
@@ -120,7 +122,10 @@ export function initPageTransitions(panel: HTMLElement, prepared: Promise<unknow
       startExit();
       root.classList.remove('is-arriving', 'is-uncovering');
       root.classList.add('is-departing');
-      timers.push(window.setTimeout(() => location.assign(url.href), LEAVE_MS));
+      timers.push(
+        window.setTimeout(() => root.classList.add('is-covered'), COVERED_MS),
+        window.setTimeout(() => location.assign(url.href), LEAVE_MS),
+      );
     }
   };
   const onPageShow = (event: PageTransitionEvent): void => {
@@ -134,7 +139,7 @@ export function initPageTransitions(panel: HTMLElement, prepared: Promise<unknow
     } catch {
       // History restoration also works when storage is unavailable.
     }
-    root.classList.remove('is-departing', 'is-arriving', 'is-uncovering');
+    root.classList.remove('is-departing', 'is-covered', 'is-arriving', 'is-uncovering');
     uncover();
   };
   document.addEventListener('click', onClick);

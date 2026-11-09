@@ -83,6 +83,8 @@ function start(): void {
 
 window.addEventListener('pagehide', (event) => {
   if (event.persisted) return;
+  // A departing page is discarded behind the cover; reverting its motion there only costs frames.
+  if (document.documentElement.classList.contains('is-departing')) return;
   while (cleanups.length > 0) cleanups.pop()?.();
 });
 
