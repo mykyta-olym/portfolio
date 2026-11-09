@@ -1,5 +1,6 @@
 // Coordinates when the page is "on stage": after the home loader or the page transition has
 // uncovered it. Entrance animations wait for this so they never play behind a cover.
+import { gsap } from '@/scripts/core/gsap';
 
 const READY_EVENT = 'stage:ready';
 let ready = false;
@@ -23,6 +24,8 @@ export function isStageReady(): boolean {
 /** Locks scrolling while something covers the page. Counted, so overlaps unlock correctly. */
 let locks = 0;
 export function lockScroll(): () => void {
+  // Overflow does not stop programmatic scrolling already in flight.
+  if (locks === 0) gsap.killTweensOf(window);
   locks += 1;
   document.documentElement.classList.add('is-locked');
   let released = false;

@@ -81,6 +81,11 @@ export function initPageTransitions(panel: HTMLElement): Cleanup {
     timers.forEach(clearTimeout);
     timers.length = 0;
     leaving = false;
+    try {
+      sessionStorage.removeItem(TRANSITION_KEY);
+    } catch {
+      // History restoration also works when storage is unavailable.
+    }
     root.classList.remove('is-departing', 'is-arriving', 'is-uncovering');
     uncover();
   };

@@ -58,11 +58,11 @@ const wordWidth = Math.max(...phrase.words.map((word) => word.length));
     align-items: center;
     height: 3.25rem;
     padding: 0.3125rem;
-    background: rgb(27 29 27 / 96%);
-    border: 1px solid rgb(255 255 255 / 30%);
+    background: rgb(74 74 74 / 38%);
+    border: 1px solid transparent;
     border-radius: var(--radius-pill);
-    -webkit-backdrop-filter: blur(18px);
-    backdrop-filter: blur(18px);
+    -webkit-backdrop-filter: blur(18px) brightness(0.4);
+    backdrop-filter: blur(18px) brightness(0.4);
   }
 
   .nav__logo,

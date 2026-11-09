@@ -7,11 +7,11 @@ test.beforeEach(async ({ page }) => {
 });
 
 test('opens with focus inside and closes with Escape, returning focus', async ({ page }) => {
-  const toggle = page.getByRole('button', { name: 'Open menu' });
+  const toggle = page.locator('[data-menu-toggle]');
   const dialog = page.getByRole('dialog', { name: 'Site menu' });
   await expect(toggle).toHaveAttribute('aria-expanded', 'false');
   await toggle.click();
-  // The close control must be available immediately, before the body wipe finishes.
+  // The close control must be available immediately, before the panel finishes expanding.
   await expect(page.getByRole('button', { name: 'Close menu' })).toBeInViewport();
   await expect(dialog).toBeVisible();
   await expect(toggle).toHaveAttribute('aria-expanded', 'true');
@@ -27,6 +27,7 @@ test('keeps keyboard focus inside while open', async ({ page, isMobile }) => {
   test.skip(isMobile, 'keyboard focus is checked on desktop');
   await page.getByRole('button', { name: 'Open menu' }).click();
   const dialog = page.getByRole('dialog', { name: 'Site menu' });
+  await expect(page.locator('[data-menu-surface]')).not.toHaveAttribute('inert');
   for (let i = 0; i < 12; i += 1) {
     await page.keyboard.press('Tab');
     const inside = await dialog.evaluate((element) => element.contains(document.activeElement));
@@ -35,7 +36,7 @@ test('keeps keyboard focus inside while open', async ({ page, isMobile }) => {
 });
 
 test('closes with the close button and the backdrop, and survives fast toggling', async ({ page }) => {
-  const toggle = page.getByRole('button', { name: 'Open menu' });
+  const toggle = page.locator('[data-menu-toggle]');
   const dialog = page.getByRole('dialog', { name: 'Site menu' });
   await toggle.click();
   await page.getByRole('button', { name: 'Close menu' }).click();
@@ -43,8 +44,9 @@ test('closes with the close button and the backdrop, and survives fast toggling'
   await toggle.click();
   await page.mouse.click(10, 400);
   await expect(dialog).toBeHidden();
+  const visibleControl = page.locator('.nav:not(.is-menu-active) [data-menu-toggle], .menu:not([hidden]) [data-menu-close]');
   for (let i = 0; i < 6; i += 1) {
-    await toggle.click({ force: true });
+    await visibleControl.click({ force: true });
     await page.waitForTimeout(60);
   }
   await expect(dialog).toBeHidden();

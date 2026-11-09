@@ -28,8 +28,7 @@ body {
 }
 
 /* While the loader or a page transition covers the screen, the page does not scroll. */
-html.is-locked,
-html.is-locked body {
+html.is-locked {
   overflow: hidden;
 }
 

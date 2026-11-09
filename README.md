@@ -47,8 +47,10 @@ only moves keyboard focus after arrival.
 Text lines are measured while the cover is still present and start moving when it actually
 finishes. GSAP owns line and fade reveals at the same viewport threshold; completed headings
 stay visible after reflow, and navigation typing reserves its width while the cursor moves.
-Astro's built-in hover prefetch warms internal pages. The menu uses one opaque header during
-opening and closing, and project strips retain each image's native proportions.
+Astro's built-in hover prefetch warms internal pages. The navigation pill expands into one
+opaque black menu panel; its contents keep their layout throughout opening and closing.
+The background stays in place and becomes inert until closing finishes. Overlay scroll locks
+also cancel an active return-to-top or card-centering scroll. Project strips retain each image's native proportions.
 
 ## Existing solutions and application code
 
