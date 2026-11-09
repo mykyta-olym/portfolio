@@ -69,14 +69,19 @@
   --layer-loader: 100;
 
   /* Motion */
-  --ease-out: cubic-bezier(0.22, 1, 0.36, 1);
   --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
   --ease-wipe: cubic-bezier(0.77, 0, 0.18, 1);
-  --ease-rise: cubic-bezier(0.7, 0, 0.2, 1);
-  --ease-button: cubic-bezier(0.75, 0, 0.13, 1);
   --duration-fast: 0.25s;
   --duration-base: 0.4s;
   --duration-slow: 0.8s;
+  --ease-hover: ease-in-out;
+  --duration-hover: 0.24s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-hover: 0s;
+  }
 }
 
 @media (max-width: 1024px) {

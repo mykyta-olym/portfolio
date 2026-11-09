@@ -346,7 +346,7 @@ const { project } = Astro.props;
     width: 100%;
     height: auto;
     display: block;
-    transition: transform 0.7s var(--ease-out);
+    transition: transform 0.32s var(--ease-hover);
   }
 
   .case__enlarge {
@@ -363,8 +363,8 @@ const { project } = Astro.props;
     transform: translateY(8px);
     opacity: 0;
     transition:
-      opacity 0.3s,
-      transform 0.3s var(--ease-out);
+      opacity var(--duration-hover) var(--ease-hover),
+      transform var(--duration-hover) var(--ease-hover);
   }
 
   .case__figure > a:is(:hover, :focus-visible) .case__enlarge {
@@ -406,10 +406,10 @@ const { project } = Astro.props;
     clip-path: inset(0 0 100% 0);
     transform: translateY(14px) scale(0.985);
     transition:
-      clip-path 0.4s var(--ease-in-out),
-      transform 0.4s var(--ease-out),
-      display 0.4s allow-discrete,
-      overlay 0.4s allow-discrete;
+      clip-path 0.32s var(--ease-hover),
+      transform 0.32s var(--ease-hover),
+      display 0.32s allow-discrete,
+      overlay 0.32s allow-discrete;
   }
   .viewer[open] {
     clip-path: inset(0);
@@ -423,9 +423,9 @@ const { project } = Astro.props;
     backdrop-filter: blur(10px);
     opacity: 0;
     transition:
-      opacity 0.3s,
-      display 0.4s allow-discrete,
-      overlay 0.4s allow-discrete;
+      opacity 0.32s var(--ease-hover),
+      display 0.32s allow-discrete,
+      overlay 0.32s allow-discrete;
   }
   .viewer[open]::backdrop {
     opacity: 1;

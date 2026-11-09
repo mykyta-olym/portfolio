@@ -218,9 +218,9 @@ const year = new Date().getFullYear();
     border: 1px solid #454545;
     border-radius: 50%;
     transition:
-      color 0.4s,
-      background-color 0.4s,
-      transform 0.45s var(--ease-out);
+      color var(--duration-hover) var(--ease-hover),
+      background-color var(--duration-hover) var(--ease-hover),
+      transform var(--duration-hover) var(--ease-hover);
   }
   .footer__top-arrow :global(svg) {
     rotate: -45deg;
@@ -242,7 +242,7 @@ const year = new Date().getFullYear();
     background: currentColor;
     transform: scaleX(0);
     transform-origin: left;
-    transition: transform 0.45s var(--ease-out);
+    transition: transform var(--duration-hover) var(--ease-hover);
   }
   .footer__top:is(:hover, :focus-visible) .footer__top-label::after {
     transform: scaleX(1);

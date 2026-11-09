@@ -52,21 +52,21 @@ const { href, variant = 'light', external = false, class: className, hoverText }
     white-space: nowrap;
     overflow: hidden;
     transition:
-      background-color 0.45s var(--ease-out),
-      color 0.45s var(--ease-out),
-      border-color 0.45s var(--ease-out);
+      background-color var(--duration-hover) var(--ease-hover),
+      color var(--duration-hover) var(--ease-hover),
+      border-color var(--duration-hover) var(--ease-hover);
   }
 
   .button__label {
     display: block;
     transform: translate3d(-10px, 0, 0);
-    transition: transform 0.45s var(--ease-out);
+    transition: transform var(--duration-hover) var(--ease-hover);
   }
 
   .button :global(.button__icon) {
     flex: none;
     transform: translate3d(-10px, 0, 0);
-    transition: transform 0.45s var(--ease-out);
+    transition: transform var(--duration-hover) var(--ease-hover);
   }
   .button__text {
     position: relative;
@@ -85,14 +85,14 @@ const { href, variant = 'light', external = false, class: className, hoverText }
   .button__next {
     position: absolute;
     inset: 0;
-    transform: translateY(110%);
+    transform: translateY(100%);
   }
   .button__original,
   .button__next {
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform var(--duration-hover) var(--ease-hover);
   }
   .button:is(:hover, :focus-visible) .button__text[data-hover-text] .button__original {
-    transform: translateY(-110%);
+    transform: translateY(-100%);
   }
   .button:is(:hover, :focus-visible) .button__next {
     transform: translateY(0);

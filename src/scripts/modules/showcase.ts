@@ -21,13 +21,13 @@ export function initShowcase(section: HTMLElement): Cleanup {
       const timeline = gsap
         .timeline()
         .fromTo(frame, { scale: 1 }, { scale, ease: 'none' })
-        .fromTo(content, { y: 90, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.3, ease: 'power2.out' });
+        .fromTo(content, { y: 90, opacity: 0 }, { y: 0, opacity: 1, stagger: 0.3, ease: 'none' });
       const trigger = ScrollTrigger.create({
         trigger: section,
         animation: timeline,
         start: 'top top',
         end: 'bottom bottom',
-        scrub: 1,
+        scrub: 0.12,
       });
       return () => {
         trigger.kill();

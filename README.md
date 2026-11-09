@@ -11,7 +11,7 @@ Live: https://mykyta-olym.github.io/portfolio/
 - [Astro 7](https://astro.build) with static output: every route is a real HTML file, so
   nested pages work on reload and without JavaScript.
 - TypeScript in strict mode for all page scripts and data.
-- [GSAP 3](https://gsap.com) with ScrollTrigger, SplitText, ScrambleText, Draggable, Inertia, CustomEase and ScrollToPlugin for the motion system.
+- [GSAP 3](https://gsap.com) with ScrollTrigger, SplitText, ScrambleText, Draggable, Inertia and ScrollToPlugin for the motion system.
 - [Swiper](https://swiperjs.com) for the project carousels and continuous tool-logo strip.
 - [Typed.js](https://github.com/mattboldt/typed.js/tree/v2.1.0) for navigation typing and its persistent cursor.
 - [Three.js](https://threejs.org) for the photographic About field, adapting the reference's camera and curved-plane motion.
@@ -47,6 +47,9 @@ only moves keyboard focus after arrival.
 Text lines are measured while the cover is still present and start moving when it actually
 finishes. GSAP owns line and fade reveals at the same viewport threshold; completed headings
 stay visible after reflow, and navigation typing reserves its width while the cursor moves.
+Entrance easing has a short finish; scroll-linked text and the picture frame use only a
+120 ms catch-up. Hover labels share a 240 ms CSS transition that reverses from its current
+position, and process cards finish their return flip before the orbit resumes.
 Astro's built-in hover prefetch warms internal pages. The navigation pill expands into one
 opaque black menu panel; its contents keep their layout throughout opening and closing.
 The background stays in place and becomes inert until closing finishes. Overlay scroll locks

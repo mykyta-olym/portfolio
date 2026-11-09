@@ -93,7 +93,7 @@ const next = projects[(index + 1) % projects.length];
   .more__arrow :global(svg) {
     width: 50%;
     height: 50%;
-    transition: transform 0.45s var(--ease-out);
+    transition: transform var(--duration-hover) var(--ease-hover);
   }
   .more__next:is(:hover, :focus-visible) .more__arrow {
     color: #111;

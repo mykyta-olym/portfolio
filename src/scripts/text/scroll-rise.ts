@@ -30,7 +30,7 @@ export async function initScrollRise(scope: ParentNode = document): Promise<Clea
               trigger: group,
               start: 'top 85%',
               end: 'top 30%',
-              scrub: 0.2,
+              scrub: 0.12,
               invalidateOnRefresh: true,
             },
           })
@@ -38,9 +38,9 @@ export async function initScrollRise(scope: ParentNode = document): Promise<Clea
             yPercent: 0,
             duration: 0.68,
             stagger,
-            ease: 'power2.out',
+            ease: 'none',
           })
-          .to(self.lines, { opacity: 1, duration: 0.45, stagger, ease: 'power2.out' }, 0);
+          .to(self.lines, { opacity: 1, duration: 0.45, stagger, ease: 'none' }, 0);
       },
     });
   });

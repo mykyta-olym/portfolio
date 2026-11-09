@@ -21,14 +21,14 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
   const expand = (card: HTMLButtonElement | null): void => {
     if (selected) {
       selected.setAttribute('aria-expanded', 'false');
-      gsap.to(selected, { ...resting.get(selected), duration: reduce ? 0 : 0.65, ease: 'power3.inOut', overwrite: 'auto' });
+      gsap.to(selected, { ...resting.get(selected), duration: reduce ? 0 : 0.5, ease: 'power1.inOut', overwrite: 'auto' });
     }
     selected = card;
     section.classList.toggle('has-expanded', Boolean(card));
     if (card) {
       if (!resting.has(card)) resting.set(card, { x: Number(gsap.getProperty(card, 'x')), y: Number(gsap.getProperty(card, 'y')) });
       card.setAttribute('aria-expanded', 'true');
-      gsap.to(card, { x: 0, y: 0, duration: reduce ? 0 : 0.65, ease: 'power3.inOut', overwrite: 'auto' });
+      gsap.to(card, { x: 0, y: 0, duration: reduce ? 0 : 0.5, ease: 'power1.inOut', overwrite: 'auto' });
       const stage = section.querySelector<HTMLElement>('.orbit__stage');
       if (stage)
         gsap.to(window, {
@@ -36,15 +36,22 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
             y: stage.getBoundingClientRect().top + window.scrollY + stage.clientHeight / 2 - window.innerHeight / 2,
             autoKill: true,
           },
-          duration: reduce ? 0 : 0.65,
-          ease: 'power3.inOut',
+          duration: reduce ? 0 : 0.5,
+          ease: 'power1.inOut',
         });
     }
   };
 
   const updatePlayback = (): void => {
     const reading = cards.some((card) => card.matches(':hover, :focus-visible') || card.getAttribute('aria-expanded') === 'true');
-    spin?.paused(!visible || reading || document.hidden);
+    // Keep a card still until its return flip ends, including interrupted hover reversals.
+    const turning = cards.some((card) =>
+      card
+        .querySelector('.orbit__flip')
+        ?.getAnimations()
+        .some((animation) => animation.playState === 'running'),
+    );
+    spin?.paused(!visible || reading || turning || document.hidden);
     timeline?.paused(!visible || document.hidden);
   };
   const onClick = (event: Event): void => {
@@ -83,16 +90,21 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
     if (animate) {
       const lift = 50 + (cards[0]?.offsetHeight ?? 120) / 2;
       timeline
-        .from(cards, { y: window.innerHeight / 2 + 200, rotateX: -180, scale: 3, duration: 0.5, stagger: 0.1 })
+        .from(cards, { y: window.innerHeight / 2 + 200, rotateX: -180, scale: 3, duration: 0.5, stagger: 0.1, ease: 'power1.out' })
         .set(cards, { transformOrigin: `center ${lift}px` })
         .to(cards, { y: -lift, duration: 0.5, ease: 'power1.out' })
         .to(cards, { rotation: (i) => (i * 360) / count, rotateY: 15, duration: 1, ease: 'power1.out' }, '<')
         .addLabel('spread')
-        .to(cards, { ...positions, rotation: 0, rotateY: 0, duration: 1.2, ease: 'power3.inOut' })
+        .to(cards, { ...positions, rotation: 0, rotateY: 0, duration: 0.9, ease: 'power1.inOut' })
         // Reset the pivot only in the flat pose, where it cannot move a card.
         .set(cards, { transformOrigin: 'center center' });
       if (heading)
-        timeline.fromTo(heading, { opacity: 0, filter: 'blur(40px)' }, { opacity: 1, filter: 'blur(0px)', duration: 1 }, 'spread');
+        timeline.fromTo(
+          heading,
+          { opacity: 0, filter: 'blur(40px)' },
+          { opacity: 1, filter: 'blur(0px)', duration: 0.72, ease: 'power1.out' },
+          'spread',
+        );
     } else {
       gsap.set(cards, positions);
       if (heading) gsap.set(heading, { opacity: 1, filter: 'blur(0px)' });
@@ -139,6 +151,8 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
     if (built) resizeTimer = window.setTimeout(() => build(false), 150);
   };
   for (const event of ['pointerover', 'pointerout', 'focusin', 'focusout']) section.addEventListener(event, updatePlayback);
+  section.addEventListener('transitionend', updatePlayback);
+  section.addEventListener('transitioncancel', updatePlayback);
   section.addEventListener('click', onClick);
   section.addEventListener('keydown', onKey);
   window.addEventListener('resize', onResize);
@@ -151,6 +165,8 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
     gsap.killTweensOf(cards);
     window.clearTimeout(resizeTimer);
     for (const event of ['pointerover', 'pointerout', 'focusin', 'focusout']) section.removeEventListener(event, updatePlayback);
+    section.removeEventListener('transitionend', updatePlayback);
+    section.removeEventListener('transitioncancel', updatePlayback);
     section.removeEventListener('click', onClick);
     section.removeEventListener('keydown', onKey);
     window.removeEventListener('resize', onResize);

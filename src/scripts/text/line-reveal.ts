@@ -35,9 +35,9 @@ export async function initLineReveals(scope: ParentNode = document): Promise<Cle
         gsap.set(self.lines, { yPercent: 110 });
         const tween = gsap.to(self.lines, {
           yPercent: 0,
-          duration: 1.1,
-          ease: 'power3.out',
-          stagger: 0.08,
+          duration: 0.78,
+          ease: 'power1.out',
+          stagger: 0.06,
           delay: Number(element.dataset['revealDelay'] ?? 0),
           paused: !played,
           onComplete: () => element.classList.add('is-done'),
@@ -77,9 +77,9 @@ export async function initFadeReveals(scope: ParentNode = document): Promise<Cle
     gsap.to(element, {
       opacity: 1,
       y: 0,
-      duration: 0.8,
+      duration: 0.56,
       delay: Number(element.dataset['revealDelay'] ?? 0),
-      ease: 'power3.out',
+      ease: 'power1.out',
       scrollTrigger: { trigger: element, start: 'top 92%', once: true },
       onComplete: () => {
         element.classList.add('is-done');

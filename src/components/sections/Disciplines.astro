@@ -91,7 +91,7 @@ import { disciplines } from '@/data/disciplines';
     opacity: 0;
     visibility: hidden;
     pointer-events: none;
-    transition: opacity 0.45s ease;
+    transition: opacity 0.32s var(--ease-hover);
   }
 
   .disciplines__figure:global(.is-active) {
@@ -110,7 +110,7 @@ import { disciplines } from '@/data/disciplines';
     height: 100%;
     object-fit: cover;
     transform: scale(1.03);
-    transition: transform 0.6s var(--ease-out);
+    transition: transform 0.32s var(--ease-hover);
   }
 
   .disciplines__figure:global(.is-active) .disciplines__picture :global(img) {

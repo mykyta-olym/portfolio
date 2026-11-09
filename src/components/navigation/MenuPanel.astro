@@ -214,13 +214,12 @@ const current = Astro.url.pathname;
     height: 1px;
     background: currentColor;
     transform: scaleX(0);
-    transform-origin: right;
-    transition: transform 0.3s cubic-bezier(0.25, 0, 0.4, 1);
+    transform-origin: left;
+    transition: transform var(--duration-hover) var(--ease-hover);
   }
 
   .menu__link:is(:hover, :focus-visible)::after {
     transform: scaleX(1);
-    transform-origin: left;
   }
 
   .menu__nav ul:hover .menu__link:not(:hover) {
@@ -234,7 +233,7 @@ const current = Astro.url.pathname;
   .menu__link :global(.menu__arrow) {
     width: 30px;
     height: 30px;
-    transition: transform var(--duration-base) var(--ease-button);
+    transition: transform var(--duration-hover) var(--ease-hover);
   }
 
   .menu__link:hover :global(.menu__arrow) {

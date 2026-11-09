@@ -72,14 +72,14 @@ export function initMenu(root: HTMLElement): Cleanup {
     } else {
       timeline = gsap
         .timeline()
-        .to(backdrop, { opacity: 1, duration: 0.45, ease: 'power2.out' }, 0)
+        .to(backdrop, { opacity: 1, duration: 0.36, ease: 'power1.out' }, 0)
         .to(
           dialog,
           {
             height: () => root.clientHeight - dialog.offsetTop,
             backgroundColor: PANEL_COLOR,
-            duration: 0.65,
-            ease: 'power3.out',
+            duration: 0.52,
+            ease: 'power1.out',
             onComplete: () => {
               gsap.set(dialog, { clearProps: 'height' });
               surface.inert = false;
@@ -87,9 +87,9 @@ export function initMenu(root: HTMLElement): Cleanup {
           },
           0,
         )
-        .to(links, { y: 0, opacity: 1, duration: 0.5, stagger: 0.06, ease: 'power3.out' }, 0.15)
-        .to(socials, { y: 0, opacity: 1, duration: 0.5, stagger: 0.05, ease: 'power3.out' }, 0.2);
-      if (media) timeline.to(media, { clipPath: OPEN, duration: 0.5, ease: 'power3.out' }, 0.25);
+        .to(links, { y: 0, opacity: 1, duration: 0.36, stagger: 0.04, ease: 'power1.out' }, 0.1)
+        .to(socials, { y: 0, opacity: 1, duration: 0.36, stagger: 0.04, ease: 'power1.out' }, 0.14);
+      if (media) timeline.to(media, { clipPath: OPEN, duration: 0.36, ease: 'power1.out' }, 0.18);
     }
     closeButton.focus({ preventScroll: true });
   };
@@ -114,8 +114,8 @@ export function initMenu(root: HTMLElement): Cleanup {
     else {
       timeline = gsap
         .timeline({ onComplete: finish })
-        .to(dialog, { height: 52, backgroundColor: PILL_COLOR, duration: 0.5, ease: 'power3.inOut' }, 0)
-        .to(backdrop, { opacity: 0, duration: 0.4, ease: 'power2.inOut' }, 0.1);
+        .to(dialog, { height: 52, backgroundColor: PILL_COLOR, duration: 0.4, ease: 'power1.inOut' }, 0)
+        .to(backdrop, { opacity: 0, duration: 0.32, ease: 'power1.inOut' }, 0.08);
     }
   };
 

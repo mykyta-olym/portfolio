@@ -40,7 +40,7 @@ const { href, label, hoverText = label, external = false, as: Tag = 'a', align =
     inset: 0;
     display: grid;
     place-items: center var(--hover-align);
-    transform: translate3d(0, 110%, 0);
+    transform: translate3d(0, 100%, 0);
     overflow: hidden;
   }
   .hover-link::after {
@@ -51,7 +51,7 @@ const { href, label, hoverText = label, external = false, as: Tag = 'a', align =
   }
   .hover-link__inner,
   .hover-link__next {
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform var(--duration-hover) var(--ease-hover);
     white-space: nowrap;
   }
   .hover-link__inner {
@@ -67,7 +67,7 @@ const { href, label, hoverText = label, external = false, as: Tag = 'a', align =
   }
   .hover-link:is(:hover, :focus-visible) .hover-link__inner,
   :global(a:is(:hover, :focus-visible)) > .hover-link .hover-link__inner {
-    transform: translate3d(0, -110%, 0);
+    transform: translate3d(0, -100%, 0);
   }
   @media (prefers-reduced-motion: reduce) {
     .hover-link__inner,

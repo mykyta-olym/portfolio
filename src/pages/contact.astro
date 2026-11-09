@@ -137,9 +137,6 @@ import { href } from '@/lib/paths';
     background: rgb(255 255 255 / 71%);
     color: #242424;
     font-size: var(--fs-small);
-    transition:
-      translate 0.4s var(--ease-out),
-      scale 0.4s var(--ease-out);
   }
   .contact__paper {
     position: relative;
@@ -233,13 +230,6 @@ import { href } from '@/lib/paths';
   }
   .contact__copy:global(.is-copied) :global(.contact__copied-icon) {
     display: block;
-  }
-
-  @media (hover: hover) and (pointer: fine) {
-    .contact__card:hover {
-      translate: 0 -6px;
-      scale: 1.02;
-    }
   }
 
   @media (max-width: 1439px) and (min-width: 768px) {

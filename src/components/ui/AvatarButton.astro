@@ -36,7 +36,7 @@ const { href, class: className, hoverText = 'Hire me' } = Astro.props;
     font-size: var(--fs-small);
     font-weight: 400;
     white-space: nowrap;
-    transition: background-color 0.45s var(--ease-out);
+    transition: background-color var(--duration-hover) var(--ease-hover);
   }
 
   .avatar-button:hover,
@@ -51,8 +51,8 @@ const { href, class: className, hoverText = 'Hire me' } = Astro.props;
     object-fit: cover;
     filter: grayscale(1);
     transition:
-      filter 0.45s var(--ease-out),
-      clip-path 0.45s var(--ease-out);
+      filter var(--duration-hover) var(--ease-hover),
+      clip-path var(--duration-hover) var(--ease-hover);
     clip-path: inset(0 round 2px);
   }
 
@@ -77,14 +77,14 @@ const { href, class: className, hoverText = 'Hire me' } = Astro.props;
   .avatar-button__next {
     position: absolute;
     inset: 0;
-    transform: translateY(110%);
+    transform: translateY(100%);
   }
   .avatar-button__label,
   .avatar-button__next {
-    transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+    transition: transform var(--duration-hover) var(--ease-hover);
   }
   .avatar-button:is(:hover, :focus-visible) .avatar-button__label {
-    transform: translateY(-110%);
+    transform: translateY(-100%);
   }
   .avatar-button:is(:hover, :focus-visible) .avatar-button__next {
     transform: translateY(0);
