@@ -1,6 +1,6 @@
 import { SplitText } from 'gsap/SplitText';
 import { gsap, ScrollTrigger } from '@/scripts/core/gsap';
-import { coarsePointer, fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
+import { fontsReady, reducedMotion, type Cleanup } from '@/scripts/core/motion';
 import { entranceStart, playOnStage, whenStageReady } from '@/scripts/core/stage';
 
 gsap.registerPlugin(SplitText);
@@ -12,12 +12,9 @@ export async function initLineReveals(scope: ParentNode = document): Promise<Cle
     elements.forEach((element) => element.classList.add('is-done'));
     return () => undefined;
   }
-  // Measure under the cover; only playback waits for its actual exit.
+  // Measure under the cover; only playback waits for its actual exit. Phones get the same
+  // masked lines: autoSplit only re-splits on a width change, not when browser bars move.
   await fontsReady();
-  if (coarsePointer() || window.innerWidth < 768) {
-    // Whole-block touch headings use the shared entrance below, without line masks.
-    return () => undefined;
-  }
   let disposed = false;
   const splits = elements.map((element) => {
     let played = false;
@@ -34,16 +31,15 @@ export async function initLineReveals(scope: ParentNode = document): Promise<Cle
         currentTween = null;
       },
       onSplit(self) {
-        const compact = coarsePointer() || window.innerWidth < 768;
         element.classList.add('is-split');
         if (element.classList.contains('is-done')) return gsap.set(self.lines, { yPercent: 0 });
         gsap.set(self.lines, { yPercent: 110 });
         const tween = gsap.to(self.lines, {
           yPercent: 0,
-          duration: compact ? 0.5 : 0.78,
+          duration: 0.78,
           ease: 'power1.out',
-          stagger: compact ? 0.035 : 0.06,
-          delay: Math.min(Number(element.dataset['revealDelay'] ?? 0), compact ? 0.15 : Infinity),
+          stagger: 0.06,
+          delay: Number(element.dataset['revealDelay'] ?? 0),
           paused: !played,
           onComplete: () => element.classList.add('is-done'),
         });
@@ -72,10 +68,7 @@ export async function initLineReveals(scope: ParentNode = document): Promise<Cle
 }
 
 export async function initFadeReveals(scope: ParentNode = document): Promise<Cleanup> {
-  const compact = coarsePointer() || window.innerWidth < 768;
-  const elements = [
-    ...scope.querySelectorAll<HTMLElement>(compact ? '[data-reveal="fade"], [data-reveal="lines"]' : '[data-reveal="fade"]'),
-  ];
+  const elements = [...scope.querySelectorAll<HTMLElement>('[data-reveal="fade"]')];
   if (reducedMotion()) {
     elements.forEach((element) => element.classList.add('is-done'));
     return () => undefined;
@@ -83,13 +76,12 @@ export async function initFadeReveals(scope: ParentNode = document): Promise<Cle
   await fontsReady();
   const cleanups = elements.map((element) => {
     gsap.set(element, { opacity: 0, y: element.dataset['revealMotion'] === 'opacity' ? 0 : 14 });
-    if (element.dataset['reveal'] === 'lines') element.classList.add('is-split');
     const tween = gsap.to(element, {
       opacity: 1,
       y: 0,
       duration: 0.68,
       paused: true,
-      delay: Math.min(Number(element.dataset['revealDelay'] ?? 0), compact ? 0.15 : Infinity),
+      delay: Number(element.dataset['revealDelay'] ?? 0),
       ease: 'power1.out',
       onComplete: () => {
         element.classList.add('is-done');

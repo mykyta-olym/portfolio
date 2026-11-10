@@ -152,6 +152,8 @@ import Icon from '@/components/ui/Icon.astro';
     transform: translate(calc(var(--dx) * var(--ring-radius)), calc(var(--dy) * var(--ring-radius)));
     will-change: transform;
     transition: width 0.5s var(--ease-hover);
+    -webkit-tap-highlight-color: transparent;
+    --open-width: min(300px, 72vw);
   }
   .orbit:global(.has-expanded) .orbit__slot {
     opacity: 0.18;
@@ -164,7 +166,7 @@ import Icon from '@/components/ui/Icon.astro';
     opacity: 1 !important;
   }
   .orbit__card[aria-expanded='true'] {
-    width: min(300px, 72vw);
+    width: var(--open-width);
     aspect-ratio: 1.1;
   }
   .orbit__card[aria-expanded='true'] .orbit__back {
@@ -406,18 +408,47 @@ import Icon from '@/components/ui/Icon.astro';
         opacity var(--duration-hover) var(--ease-hover),
         visibility var(--duration-hover) var(--ease-hover);
     }
+    /* The explanation is laid out once at the opened size and the card opens over it like a
+       window, so no line reflows while the card grows. */
+    .orbit__flip {
+      overflow: hidden;
+      border-radius: 5px;
+    }
     .orbit__back {
-      transform: none;
+      inset: auto;
+      top: 50%;
+      left: 50%;
+      width: var(--open-width);
+      height: calc(var(--open-width) / 1.1);
+      padding: 1.25rem;
+      transform: translate(-50%, -50%);
       opacity: 0;
       visibility: hidden;
+    }
+    .orbit__back .orbit__explanation {
+      font-size: 20px;
+    }
+    .orbit__back .orbit__number {
+      font-size: 11px;
+      letter-spacing: 0.08em;
     }
     .orbit__card[aria-expanded='true'] .orbit__front {
       opacity: 0;
       visibility: hidden;
     }
+    .orbit__back > * {
+      opacity: 0;
+      transition: opacity var(--duration-hover) var(--ease-hover);
+    }
     .orbit__card[aria-expanded='true'] .orbit__back {
       opacity: 1;
       visibility: visible;
+    }
+    /* The paper comes in with the opening; the text waits until the window is mostly open.
+       Closing fades both out at once. */
+    .orbit__card[aria-expanded='true'] .orbit__back > * {
+      opacity: 1;
+      transition-delay: 0.3s;
     }
   }
   @media (prefers-reduced-motion: reduce) {

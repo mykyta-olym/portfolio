@@ -335,7 +335,8 @@ test('scroll text reflows during a reveal and returns intact after reverse scrol
   );
   await expect(text.locator('[data-inline-pic]')).toHaveCount(2);
   expect(await text.evaluate((element) => element.scrollWidth - element.clientWidth)).toBeLessThanOrEqual(1);
-  const visibleText = isMobile ? paragraphs : text.locator('.rise-line');
+  // Touch lines rise once on entry; desktop lines follow the scroll position.
+  const visibleText = text.locator('.rise-line');
   expect(await visibleText.evaluateAll((lines) => lines.every((line) => Number(getComputedStyle(line).opacity) > 0.99))).toBe(true);
   const freshTop = await text.evaluate((element) => element.getBoundingClientRect().top + window.scrollY);
   await page.evaluate((y) => window.scrollTo(0, y - innerHeight * 0.83), freshTop);

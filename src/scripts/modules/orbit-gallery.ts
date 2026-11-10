@@ -88,18 +88,19 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
     cards.forEach((card, i) => resting.set(card, { x: positions.x(i), y: positions.y(i) }));
     gsap.set(cards, { opacity: 1, x: 0, y: 0, rotateX: 0, rotation: 0, scale: 1, transformOrigin: 'center center' });
     timeline = gsap.timeline();
-    if (animate && compact) {
-      // Touch scrolling needs the six stages ready within one gesture, without giant flips.
-      timeline.fromTo(
-        cards,
-        { x: positions.x, y: (i) => positions.y(i) + 24, scale: 0.9, opacity: 0 },
-        { ...positions, scale: 1, opacity: 1, duration: 0.5, stagger: 0.06, ease: 'power1.out' },
-      );
-      if (heading) timeline.fromTo(heading, { opacity: 0, y: 10 }, { opacity: 1, y: 0, duration: 0.5, ease: 'power1.out' }, 0.08);
-    } else if (animate) {
-      const lift = 50 + (cards[0]?.offsetHeight ?? 120) / 2;
+    if (animate) {
+      // The same stacked entrance on every screen. Phones scale it to their narrow cards and
+      // play it a little faster, so the ring is ready within one swipe.
+      const lift = (compact ? 30 : 50) + (cards[0]?.offsetHeight ?? 120) / 2;
       timeline
-        .from(cards, { y: window.innerHeight / 2 + 200, rotateX: -180, scale: 3, duration: 0.5, stagger: 0.1, ease: 'power1.out' })
+        .from(cards, {
+          y: window.innerHeight / 2 + 200,
+          rotateX: -180,
+          scale: compact ? 2 : 3,
+          duration: 0.5,
+          stagger: 0.1,
+          ease: 'power1.out',
+        })
         .set(cards, { transformOrigin: `center ${lift}px` })
         .to(cards, { y: -lift, duration: 0.5, ease: 'power1.out' })
         .to(cards, { rotation: (i) => (i * 360) / count, rotateY: 15, duration: 1, ease: 'power1.out' }, '<')
@@ -114,6 +115,7 @@ export function initOrbitGallery(section: HTMLElement): Cleanup {
           { opacity: 1, filter: 'blur(0px)', duration: 0.72, ease: 'power1.out' },
           'spread',
         );
+      if (compact) timeline.timeScale(1.25);
     } else {
       gsap.set(cards, positions);
       if (heading) gsap.set(heading, { opacity: 1, filter: 'blur(0px)' });
